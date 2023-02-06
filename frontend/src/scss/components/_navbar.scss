@@ -1,0 +1,9 @@
+nav {
+  &.navbar {
+    background-color: $color-foxv-01 !important;
+    border-bottom: 2px solid $color-foxv-02;
+  }
+  .nav-dashboard {
+    background-color: $color-secondary-light;
+  }
+}

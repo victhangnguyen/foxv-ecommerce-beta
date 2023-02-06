@@ -1,0 +1,12 @@
+@import '../abstracts/variables';
+
+.card-main {
+  -webkit-border-radius: 10px;
+  -moz-border-radius: 10px;
+  border-radius: 10px;
+
+  .card-line-top {
+    background-color: $color-secondary;
+    height: 10px;
+  }
+}

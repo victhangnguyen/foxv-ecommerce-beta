@@ -1,0 +1,44 @@
+//! Colors
+* {
+  --bs-light: #ffffff;
+  --bs-dark: #f5f5f5;
+}
+
+.navbar {
+  --bs-navbar-padding-x: 0;
+  --bs-navbar-padding-y: 0.25rem;
+
+  .navbar-brand {
+    --bs-navbar-brand-padding-x: 1.25rem;
+    --bs-navbar-brand-padding-y: 0.25rem;
+    --bs-navbar-brand-margin-end: 1rem;
+    --bs-navbar-brand-font-size: 1.25rem;
+    --bs-navbar-brand-color: rgba(0, 0, 0, 0.9);
+  }
+  .navbar-nav {
+    .nav-link {
+      --bs-nav-link-padding-x: 0.5rem;
+      --bs-nav-link-padding-y: 0.25rem;
+    }
+  }
+}
+
+//! color
+$bs-light: var(--bs-light);
+$bs-dark: var(--bs-dark);
+
+//! navbar
+$bs-navbar-padding-x: var(--bs-navbar-padding-x);
+$bs-navbar-padding-y: var(--bs-navbar-padding-y);
+
+//! nav-link
+$bs-nav-link-padding-x: var(--bs-nav-link-padding-x);
+$bs-nav-link-padding-y: var(--bs-nav-link-padding-y);
+//! navbar-brand
+$bs-navbar-brand-padding-x: var(--bs-navbar-brand-padding-x);
+$bs-navbar-brand-padding-y: var(--bs-navbar-brand-padding-y);
+$bs-navbar-brand-padding-y: var(--bs-navbar-brand-padding-y);
+$bs-navbar-brand-margin-end: var(--bs-navbar-brand-margin-end);
+$bs-navbar-brand-font-size: var(--bs-navbar-brand-font-size);
+$bs-navbar-brand-color: var(--bs-navbar-brand-color);
+$bs-navbar-brand-hover-color: var(--bs-navbar-brand-hover-color);

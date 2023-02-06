@@ -1,4 +1,6 @@
 import { RouterProvider } from 'react-router-dom';
+import '../bootstrap.css'
+import '../main.css'
 
 //! imp router
 import router from './router';
