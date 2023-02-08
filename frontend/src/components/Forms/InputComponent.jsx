@@ -7,14 +7,14 @@ const InputComponent = ({ methods, name, label, ...rest }) => {
       {label && <Form.Label>{label}</Form.Label>}
       <Col>
         <Form.Control
-          {...methods?.register(name)}
-          isInvalid={methods?.formState.errors[name] ? true : false}
+          {...methods.register(name)}
+          isInvalid={methods.formState.errors[name] ? true : false}
           {...rest}
           size="sm"
         />
-        {methods?.formState.errors[name] && (
+        {methods.formState.errors[name] && (
           <Form.Control.Feedback type="invalid">
-            {methods?.formState.errors[name].message}
+            {methods.formState.errors[name].message}
           </Form.Control.Feedback>
         )}
       </Col>

@@ -40,25 +40,23 @@ const FormComponent = ({
   onSubmit,
   children,
 }) => {
+  console.log('__Debugger__FormComponent__values: ', values);
   const resolver = useYupValidationResolver(validationSchema);
   const methods = useForm({
     resolver,
     // defaultValues: defaultValues,
   });
+  const fields = children.map((child) => child.props.name);
 
-  const isEdit = true;
-
-  //! effect DidMount
+  //! initialize Values
   React.useEffect(() => {
-    if (isEdit) {
-      // methods.setValue
-      const fields = ['name', 'description'];
-      fields.forEach(field => methods.setValue(field, 'user[field])'));
-      // setUser(user);
-
+    console.log('Effect Depts: JSON.stringify(values)', JSON.stringify(values));
+    //! if values is Empty
+    if (Object.keys(values).length) {
+      fields.forEach((field) => methods.setValue(field, values[field]));
     }
-  }, []);
-
+    // }, [...fields.map((field) => values[field])]);
+  }, [JSON.stringify(values)]);
 
   // //! initialize Values
   // React.useEffect(() => {

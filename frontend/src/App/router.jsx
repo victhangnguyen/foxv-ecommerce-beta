@@ -22,11 +22,11 @@ const router = createBrowserRouter([
     children: [
       //! Admin Route
       {
-        path: '/admin',
+        path: '/',
         element: <AdminRoute />,
         children: [
           {
-            path: '',
+            path: '/admin',
             element: <AdminDashboardScreen />,
             children: [
               { path: 'product', element: <AddEditProductScreen /> },

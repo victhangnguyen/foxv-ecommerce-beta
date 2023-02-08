@@ -39,9 +39,9 @@ const importData = async () => {
     }));
 
     const userDocs = await User.insertMany(userDatas);
+    const productDocs = await Product.insertMany(products);
     const categoryDocs = await Category.insertMany(categories);
     const subCategoryDocs = await SubCategory.insertMany(subCategories);
-    const productDocs = await Product.insertMany(products);
 
     Logging.log('Data Imported!!!');
     process.exit();

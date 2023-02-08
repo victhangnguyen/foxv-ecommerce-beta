@@ -5,7 +5,7 @@ import mongoose from 'mongoose';
 import dotenv from 'dotenv';
 
 dotenv.config();
-
+const BASE_URL = process.env.BASE_URL || 'http://127.0.0.1';
 const MONGO_CLUSTER = process.env.MONGO_CLUSTER || '';
 const MONGO_USERNAME = process.env.MONGO_USERNAME || '';
 const MONGO_PASSWORD = process.env.MONGO_PASSWORD || '';
@@ -24,6 +24,7 @@ const config = {
   },
   server: {
     port: SERVER_PORT,
+    baseURL: BASE_URL,
   },
   //!
   connectMongoDB: async () => {
