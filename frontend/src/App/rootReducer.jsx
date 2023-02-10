@@ -3,7 +3,7 @@ import { persistReducer } from 'redux-persist';
 import storage from 'redux-persist/lib/storage';
 
 //! imp Reducers
-import productReducer from '../features/product/productSlice';
+import productReducer from '../features/Product/ProductSlice';
 
 const rootPersistConfig = {
   key: 'root',
@@ -21,7 +21,7 @@ const authPersistConfig = {
 const productPersistConfig = {
   key: 'product',
   storage: storage,
-  blacklist: ['loading', 'error'],
+  blacklist: ['loading', 'error', 'productsCount'],
 };
 
 const cartPersistConfig = {

@@ -10,6 +10,7 @@ import ErrorScreen from '../features/Error/screens/ErrorScreen';
 import AdminDashboardScreen from '../features/Admin/screens/AdminDashboardScreen';
 //! imp Admin
 import AddEditProductScreen from '../features/Product/screens/AddEditProductScreen';
+import ManageProductScreen from '../features/Product/screens/ManageProductScreen';
 
 //! imp Routes
 import AdminRoute from '../components/Routes/AdminRoute';
@@ -29,6 +30,8 @@ const router = createBrowserRouter([
             path: '/admin',
             element: <AdminDashboardScreen />,
             children: [
+              //! Product Management
+              { path: 'products', element: <ManageProductScreen /> },
               { path: 'product', element: <AddEditProductScreen /> },
               { path: 'product/:productId', element: <AddEditProductScreen /> },
             ],
