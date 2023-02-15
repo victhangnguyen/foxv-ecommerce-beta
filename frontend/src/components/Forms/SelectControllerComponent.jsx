@@ -8,6 +8,7 @@ const SelectControllerComponent = ({
   name,
   label,
   handleChange,
+  className,
   ...rest
 }) => {
   return (
@@ -15,7 +16,7 @@ const SelectControllerComponent = ({
       control={methods.control}
       name={name}
       render={({ field }) => (
-        <Form.Group as={Row} className="mb-3" controlId={`ipt-${name}`}>
+        <Form.Group as={Row} className={className} controlId={`ipt-${name}`}>
           <Form.Label>{label}</Form.Label>
           <Col>
             <Form.Select
@@ -24,8 +25,10 @@ const SelectControllerComponent = ({
               isInvalid={methods.formState.errors[name] ? true : false}
               onChange={(e) => {
                 field.onChange(e);
+                //! TRIGGER handleChange(e, setValue)
                 handleChange(e, methods.setValue);
               }}
+              {...rest}
             >
               <option value={''}>Vui lòng chọn</option>
               {options?.map((option, index) => (
@@ -34,7 +37,7 @@ const SelectControllerComponent = ({
                 </option>
               ))}
             </Form.Select>
-            {methods.formState.errors[name] && (
+            {methods.formState.errors[name] && ( //! ok
               <Form.Control.Feedback type="invalid">
                 {methods.formState.errors[name].message}
               </Form.Control.Feedback>

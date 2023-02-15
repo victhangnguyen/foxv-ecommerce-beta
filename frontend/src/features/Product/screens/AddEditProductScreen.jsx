@@ -1,5 +1,6 @@
 import React from 'react';
 import { useParams } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { toast } from 'react-toastify';
 
 //! imp Services
@@ -7,27 +8,39 @@ import productService from '../services/productService';
 import categoryService from '../../Category/services/categoryService';
 
 //! imp Components
+import ToolbarComponent from '../../../components/Toolbars/ToolbarComponent';
 import FormProductComponent from '../components/Forms/FormProductComponent';
+import AlertDismissibleComponent from '../../../components/Alerts/AlertDismissibleComponent';
 
 const AddEditProductScreen = () => {
   const [loading, setLoading] = React.useState(false);
   const [product, setProduct] = React.useState({});
+  const [newProduct, setNewProduct] = React.useState({});
   const [categories, setCategories] = React.useState([]);
   const [subCategories, setSubCategories] = React.useState([]);
   const [showSub, setShowSub] = React.useState(false);
   //! turn on/off Alert
   const [showAlert, setShowAlert] = React.useState(false);
 
+  const [deleteAllProduct, setDeleteAllProduct] = React.useState([]);
+
   const { productId } = useParams();
+  // console.log(
+  //   '__Debugger__AddEditProductScreen\n__***__productId: ',
+  //   productId
+  // );
 
   //! effect DidMount
   React.useEffect(() => {
     loadCategories();
     if (productId) {
       //! Mode: Edit Product
-      loadProduct();
+      loadProduct(); //! setProduct with data
+    } else {
+      //! Mode: Create Product
+      setProduct({}); //! setProduct with empty data
     }
-  }, []);
+  }, [productId]);
 
   const loadProduct = async () => {
     try {
@@ -39,7 +52,7 @@ const AddEditProductScreen = () => {
       }
       await loadSubCategories(categoryId);
     } catch (error) {
-      console.log('__Debugger__screens__AddEditProductScreen__error: ', error);
+      console.log(error);
       toast.error(error.response.data.message);
     }
   };
@@ -49,8 +62,8 @@ const AddEditProductScreen = () => {
       const response = await categoryService.getCategories();
       setCategories(response);
     } catch (error) {
-      console.log('__Debugger__screens__AddEditProductScreen__error: ', error);
-      toast.error(error.response.data.message);
+      console.log(error);
+      toast.error(error.response?.data.message);
     }
   };
 
@@ -61,13 +74,9 @@ const AddEditProductScreen = () => {
       );
       setSubCategories(response);
     } catch (error) {
-      console.log('__Debugger__screens__AddEditProductScreen__error: ', error);
+      console.log(error);
       toast.error(error.response.data.message);
     }
-  };
-
-  const onSubmit = () => {
-    console.log('__Debugger__FormProductComponent__onSubmit');
   };
 
   const handleCategoryChange = async (e) => {
@@ -81,21 +90,75 @@ const AddEditProductScreen = () => {
         setShowSub(false);
       }
     } catch (error) {
-      console.log('__Debugger__screens__AddEditProductScreen__error: ', error);
+      console.log('Error: ', error);
       toast.error(error.response.data.message);
     }
   };
 
+  const handleSubmit = async (productData) => {
+    try {
+      if (productId) {
+        //! Mode: Edit Product
+      } else {
+        //! Mode: Create Product
+        let images = [];
+        if (productData.images) images = Array.from(productData.images);
+
+        const newProduct = await productService.createProduct({
+          ...productData,
+          images,
+        });
+        setNewProduct(newProduct);
+        setShowAlert(true);
+        toast.success(`${newProduct.name} đã được tạo!`);
+      }
+    } catch (error) {
+      console.log('Error: ', error);
+      toast.error(error.response?.data.message);
+    }
+  };
+
   return (
-    <div>
+    <div className="screen-main mb-3 mt-md-4">
+      {
+        //! Show Notication Alert
+      }
+      {showAlert && (
+        <AlertDismissibleComponent
+          show={showAlert}
+          setShow={setShowAlert}
+          title={`Sản phẩm được tạo thành công!`}
+        >
+          <p>
+            Sản phẩm <strong>{newProduct.name}</strong> có Mã số là{' '}
+            <strong>{newProduct._id}</strong>
+          </p>
+          <p>
+            Xem chi tiết sản phẩm mới:{' '}
+            <Link to={`/admin/product/${newProduct._id}`}>
+              <strong>{newProduct.name}</strong>
+            </Link>
+          </p>
+        </AlertDismissibleComponent>
+      )}
+      <h2 className="fw-bold mb-2 text-uppercase ">Tạo sản phẩm mới</h2>
+      {
+        //! FORM SubCategoryFormComponent
+      }
       <FormProductComponent
         product={product}
         categories={categories}
         subCategories={subCategories}
         handleCategoryChange={handleCategoryChange}
         showSub={showSub}
-        onSubmit={onSubmit}
+        onSubmit={handleSubmit}
       />
+      {
+        //! Step 2 and Step 3
+      }
+      {/* <Col md="12">
+        <LocalSearchComponent keyword={keyword} setKeyword={setKeyword} />
+      </Col> */}
     </div>
   );
 };

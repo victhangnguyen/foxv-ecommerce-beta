@@ -13,6 +13,16 @@ const productService = {
     const url = `/products`;
     return axiosInstance.post(url, { sort, order, page, perPage });
   },
+  createProduct: (product) => {
+    const url = `/product`;
+    const config = {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    };
+
+    return axiosInstance.post(url, product, config);
+  },
   removeProduct: (productId) => {
     const url = `/product/${productId}`;
     return axiosInstance.delete(url);

@@ -12,6 +12,7 @@ import {
 } from '../ProductSlice';
 
 //! imp Components
+import ToolbarComponent from '../../../components/Toolbars/ToolbarComponent';
 import AdminProductCard from '../components/Cards/AdminProductCard';
 import AdminLoadingProductCard from '../components/Cards/AdminLoadingProductCard';
 import PaginationComponent from '../../../components/Pagination/PaginationComponent';
@@ -58,20 +59,6 @@ const ManageProductScreen = () => {
     product.error && toast.error(product.error);
   }, [product.error]);
 
-  const loadAllProducts = () => {
-    // setLoading(true);
-    // productAPI
-    //   .getProductsByCount(10)
-    //   .then((data) => {
-    //     setProducts(data);
-    //     setLoading(false);
-    //   })
-    //   .catch((error) => {
-    //     console.log(error);
-    //     setLoading(false);
-    //   });
-  };
-
   // productAPI
   //   .removeProduct(productId)
   //   .then((data) => {
@@ -83,9 +70,9 @@ const ManageProductScreen = () => {
   //     console.log(error);
   //   });
 
-  const handleRemove = (productId) => {
+  const handleRemove = async (productId) => {
     console.log(`%c__Debugger__handleRemove`, 'color: red; font-weight: bold');
-    dispatch(removeProduct(productId))
+    await dispatch(removeProduct(productId))
       .unwrap()
       .then((deletedProduct) => {
         toast.success(`Sản phẩm ${deletedProduct.name} đã được xóa`);
@@ -93,6 +80,15 @@ const ManageProductScreen = () => {
       .catch((error) => {
         toast.error(error);
       });
+
+    await dispatch(
+      getProductList({
+        sort: 'createdAt',
+        order: 'asc',
+        page: currentPage,
+        perPage: productsPerPage,
+      })
+    );
   };
 
   return (
@@ -103,6 +99,31 @@ const ManageProductScreen = () => {
         }
       </Row>
       <h1>Quản lý Sản phẩm </h1>
+      <ToolbarComponent role="toolbar" aria-label="Toolbar with button groups">
+        <div
+          className="btn-group me-2"
+          role="group"
+          aria-label="Clipboard group"
+        >
+          <button type="button" className="btn btn-primary">
+            Xóa nhiều
+          </button>
+        </div>
+        {/* <div className="btn-group me-2" role="group" aria-label="Styles group">
+          <button type="button" className="btn btn-secondary">
+            Font
+          </button>
+          <button type="button" className="btn btn-secondary">
+            Size
+          </button>
+        </div>
+        <div className="btn-group" role="group" aria-label="Source group">
+          <button type="button" className="btn btn-success">
+            Source
+          </button>
+        </div> */}
+      </ToolbarComponent>
+
       {product.loading === true ? (
         <AdminLoadingProductCard count={productsCountPerPage} />
       ) : (

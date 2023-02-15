@@ -8,13 +8,8 @@ import EditRegularIcon from '../../../../components/Icons/EditRegularIcon';
 const AdminProductCard = ({ product, index, handleRemove }) => {
   return (
     <Card as="article" className="my-3 p-3 rounded card-admin-product">
-      <Link to={`/product/${product._id}`}>
-        <Card.Img
-          // src={`http://127.0.0.1:5000/${product.image}`}
-          variant="top"
-        />
-      </Link>
       <Card.Body>
+        {product.images.length && <Card.Img src={product.images[0]} variant="top" />}
         <Link to={`/product/${product._id}`}>
           <Card.Title as={'div'} className="card-admin-title-product">
             <strong>{product.name}</strong>

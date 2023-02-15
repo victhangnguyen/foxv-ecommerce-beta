@@ -1,7 +1,18 @@
 import express from 'express';
 import * as productController from '../controllers/product.js';
+//! imp Middleware
+import upload from '../middleware/upload.js';
 
 const router = express.Router();
+
+//! @desc     Create a new Product
+//! @route    POST /api/products
+//! @access   Private: Admin
+router.post(
+  '/product',
+  upload.array('images[]', 10),
+  productController.createProduct
+);
 
 //! @desc     Fetch Count of all product
 //! @route    GET /api/products/total
@@ -20,7 +31,7 @@ router.get('/product/:productId', productController.getProduct);
 
 //! @desc     Delete one Product
 //! @route    DEL /api/product/:productId
-//! @access   Private
+//! @access   Private:Admin
 router.delete('/product/:productId', productController.removeProduct);
 
 export default router;

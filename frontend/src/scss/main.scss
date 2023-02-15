@@ -1,6 +1,6 @@
-// @import 'abstracts/*';
 @import 'vendors/fonts';
 @import 'abstracts/bs-variables';
+@import 'abstracts/mixins';
 @import 'vendors/boostrap';
 @import 'base/typography';
 @import 'layout/form';
@@ -13,6 +13,7 @@
 @import 'components/navbar';
 @import 'components/card';
 @import 'components/jumbotron';
+@import 'components/toolbar';
 @import 'layout/footer';
 //! screens
 @import 'screens/ProductDetailScreen';

@@ -39,23 +39,35 @@ const FormComponent = ({
   validationSchema,
   onSubmit,
   children,
+  ...rest
 }) => {
-  console.log('__Debugger__FormComponent__values: ', values);
   const resolver = useYupValidationResolver(validationSchema);
   const methods = useForm({
     resolver,
     // defaultValues: defaultValues,
   });
-  const fields = children.map((child) => child.props.name);
 
+  const watchAllFields = useWatch({ control: methods.control });
+
+  const watchAllFieldsCountRef = React.useRef(0);
+  console.log(
+    '%c__Debugger__FormComponent\n__***__watchAllFields__',
+    'color: DeepSkyBlue;',
+    (watchAllFieldsCountRef.current += 1),
+    ':',
+    watchAllFields
+  );
+
+  const fields = children.map((child) => child.props?.name);
   //! initialize Values
   React.useEffect(() => {
-    console.log('Effect Depts: JSON.stringify(values)', JSON.stringify(values));
     //! if values is Empty
     if (Object.keys(values).length) {
-      fields.forEach((field) => methods.setValue(field, values[field]));
+      fields.forEach((field) => {
+        if (!field) return;
+        methods.setValue(field, values[field]);
+      });
     }
-    // }, [...fields.map((field) => values[field])]);
   }, [JSON.stringify(values)]);
 
   // //! initialize Values
@@ -75,10 +87,11 @@ const FormComponent = ({
     <Form
       onSubmit={methods.handleSubmit(onSubmit)}
       onKeyDown={(e) => checkKeyDown(e)}
+      {...rest}
     >
       {Array.isArray(children)
         ? children.map((child) => {
-            return child.props.name
+            return child.props?.name
               ? React.createElement(child.type, {
                   ...{
                     ...child.props,
