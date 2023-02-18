@@ -66,6 +66,44 @@ export const removeProduct = createAsyncThunk(
   }
 );
 
+export const removeProducts = createAsyncThunk(
+  'product/removeProducts',
+  async (productIdArray, thunkAPI) => {
+    try {
+      const response = await productService.removeProducts(productIdArray);
+      return thunkAPI.fulfillWithValue(response);
+    } catch (error) {
+      if (error.response && error.response.data.message) {
+        return thunkAPI.rejectWithValue(error.response.data.message);
+      } else {
+        return thunkAPI.rejectWithValue(error.message);
+      }
+    }
+  }
+);
+
+export const fetchProductsByFilter = createAsyncThunk(
+  'product/fetchProductsByFilter',
+  async (args, thunkAPI) => {
+    const response = await productService.fetchProductsByFilter(
+      args.search,
+      args.sort,
+      args.order,
+      args.page,
+      args.perPage
+    );
+    try {
+      return thunkAPI.fulfillWithValue(response);
+    } catch (error) {
+      if (error.response && error.response.data.message) {
+        return thunkAPI.rejectWithValue(error.response.data.message);
+      } else {
+        return thunkAPI.rejectWithValue(error.message);
+      }
+    }
+  }
+);
+
 const initialState = {
   products: [],
   productsCount: 0,
@@ -108,10 +146,38 @@ const productSlice = createSlice({
       })
       .addCase(removeProduct.fulfilled, (state, action) => {
         state.loading = false;
-        state.products = state.products.filter(product => product._id !== action.payload._id);
+        state.products = state.products.filter(
+          (product) => product._id !== action.payload._id
+        );
         state.productsCount -= 1;
       })
       .addCase(removeProduct.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      });
+    builder
+      .addCase(removeProducts.pending, (state, action) => {
+        state.loading = true;
+      })
+      .addCase(removeProducts.fulfilled, (state, action) => {
+        state.loading = false;
+        state.productsCount = state.productsCount - action.payload.deletedCount;
+      })
+      .addCase(removeProducts.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      });
+    builder
+      .addCase(fetchProductsByFilter.pending, (state, action) => {
+        state.loading = true;
+      })
+      .addCase(fetchProductsByFilter.fulfilled, (state, action) => {
+        //! action.payload = {products, productsCount}
+        state.loading = false;
+        state.products = action.payload.products;
+        state.productsCount = action.payload.productsCount;
+      })
+      .addCase(fetchProductsByFilter.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
       });

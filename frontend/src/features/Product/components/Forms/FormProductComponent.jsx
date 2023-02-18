@@ -10,7 +10,7 @@ import InputComponent from '../../../../components/Forms/InputComponent';
 import SelectComponent from '../../../../components/Forms/SelectComponent';
 import SelectControllerComponent from '../../../../components/Forms/SelectControllerComponent';
 import TagControllerComponent from '../../../../components/Forms/TagControllerComponent';
-import ImageControllerComponent from '../../../../components/Forms/ImageControllerComponent';
+import ImageComponent from '../../../../components/Forms/ImageComponent';
 
 const validationSchema = yup.object({
   name: yup
@@ -195,7 +195,7 @@ const ProductFormComponent = ({
         {
           //! image
         }
-        <ImageControllerComponent
+        <ImageComponent
           name={'images'}
           label={'Hình ảnh sản phẩm'}
           className={'mb-3 form-group-images'}

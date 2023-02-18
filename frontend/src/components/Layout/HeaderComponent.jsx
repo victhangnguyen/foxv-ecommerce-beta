@@ -16,7 +16,7 @@ const HeaderComponent = () => {
   const [user, setUser] = React.useState({
     result: {
       name: 'Victhangnguyen',
-      role: 'user',
+      role: 'admin',
     },
   });
 
@@ -148,7 +148,7 @@ const HeaderComponent = () => {
                       <NavDropdown.Item as="div">Profile</NavDropdown.Item>
                       {user.result.role === 'admin' && (
                         <NavDropdown.Item as="div">
-                          <NavLink className="nav-link" to={'/admin/category'}>
+                          <NavLink className="nav-link" to={'/admin'}>
                             Dashboard
                           </NavLink>
                         </NavDropdown.Item>

@@ -95,19 +95,47 @@ const AddEditProductScreen = () => {
     }
   };
 
+  const imagesDataCountRef = React.useRef(0);
   const handleSubmit = async (productData) => {
+    const { images, ...ortherProps } = productData;
     try {
+      //! Neu thay doi Image => FileList
+      //! Khong thay doi Image => Array
+      let product;
+      let imagesData = [];
+      //! FileList
+      if (!Array.isArray(images)) {
+        imagesData = Array.from(images);
+      }
+
+      if (imagesData.length) {
+        product = {
+          ...productData,
+          images: imagesData,
+        };
+      } else {
+        product = {
+          ...ortherProps,
+        };
+      }
+      console.log(
+        '%c__Debugger__AddEditProductScreen\n__handleSubmit__imagesData__',
+        'color: chartreuse;',
+        (imagesDataCountRef.current += 1),
+        ':',
+        imagesData,
+        '\n'
+      );
       if (productId) {
         //! Mode: Edit Product
+        const updatedProduct = await productService.updateProduct(
+          productId,
+          product
+        );
+        toast.success(`${updatedProduct.name} đã được cập nhật!`);
       } else {
         //! Mode: Create Product
-        let images = [];
-        if (productData.images) images = Array.from(productData.images);
-
-        const newProduct = await productService.createProduct({
-          ...productData,
-          images,
-        });
+        const newProduct = await productService.createProduct(product);
         setNewProduct(newProduct);
         setShowAlert(true);
         toast.success(`${newProduct.name} đã được tạo!`);

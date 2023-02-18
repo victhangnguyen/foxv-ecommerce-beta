@@ -5,7 +5,6 @@ const SelectComponent = ({ methods, options, name, label, className,...rest }) =
   return (
     <Form.Group as={Row} className={className} controlId={`ipt-${name}`}>
       {label && <Form.Label>{label}</Form.Label>}
-
       <Col>
         <Form.Select
           {...methods.register(name)}

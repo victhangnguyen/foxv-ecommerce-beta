@@ -4,6 +4,7 @@ import storage from 'redux-persist/lib/storage';
 
 //! imp Reducers
 import productReducer from '../features/Product/ProductSlice';
+import searchReducer from '../features/Search/SearchSlice';
 
 const rootPersistConfig = {
   key: 'root',
@@ -41,7 +42,7 @@ const rootReducer = combineReducers({
   product: persistReducer(productPersistConfig, productReducer),
   // cart: persistReducer(cartPersistConfig, cartReducer),
   // user: persistReducer(userPersistConfig, userReducer),
-  // search: searchSlice,
+  search: searchReducer,
 });
 
 export default persistReducer(rootPersistConfig, rootReducer);

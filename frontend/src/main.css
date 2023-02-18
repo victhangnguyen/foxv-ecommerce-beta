@@ -434,6 +434,9 @@ a {
 .card.card-admin-product {
   padding: 0.35rem !important;
 }
+.card.card-admin-product .card-admin-product {
+  padding: 0.2rem;
+}
 .card.card-admin-product .card-body {
   padding: 0.2rem;
 }
@@ -471,8 +474,11 @@ a {
 }
 
 .btn-toolbar {
+  width: 100%;
+}
+.btn-toolbar__group {
   display: flex;
-  justify-content: end;
+  justify-content: space-between;
 }
 
 footer {

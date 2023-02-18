@@ -4,81 +4,65 @@ import { Row, Col, Form, Image } from 'react-bootstrap';
 const ImageComponent = ({ methods, name, label, className, ...rest }) => {
   const [imageMain, setImageMain] = React.useState(null);
   const [images, setImages] = React.useState();
-  // const [imageFiles, setImageFiles] = React.useState([]);
+
   const imageFiles = methods.getValues(name) || [];
 
   React.useEffect(() => {
-    setImages(imageFiles);
-    setImageMain(imageFiles[0]);
+    if (Array.isArray(imageFiles)) {
+      //! rhf.State === Array
+      setImages(imageFiles);
+      setImageMain(imageFiles[0]);
+      return;
+    }
+    //! rhf.State === FileList
+
+    const fileReaders = [];
+    let isCancel = false;
+    if (imageFiles.length) {
+      const promises = Array.from(imageFiles).map((file) => {
+        return new Promise((resolve, reject) => {
+          const fileReader = new FileReader();
+          fileReaders.push(fileReader);
+          fileReader.onload = (e) => {
+            const { result } = e.target;
+            if (result) {
+              resolve(result);
+            }
+          };
+          fileReader.onabort = () => {
+            reject(new Error('File reading aborted'));
+          };
+          fileReader.onerror = () => {
+            reject(new Error('Failed to read file'));
+          };
+          fileReader.readAsDataURL(file);
+        });
+      });
+
+      Promise.all(promises)
+        .then((images) => {
+          if (!isCancel) {
+            setImages(images);
+            setImageMain(images[0]);
+          }
+        })
+        .catch((reason) => {
+          console.log(reason);
+        });
+    }
+    return () => {
+      isCancel = true;
+      fileReaders.forEach((fileReader) => {
+        if (fileReader.readyState === 1) {
+          fileReader.abort();
+        }
+      });
+    };
   }, [imageFiles]);
-
-  // const getValuesCountRef = React.useRef(0);
-  // console.log(
-  //   '%c__Debugger__FormComponent\n__***__getValues__',
-  //   'color: chartreuse;',
-  //   (getValuesCountRef.current += 1),
-  //   ':',
-  //   methods.getValues(name)
-  // );
-
-  // React.useEffect(() => {
-  //   const fileReaders = [];
-  //   let isCancel = false;
-  //   if (imageFiles.length) {
-  //     const promises = Array.from(imageFiles).map((file) => {
-  //       return new Promise((resolve, reject) => {
-  //         const fileReader = new FileReader();
-  //         fileReaders.push(fileReader);
-  //         fileReader.onload = (e) => {
-  //           const { result } = e.target;
-  //           if (result) {
-  //             resolve(result);
-  //           }
-  //         };
-  //         fileReader.onabort = () => {
-  //           reject(new Error('File reading aborted'));
-  //         };
-  //         fileReader.onerror = () => {
-  //           reject(new Error('Failed to read file'));
-  //         };
-  //         fileReader.readAsDataURL(file);
-  //       });
-  //     });
-  //    
-  //     Promise.all(promises)
-  //       .then((images) => {
-  //         if (!isCancel) {
-  //           setImages(images);
-  //           setImageMain(images[0]);
-  //         }
-  //       })
-  //       .catch((reason) => {
-  //         console.log(reason);
-  //       });
-  //   }
-  //   return () => {
-  //     isCancel = true;
-  //     fileReaders.forEach((fileReader) => {
-  //       if (fileReader.readyState === 1) {
-  //         fileReader.abort();
-  //       }
-  //     });
-  //   };
-  // }, [imageFiles]);
 
   const handleImage = (index) => {
     setImageMain(images[index]);
   };
-
-  const imagesCountRef = React.useRef(0);
-  console.log(
-    '%c__Debugger__ImageComponent\n__***__images__',
-    'color: Gold;',
-    (imagesCountRef.current += 1),
-    ':',
-    images,
-    '\n'
-  );
 
   const renderSlices = images?.map((image, index) => {
     // const renderSlices = imageFiles.map((image, index) => {

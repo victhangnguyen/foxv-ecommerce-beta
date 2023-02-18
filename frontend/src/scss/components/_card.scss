@@ -3,7 +3,6 @@ a {
   color: $color-secondary;
 }
 
-
 .card {
   //! GUEST
   &.card-category {
@@ -34,6 +33,11 @@ a {
   //! ADMIN
   &.card-admin-product {
     padding: 0.35rem !important;
+
+    .card-admin-product {
+      padding: 0.2rem;
+    }
+
     .card-body {
       padding: 0.2rem;
       a {
@@ -64,4 +68,3 @@ a {
     }
   }
 }
-

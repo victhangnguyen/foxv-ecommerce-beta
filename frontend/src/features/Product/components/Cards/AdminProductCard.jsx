@@ -1,16 +1,21 @@
 import React from 'react';
-import { Card, Button } from 'react-bootstrap';
+import { Card, Button, FormCheck } from 'react-bootstrap';
 import { Link, useNavigate } from 'react-router-dom';
 //! imp comps/icons
 import TrashIcon from '../../../../components/Icons/TrashIcon';
 import EditRegularIcon from '../../../../components/Icons/EditRegularIcon';
 
-const AdminProductCard = ({ product, index, handleRemove }) => {
+const AdminProductCard = ({ product, checkProductIds, handleRemove, handleCheckChange }) => {
   return (
     <Card as="article" className="my-3 p-3 rounded card-admin-product">
+      <Card.Header>
+        <FormCheck inline id={product._id} checked={checkProductIds.includes(product._id)} onChange={handleCheckChange} />
+      </Card.Header>
       <Card.Body>
-        {product.images.length && <Card.Img src={product.images[0]} variant="top" />}
-        <Link to={`/product/${product._id}`}>
+        <Link to={`/admin/product/${product._id}`}>
+          {product.images.length && (
+            <Card.Img src={product.images[0]} variant="top" />
+          )}
           <Card.Title as={'div'} className="card-admin-title-product">
             <strong>{product.name}</strong>
           </Card.Title>

@@ -9,6 +9,8 @@ import {
   getProductList,
   getProductsCount,
   removeProduct,
+  removeProducts,
+  fetchProductsByFilter,
 } from '../ProductSlice';
 
 //! imp Components
@@ -25,13 +27,30 @@ const ManageProductScreen = () => {
   const dispatch = useDispatch();
   const product = useSelector((state) => state.product);
 
-  // const [loading, setLoading] = React.useState();
-  // const [products, setProducts] = React.useState([]);
+  //! Toolbars
+  const [isCheckAll, setIsCheckAll] = React.useState(false);
+  const [checkProductIds, setCheckProductIds] = React.useState([]); //! Nhung doi tuong checkAll co trong product
 
-  //! effect DidMount
+  //! Search
+  const search = useSelector((state) => state.search);
+
+  const productproductsCountCountRef = React.useRef(0);
+  console.log(
+    '%c__Debugger__ManageProductScreen\n__***__product.productsCount__',
+    'color: chartreuse;',
+    (productproductsCountCountRef.current += 1),
+    ':',
+    product.productsCount,
+    '\n'
+  );
+  // React.useEffect(() => {
+  //   dispatch(getProductsCount());
+  // }, []);
+
+  //! effect deps: Pagination, Search
   React.useEffect(() => {
-    dispatch(getProductsCount());
-  }, []);
+    loadAllProducts();
+  }, [search.text, currentPage]);
 
   // React.useEffect(() => {
   //   setProductsCountPerPage(
@@ -42,53 +61,65 @@ const ManageProductScreen = () => {
   //   );
   // }, []);
 
-  //! effect Deps: currentPage
-  React.useEffect(() => {
-    dispatch(
-      getProductList({
-        sort: 'createdAt',
-        order: 'asc',
-        page: currentPage,
-        perPage: productsPerPage,
-      })
-    );
-  }, [currentPage]);
-
-  //! effect Depts: product.errror
+  //! effect Error
   React.useEffect(() => {
     product.error && toast.error(product.error);
   }, [product.error]);
 
-  // productAPI
-  //   .removeProduct(productId)
-  //   .then((data) => {
-  //     console.log('__Debugger__AdminProductCard__data: ', data);
-  //     loadAllProducts();
-  //     toast(`Sản phẩm ${data.name} đã được xóa`);
-  //   })
-  //   .catch((error) => {
-  //     console.log(error);
-  //   });
-
-  const handleRemove = async (productId) => {
-    console.log(`%c__Debugger__handleRemove`, 'color: red; font-weight: bold');
-    await dispatch(removeProduct(productId))
-      .unwrap()
-      .then((deletedProduct) => {
-        toast.success(`Sản phẩm ${deletedProduct.name} đã được xóa`);
-      })
-      .catch((error) => {
-        toast.error(error);
-      });
-
-    await dispatch(
-      getProductList({
-        sort: 'createdAt',
-        order: 'asc',
+  //! slug, _id,
+  const loadAllProducts = () => {
+    dispatch(
+      fetchProductsByFilter({
+        search: { query: search.text },
+        sort: 'price',
+        order: 'descending',
         page: currentPage,
-        perPage: productsPerPage,
+        perPage: 18,
       })
     );
+  };
+
+  const handleRemove = async (productId) => {
+    try {
+      const deletedProduct = await dispatch(removeProduct(productId)).unwrap();
+      toast.success(`Sản phẩm ${deletedProduct.name} đã được xóa`);
+      loadAllProducts();
+    } catch (error) {
+      toast.error(error);
+    }
+  };
+
+  const handleSelectALl = (e) => {
+    setIsCheckAll(!isCheckAll);
+    if (!isCheckAll) {
+      setCheckProductIds(product.products.map((product) => product._id));
+    } else {
+      setCheckProductIds([]);
+    }
+  };
+
+  const handleDeleteAll = async () => {
+    try {
+      await dispatch(removeProducts(checkProductIds)).unwrap();
+      loadAllProducts();
+    } catch (error) {
+      toast.error(error);
+    }
+  };
+
+  const handleCardCheckChange = (e) => {
+    const { id, checked } = e.target;
+    if (!checked) {
+      setCheckProductIds(
+        checkProductIds.filter((productId) => productId !== id)
+      );
+    } else {
+      setCheckProductIds([...checkProductIds, id]);
+    }
+    //! reset isCheckAll
+    if (checkProductIds.length === 0 && isCheckAll) {
+      setIsCheckAll(false);
+    }
   };
 
   return (
@@ -99,31 +130,15 @@ const ManageProductScreen = () => {
         }
       </Row>
       <h1>Quản lý Sản phẩm </h1>
-      <ToolbarComponent role="toolbar" aria-label="Toolbar with button groups">
-        <div
-          className="btn-group me-2"
-          role="group"
-          aria-label="Clipboard group"
-        >
-          <button type="button" className="btn btn-primary">
-            Xóa nhiều
-          </button>
-        </div>
-        {/* <div className="btn-group me-2" role="group" aria-label="Styles group">
-          <button type="button" className="btn btn-secondary">
-            Font
-          </button>
-          <button type="button" className="btn btn-secondary">
-            Size
-          </button>
-        </div>
-        <div className="btn-group" role="group" aria-label="Source group">
-          <button type="button" className="btn btn-success">
-            Source
-          </button>
-        </div> */}
-      </ToolbarComponent>
-
+      <ToolbarComponent
+        role="toolbar"
+        aria-label="Toolbar with button groups"
+        items={product.products}
+        isCheckAll={isCheckAll}
+        checkProductIds={checkProductIds}
+        handleCheckChange={handleSelectALl}
+        handleDelete={handleDeleteAll}
+      />
       {product.loading === true ? (
         <AdminLoadingProductCard count={productsCountPerPage} />
       ) : (
@@ -139,6 +154,8 @@ const ManageProductScreen = () => {
                     <AdminProductCard
                       product={product}
                       handleRemove={handleRemove}
+                      checkProductIds={checkProductIds}
+                      handleCheckChange={handleCardCheckChange}
                     />
                   </Col>
                 );
@@ -148,7 +165,7 @@ const ManageProductScreen = () => {
             <PaginationComponent
               currentPage={currentPage}
               itemsCount={product.productsCount}
-              itemsPerPage={productsPerPage}
+              itemsPerPage={18}
               setCurrentPage={setCurrentPage}
             />
           </div>

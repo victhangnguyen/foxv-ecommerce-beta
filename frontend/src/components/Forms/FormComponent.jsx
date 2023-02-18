@@ -52,7 +52,7 @@ const FormComponent = ({
   const watchAllFieldsCountRef = React.useRef(0);
   console.log(
     '%c__Debugger__FormComponent\n__***__watchAllFields__',
-    'color: DeepSkyBlue;',
+    'color: Brown;',
     (watchAllFieldsCountRef.current += 1),
     ':',
     watchAllFields

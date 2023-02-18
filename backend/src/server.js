@@ -15,7 +15,7 @@ import config from './config/index.js';
 
 //! imp Routes
 import productRouter from './routes/product.js';
-// import userRouter from './routes/user.js';
+import userRouter from './routes/user.js';
 import categoryRouter from './routes/category.js';
 import subCategoryRouter from './routes/subCategory.js';
 const app = express();
@@ -33,7 +33,7 @@ app.use(express.static(publicDir));
 const imagesDir = path.join(__dirname, '..', 'images');
 app.use('/images', express.static(imagesDir));
 
-// app.use('/api', userRouter);
+app.use('/api', userRouter);
 app.use('/api', productRouter);
 app.use('/api', categoryRouter);
 app.use('/api', subCategoryRouter);
