@@ -1,7 +1,8 @@
 import React from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import { Link } from 'react-router-dom';
 import { toast } from 'react-toastify';
+import _ from 'lodash';
 
 //! imp Services
 import productService from '../services/productService';
@@ -9,10 +10,12 @@ import categoryService from '../../Category/services/categoryService';
 
 //! imp Components
 import ToolbarComponent from '../../../components/Toolbars/ToolbarComponent';
+import BreadcrumbComponent from '../../../components/Breadcrumbs/BreadcrumbComponent';
 import FormProductComponent from '../components/Forms/FormProductComponent';
 import AlertDismissibleComponent from '../../../components/Alerts/AlertDismissibleComponent';
 
 const AddEditProductScreen = () => {
+  const navigate = useNavigate();
   const [loading, setLoading] = React.useState(false);
   const [product, setProduct] = React.useState({});
   const [newProduct, setNewProduct] = React.useState({});
@@ -21,14 +24,38 @@ const AddEditProductScreen = () => {
   const [showSub, setShowSub] = React.useState(false);
   //! turn on/off Alert
   const [showAlert, setShowAlert] = React.useState(false);
-
-  const [deleteAllProduct, setDeleteAllProduct] = React.useState([]);
+  const isExistProduct = !_.isEmpty(product);
 
   const { productId } = useParams();
-  // console.log(
-  //   '__Debugger__AddEditProductScreen\n__***__productId: ',
-  //   productId
-  // );
+
+  const breadcrumbRoute = [
+    { label: 'Home', path: '/' },
+    {
+      label: 'Dashboard',
+      path: '/admin',
+    },
+    {
+      label: isExistProduct ? 'Cập nhật Sản phẩm' : 'Thêm mới Sản phẩm',
+      path: '/admin/product',
+      active: true,
+    },
+  ];
+
+  const initialValues = {
+    name: product.name || '',
+    description: product.description || '',
+    category: product.category?._id || product.category || '',
+    subCategories:
+      product.subCategories?.length > 0
+        ? product.subCategories.map((sub) => sub._id)
+        : [],
+    price: product.price || 0,
+    shipping: product.shipping || 'no',
+    quantity: product.quantity || 0,
+    color: product.color || '',
+    brand: product.brand || '',
+    images: product.images || [],
+  };
 
   //! effect DidMount
   React.useEffect(() => {
@@ -44,7 +71,9 @@ const AddEditProductScreen = () => {
 
   const loadProduct = async () => {
     try {
+      setLoading(true);
       const productDoc = await productService.getProduct(productId);
+      setLoading(false);
       setProduct(productDoc);
       const categoryId = productDoc.category._id;
       if (categoryId) {
@@ -52,6 +81,7 @@ const AddEditProductScreen = () => {
       }
       await loadSubCategories(categoryId);
     } catch (error) {
+      setLoading(false);
       console.log(error);
       toast.error(error.response.data.message);
     }
@@ -95,50 +125,50 @@ const AddEditProductScreen = () => {
     }
   };
 
-  const imagesDataCountRef = React.useRef(0);
   const handleSubmit = async (productData) => {
+    console.log(
+      '__Debugger__AddEditProductScreen\n__handleSubmit__productData: ',
+      productData,
+      '\n'
+    );
+    const isSameData = _.isEqual(initialValues, productData);
+    if (isSameData) {
+      return toast.error('Chưa có thông tin nào thay đổi.');
+    }
+
     const { images, ...ortherProps } = productData;
+
     try {
       //! Neu thay doi Image => FileList
-      //! Khong thay doi Image => Array
-      let product;
+      //! Khong thay doi Image => Empty Array
       let imagesData = [];
       //! FileList
       if (!Array.isArray(images)) {
         imagesData = Array.from(images);
       }
 
-      if (imagesData.length) {
-        product = {
-          ...productData,
-          images: imagesData,
-        };
-      } else {
-        product = {
-          ...ortherProps,
-        };
-      }
-      console.log(
-        '%c__Debugger__AddEditProductScreen\n__handleSubmit__imagesData__',
-        'color: chartreuse;',
-        (imagesDataCountRef.current += 1),
-        ':',
-        imagesData,
-        '\n'
-      );
+      const product = {
+        ...productData,
+        images: imagesData,
+      };
+
       if (productId) {
         //! Mode: Edit Product
         const updatedProduct = await productService.updateProduct(
           productId,
           product
         );
+        loadProduct();
+        setShowAlert(true);
         toast.success(`${updatedProduct.name} đã được cập nhật!`);
+        navigate('/admin/products');
       } else {
         //! Mode: Create Product
         const newProduct = await productService.createProduct(product);
         setNewProduct(newProduct);
         setShowAlert(true);
         toast.success(`${newProduct.name} đã được tạo!`);
+        navigate('/admin/products');
       }
     } catch (error) {
       console.log('Error: ', error);
@@ -148,6 +178,7 @@ const AddEditProductScreen = () => {
 
   return (
     <div className="screen-main mb-3 mt-md-4">
+      <BreadcrumbComponent breadcrumbRoute={breadcrumbRoute} />
       {
         //! Show Notication Alert
       }
@@ -155,25 +186,48 @@ const AddEditProductScreen = () => {
         <AlertDismissibleComponent
           show={showAlert}
           setShow={setShowAlert}
-          title={`Sản phẩm được tạo thành công!`}
+          title={
+            isExistProduct
+              ? 'Sản phẩm được cập nhật thành công'
+              : 'Sản phẩm được Thêm thành công!'
+          }
+          variant={_.isEmpty(product) ? 'success' : 'warning'}
         >
-          <p>
-            Sản phẩm <strong>{newProduct.name}</strong> có Mã số là{' '}
-            <strong>{newProduct._id}</strong>
-          </p>
-          <p>
-            Xem chi tiết sản phẩm mới:{' '}
-            <Link to={`/admin/product/${newProduct._id}`}>
-              <strong>{newProduct.name}</strong>
-            </Link>
-          </p>
+          {isExistProduct ? (
+            <>
+              <p>
+                Sản phẩm <strong>{product.name}</strong> có Mã số là{' '}
+                <strong>{product._id}</strong>
+              </p>
+            </>
+          ) : (
+            <>
+              <p>
+                Sản phẩm <strong>{newProduct.name}</strong> có Mã số là{' '}
+                <strong>{newProduct._id}</strong>
+              </p>
+              <p>
+                Xem chi tiết sản phẩm mới:{' '}
+                <Link to={`/admin/product/${newProduct._id}`}>
+                  <strong>{newProduct.name}</strong>
+                </Link>
+              </p>
+            </>
+          )}
         </AlertDismissibleComponent>
       )}
-      <h2 className="fw-bold mb-2 text-uppercase ">Tạo sản phẩm mới</h2>
+      <h2 className="fw-bold mb-2 text-uppercase ">
+        {loading
+          ? 'Loading...'
+          : isExistProduct
+          ? 'Cập nhật sản phẩm'
+          : 'Thêm sản phẩm mới'}
+      </h2>
       {
         //! FORM SubCategoryFormComponent
       }
       <FormProductComponent
+        initialValues={initialValues}
         product={product}
         categories={categories}
         subCategories={subCategories}

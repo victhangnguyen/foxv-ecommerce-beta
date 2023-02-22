@@ -1,5 +1,8 @@
 import React from 'react';
-import { Row, Col, Form, Image } from 'react-bootstrap';
+import { Col, Form, Row } from 'react-bootstrap';
+
+const REACT_APP_SERVER = 'http://127.0.0.1';
+const REACT_APP_PORT = 5000;
 
 const ImageComponent = ({ methods, name, label, className, ...rest }) => {
   const [imageMain, setImageMain] = React.useState(null);
@@ -8,14 +11,15 @@ const ImageComponent = ({ methods, name, label, className, ...rest }) => {
   const imageFiles = methods.getValues(name) || [];
 
   React.useEffect(() => {
+    //! if Array (response from Backend)
     if (Array.isArray(imageFiles)) {
       //! rhf.State === Array
       setImages(imageFiles);
       setImageMain(imageFiles[0]);
       return;
     }
-    //! rhf.State === FileList
 
+    //! handle FileList
     const fileReaders = [];
     let isCancel = false;
     if (imageFiles.length) {
@@ -72,9 +76,14 @@ const ImageComponent = ({ methods, name, label, className, ...rest }) => {
         className="form-image__image-slides__image-slide"
         onClick={() => handleImage(index)}
       >
-        <img src={images[index]} alt="" />
-        {/* <img src={`${baseUrl}:${port}:/${imageFiles[index]}`} alt="" /> */}
-        {/* <img src={`${baseUrl}:${port}/${imageFiles[index]}`} alt="" /> */}
+        <img
+          src={
+            image.includes('data:image/')
+              ? image
+              : `${REACT_APP_SERVER}:${REACT_APP_PORT}/images/${image}`
+          }
+          alt=""
+        />
       </div>
     );
   });
@@ -88,7 +97,16 @@ const ImageComponent = ({ methods, name, label, className, ...rest }) => {
       {label && <Form.Label>{label}</Form.Label>}
       <div className="">
         <div className="form-image__image-main">
-          {imageMain && <img src={imageMain} alt="" />}
+          {imageMain && (
+            <img
+              src={
+                imageMain.includes('data:image/')
+                  ? imageMain
+                  : `${REACT_APP_SERVER}:${REACT_APP_PORT}/images/${imageMain}`
+              }
+              alt=""
+            />
+          )}
         </div>
         <div className="form-image__image-slides">{renderSlices}</div>
       </div>

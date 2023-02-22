@@ -1,65 +1,73 @@
 import React from 'react';
+import { Col, Row } from 'react-bootstrap';
 import { useDispatch, useSelector } from 'react-redux';
-import { Col, Row, Breadcrumb } from 'react-bootstrap';
-import { Link } from 'react-router-dom';
 import { toast } from 'react-toastify';
+import _ from 'lodash';
 
 //! imp Actions RTK
 import {
-  getProductList,
-  getProductsCount,
+  fetchProductsByFilters,
   removeProduct,
   removeProducts,
-  fetchProductsByFilter,
 } from '../ProductSlice';
 
+import { clearSearch } from '../../Search/SearchSlice';
+
 //! imp Components
-import ToolbarComponent from '../../../components/Toolbars/ToolbarComponent';
-import AdminProductCard from '../components/Cards/AdminProductCard';
-import AdminLoadingProductCard from '../components/Cards/AdminLoadingProductCard';
+import BreadcrumbComponent from '../../../components/Breadcrumbs/BreadcrumbComponent';
+import DeleteConfirmationModalComponent from '../components/Modals/DeleteConfirmationModalComponent';
 import PaginationComponent from '../../../components/Pagination/PaginationComponent';
+import ToolbarComponent from '../../../components/Toolbars/ToolbarComponent';
+import AdminLoadingProductCard from '../components/Cards/AdminLoadingProductCard';
+import AdminProductCard from '../components/Cards/AdminProductCard';
+import AlertDismissibleComponent from '../../../components/Alerts/AlertDismissibleComponent';
+
+const REACT_APP_PERPAGE = 18;
 
 const ManageProductScreen = () => {
+  const [sort, setSort] = React.useState('createdAt');
+  const [order, setOrder] = React.useState('desc');
+
   const [currentPage, setCurrentPage] = React.useState(1);
-  const [productsPerPage, setProductsPerPage] = React.useState(18);
+  // const productsPerPage = useHookWidth
+  //! used to make LoadingCard by PaginationComponent
   const [productsCountPerPage, setProductsCountPerPage] =
-    React.useState(productsPerPage);
-  const dispatch = useDispatch();
-  const product = useSelector((state) => state.product);
+    React.useState(REACT_APP_PERPAGE);
 
   //! Toolbars
   const [isCheckAll, setIsCheckAll] = React.useState(false);
-  const [checkProductIds, setCheckProductIds] = React.useState([]); //! Nhung doi tuong checkAll co trong product
+  const [checkedProductIds, setCheckedProductIds] = React.useState([]); //! Nhung doi tuong checkAll co trong product
 
-  //! Search
+  const breadcrumbRoute = [
+    { label: 'Home', path: '/' },
+    {
+      label: 'Dashboard',
+      path: '/admin',
+    },
+    { label: 'Quản lý Sản phẩm', path: '/admin/products', active: true },
+  ];
+
+  //! local state DeleteComfirmationModalComponent
+  const [deleteType, setDeleteType] = React.useState(null); //! single or multiple
+  const [deleteIds, setDeleteIds] = React.useState(null); //! id
+  const [showConfirmationModal, setShowConfirmationModal] =
+    React.useState(false);
+  const [deleteMessage, setDeleteMessage] = React.useState(null);
+  const [singleMessage, setSingleMessage] = React.useState(null);
+  const [multipleMessage, setMultipleMessage] = React.useState(null);
+
+  //! state Alert
+  const [showAlert, setShowAlert] = React.useState(false);
+
+  //! stateRedux:
+  const dispatch = useDispatch();
+  const product = useSelector((state) => state.product);
   const search = useSelector((state) => state.search);
-
-  const productproductsCountCountRef = React.useRef(0);
-  console.log(
-    '%c__Debugger__ManageProductScreen\n__***__product.productsCount__',
-    'color: chartreuse;',
-    (productproductsCountCountRef.current += 1),
-    ':',
-    product.productsCount,
-    '\n'
-  );
-  // React.useEffect(() => {
-  //   dispatch(getProductsCount());
-  // }, []);
 
   //! effect deps: Pagination, Search
   React.useEffect(() => {
     loadAllProducts();
-  }, [search.text, currentPage]);
-
-  // React.useEffect(() => {
-  //   setProductsCountPerPage(
-  //     product.productsCount - (currentPage - 1) * productsPerPage >=
-  //       productsPerPage
-  //       ? productsPerPage
-  //       : product.productsCount - (currentPage - 1) * productsPerPage
-  //   );
-  // }, []);
+  }, [search, sort, order, currentPage]);
 
   //! effect Error
   React.useEffect(() => {
@@ -69,17 +77,26 @@ const ManageProductScreen = () => {
   //! slug, _id,
   const loadAllProducts = () => {
     dispatch(
-      fetchProductsByFilter({
-        search: { query: search.text },
-        sort: 'price',
-        order: 'descending',
+      fetchProductsByFilters({
+        search,
+        sort,
+        order,
         page: currentPage,
-        perPage: 18,
+        perPage: REACT_APP_PERPAGE,
       })
     );
   };
 
-  const handleRemove = async (productId) => {
+  const handleSelectAll = () => {
+    setIsCheckAll(!isCheckAll);
+    if (!isCheckAll) {
+      setCheckedProductIds(product.products.map((product) => product._id));
+    } else {
+      setCheckedProductIds([]); //! unticked
+    }
+  };
+
+  const handleDelete = async (productId) => {
     try {
       const deletedProduct = await dispatch(removeProduct(productId)).unwrap();
       toast.success(`Sản phẩm ${deletedProduct.name} đã được xóa`);
@@ -89,55 +106,140 @@ const ManageProductScreen = () => {
     }
   };
 
-  const handleSelectALl = (e) => {
-    setIsCheckAll(!isCheckAll);
-    if (!isCheckAll) {
-      setCheckProductIds(product.products.map((product) => product._id));
-    } else {
-      setCheckProductIds([]);
-    }
-  };
-
-  const handleDeleteAll = async () => {
-    try {
-      await dispatch(removeProducts(checkProductIds)).unwrap();
-      loadAllProducts();
-    } catch (error) {
-      toast.error(error);
-    }
+  const handleDeleteAll = (productIds) => {
+    dispatch(removeProducts(productIds))
+      .unwrap()
+      .then((result) => {
+        setCheckedProductIds([]);
+        loadAllProducts();
+      })
+      .catch((error) => {
+        toast.error(error);
+      });
   };
 
   const handleCardCheckChange = (e) => {
     const { id, checked } = e.target;
     if (!checked) {
-      setCheckProductIds(
-        checkProductIds.filter((productId) => productId !== id)
+      setCheckedProductIds(
+        checkedProductIds.filter((productId) => productId !== id)
       );
     } else {
-      setCheckProductIds([...checkProductIds, id]);
+      setCheckedProductIds([...checkedProductIds, id]);
     }
     //! reset isCheckAll
-    if (checkProductIds.length === 0 && isCheckAll) {
+    if (checkedProductIds.length === 0 && isCheckAll) {
       setIsCheckAll(false);
     }
   };
 
+  //! DeleteConfirmationModal
+
+  const deleteTypeCountRef = React.useRef(0);
+  const handleShowDeleteModal = (type, productIds) => {
+    setDeleteIds(productIds); //! string or array
+    setDeleteType(type); //! single or multiple
+    setSingleMessage(null);
+    setMultipleMessage(null);
+
+    console.log(
+      '%c__Debugger__ManageProductScreen\n__handleShowDeleteModal__deleteType__',
+      'color: chartreuse;',
+      (deleteTypeCountRef.current += 1),
+      ':',
+      deleteType,
+      '\n'
+    );
+
+    if (type === 'single') {
+      setDeleteMessage(
+        // fruits.find((x) => x.id === id).name
+        `Bạn có muốn xóa sản phẩm [${
+          product.products.find((product) => product._id === productIds).name
+        }] này không?`
+      );
+      setSingleMessage(
+        // fruits.find((x) => x.id === id).name
+        `Bạn đã xóa sản phẩm [${
+          product.products.find((product) => product._id === productIds).name
+        }] thành công.`
+      );
+    } else if (type === 'multiple') {
+      setDeleteMessage(
+        `Có ${productIds.length} sản phẩm chờ được xóa. Bạn muốn xóa không?`
+      );
+      setMultipleMessage(
+        `Bạn đã xóa ${productIds.length} sản phẩm thành công.`
+      );
+    }
+    //! show Modal
+    setShowConfirmationModal(true);
+  };
+
+  const handleHideModal = () => {
+    setShowConfirmationModal(false);
+  };
+
+  //! handle the deletion of the product
+  const consCountRef = React.useRef(0);
+  const handleSubmitDelete = () => {
+    console.log(
+      '%c__Debugger__ManageProductScreen\n__handleSubmitDelete__',
+      'color: Gold;',
+      (consCountRef.current += 1),
+      '\n'
+    );
+    if (deleteType === 'single') {
+      //! single Id
+      handleDelete(deleteIds);
+    } else if (deleteType === 'multiple') {
+      //! multiple Ids
+      handleDeleteAll(deleteIds);
+    }
+    handleHideModal();
+    setShowAlert(true);
+    // clearMessage();
+  };
+
+  const clearAlertMessage = () => {
+    setDeleteMessage('');
+    setMultipleMessage('');
+    setSingleMessage('');
+  };
+
   return (
-    <div>
-      <Row>
-        {
-          //! Breadcrumb
-        }
-      </Row>
+    <>
+      <BreadcrumbComponent breadcrumbRoute={breadcrumbRoute} />
       <h1>Quản lý Sản phẩm </h1>
+      {singleMessage ? (
+        <AlertDismissibleComponent
+          show={showAlert}
+          setShow={setShowAlert}
+          variant="success"
+        >
+          {singleMessage}
+        </AlertDismissibleComponent>
+      ) : null}
+      {multipleMessage ? (
+        <AlertDismissibleComponent
+          show={showAlert}
+          setShow={setShowAlert}
+          variant="success"
+        >
+          {multipleMessage}
+        </AlertDismissibleComponent>
+      ) : null}
+
       <ToolbarComponent
+        setSort={setSort}
+        setOrder={setOrder}
         role="toolbar"
         aria-label="Toolbar with button groups"
-        items={product.products}
         isCheckAll={isCheckAll}
-        checkProductIds={checkProductIds}
-        handleCheckChange={handleSelectALl}
-        handleDelete={handleDeleteAll}
+        checkedProductIds={checkedProductIds}
+        currentPage={currentPage}
+        handleCheckChange={handleSelectAll}
+        handleShowDeleteModal={handleShowDeleteModal}
       />
       {product.loading === true ? (
         <AdminLoadingProductCard count={productsCountPerPage} />
@@ -153,9 +255,10 @@ const ManageProductScreen = () => {
                   <Col key={product._id} xs={6} sm={4} md={3} lg={2}>
                     <AdminProductCard
                       product={product}
-                      handleRemove={handleRemove}
-                      checkProductIds={checkProductIds}
+                      handleDelete={handleDelete}
+                      checkedProductIds={checkedProductIds}
                       handleCheckChange={handleCardCheckChange}
+                      handleShowDeleteModal={handleShowDeleteModal}
                     />
                   </Col>
                 );
@@ -165,13 +268,21 @@ const ManageProductScreen = () => {
             <PaginationComponent
               currentPage={currentPage}
               itemsCount={product.productsCount}
-              itemsPerPage={18}
+              itemsPerPage={REACT_APP_PERPAGE}
               setCurrentPage={setCurrentPage}
             />
           </div>
         </>
       )}
-    </div>
+      <DeleteConfirmationModalComponent
+        type={deleteType}
+        ids={deleteIds}
+        showModal={showConfirmationModal}
+        message={deleteMessage}
+        handleHideModal={handleHideModal}
+        handleSubmitDelete={handleSubmitDelete}
+      />
+    </>
   );
 };
 

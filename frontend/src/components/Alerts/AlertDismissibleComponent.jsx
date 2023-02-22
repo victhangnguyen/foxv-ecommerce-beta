@@ -7,27 +7,26 @@ const AlertDismissibleComponent = ({
   children,
   title,
   labelButton,
+  variant,
 }) => {
   const [seconds, setSeconds] = React.useState(5);
 
   React.useEffect(() => {
-    console.log('__Debugger__AlertDismissComp__run: Effect');
-    //! effect
     const timer = setTimeout(() => {
       setShow(false);
     }, 5000);
     return () => clearTimeout(timer);
-  }, []);
+  });
 
-  //! count seconds
-  React.useEffect(() => {
-    const timer = setTimeout(() => setSeconds(seconds - 1), 1000);
-    return () => clearTimeout(timer);
-  }); //! re-render after 1 second
+  // //! count seconds
+  // React.useEffect(() => {
+  //   const timer = setTimeout(() => setSeconds(seconds - 1), 1000);
+  //   return () => clearTimeout(timer);
+  // }); //! re-render after 1 second
 
   return (
     <>
-      <Alert show={show} variant="success">
+      <Alert show={show} variant={variant}>
         <Alert.Heading>{title}</Alert.Heading>
         <div>{children}</div>
         <hr />

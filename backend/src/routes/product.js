@@ -10,7 +10,7 @@ const router = express.Router();
 //! @access   Private: Admin
 router.post(
   '/product',
-  upload.array('images[]'),
+  upload.array('images[]', 8),
   productController.createProduct
 );
 
@@ -44,14 +44,13 @@ router.delete('/product/:productId', productController.removeProduct);
 //! @access   Private
 router.put(
   '/product/:productId',
-  upload.array('images[]'),
+  upload.array('images[]', 8),
   productController.updateProduct
 );
 
 //! @desc     Search the product
 //! @route    POST /api/search/filters
 //! @access   Public
-router.post('/search/filters', productController.fetchProductsByFilter)
-
+router.post('/search/filters', productController.fetchProductsByFilters);
 
 export default router;

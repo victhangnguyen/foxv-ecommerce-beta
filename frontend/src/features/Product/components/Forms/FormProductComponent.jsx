@@ -1,16 +1,15 @@
+import _ from 'lodash';
 import React from 'react';
-import { useParams } from 'react-router-dom';
 import * as yup from 'yup';
-import productService from '../../services/productService';
 
 //! imp Components
-import { Row, Col, Button } from 'react-bootstrap';
+import { Button } from 'react-bootstrap';
 import FormComponent from '../../../../components/Forms/FormComponent';
+import ImageComponent from '../../../../components/Forms/ImageComponent';
 import InputComponent from '../../../../components/Forms/InputComponent';
 import SelectComponent from '../../../../components/Forms/SelectComponent';
 import SelectControllerComponent from '../../../../components/Forms/SelectControllerComponent';
 import TagControllerComponent from '../../../../components/Forms/TagControllerComponent';
-import ImageComponent from '../../../../components/Forms/ImageComponent';
 
 const validationSchema = yup.object({
   name: yup
@@ -40,33 +39,16 @@ const validationSchema = yup.object({
     .max(10000000, 'Nhiều nhất là 10 triệu'),
 });
 
-
 const ProductFormComponent = ({
   product,
+  initialValues,
   categories,
   subCategories,
   handleCategoryChange,
   showSub,
   loading,
   onSubmit,
-  labelButton = 'Tạo ngay',
 }) => {
-  const values = {
-    name: product.name || '',
-    description: product.description || '',
-    category: product.category?._id || product.category || '',
-    subCategories:
-      product.subCategories?.length > 0
-        ? product.subCategories.map((sub) => sub._id)
-        : [],
-    price: product.price || 0,
-    shipping: product.shipping || 'no',
-    quantity: product.quantity || 0,
-    color: product.color || '',
-    brand: product.brand || '',
-    images: product.images || [],
-  };
-
   const categoryOptions = categories?.map((category) => ({
     key: category._id,
     value: category._id,
@@ -91,7 +73,7 @@ const ProductFormComponent = ({
   return (
     <div className="screen-body mb-4 p-3">
       <FormComponent
-        values={values}
+        initialValues={initialValues}
         validationSchema={validationSchema}
         onSubmit={onSubmit}
         className="form-product"
@@ -205,7 +187,11 @@ const ProductFormComponent = ({
           //! Submit
         }
         <Button className="btn-submit" variant="primary" type="submit">
-          {loading ? 'Loading...' : labelButton}
+          {loading
+            ? 'Loading...'
+            : _.isEmpty(product)
+            ? 'Thêm sản phẩm'
+            : 'Cập nhật sản phẩm'}
         </Button>
       </FormComponent>
     </div>

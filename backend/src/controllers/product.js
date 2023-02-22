@@ -1,6 +1,10 @@
 import slugify from 'slugify';
 import Logging from '../library/Logging.js';
 import config from '../config/index.js';
+import path from 'path';
+
+//! imp Utils
+import * as fileHelper from '../utils/file.js';
 
 //! imp Models
 import Product from '../models/Product.js';
@@ -74,9 +78,7 @@ export const createProduct = async (req, res, next) => {
     if (images.length < 1) {
       throw new Error('Chưa đính kèm tập tin hình ảnh!');
     }
-
-    // baseURL + port + '/images/' + img.filename
-    images = images.map((img) => `${baseURL}:${port}/images/${img.filename}`);
+    images = images.map((img) => img.filename);
 
     const product = await Product.create({
       ...req.body,
@@ -92,30 +94,40 @@ export const createProduct = async (req, res, next) => {
 };
 
 export const updateProduct = async (req, res, next) => {
+  //! Frontend put Empty Array or Image Array
   const productId = req.params.productId;
   let images = req.files;
+  console.log('__Debugger__product\n__updateProduct__images: ', images, '\n');
   try {
+    let newProduct;
     req.body.slug = slugify(req.body.name);
 
-    let product;
-    if (!images.length) {
-      product = { ...req.body };
+    const isExistImages = images.length;
+    if (isExistImages) {
+      images = images.map((img) => img.filename);
+      newProduct = { ...req.body, images };
+      //! Delete old-images
+      const product = await Product.findById(productId);
+      if (!product) {
+        throw new Error('Product not found!');
+      }
+
+      const fileDir = path.join(fileHelper.rootDir, 'images');
+      const files = product.images;
+
+      const deletedFiles = await fileHelper.deleteFiles(fileDir, files);
+      Logging.info(deletedFiles);
     } else {
-      images = images.map((img) => `${baseURL}:${port}/images/${img.filename}`);
-      product = { ...req.body, images };
+      newProduct = { ...req.body };
     }
 
-    // let product;
-    // if (image?.filename) {
-    //   image = 'images/' + image.filename;
-    //   product = { ...req.body, image };
-    // } else {
-    //   product = (({ image, ...rest }) => rest)(req.body);
-    // }
-
-    const updatedProduct = await Product.findByIdAndUpdate(productId, product, {
-      new: true,
-    });
+    const updatedProduct = await Product.findByIdAndUpdate(
+      productId,
+      newProduct,
+      {
+        new: true,
+      }
+    );
 
     return res.status(201).json(updatedProduct);
   } catch (error) {
@@ -126,10 +138,21 @@ export const updateProduct = async (req, res, next) => {
 
 export const removeProduct = async (req, res, next) => {
   const productId = req.params.productId;
-  try {
-    const response = await Product.findByIdAndRemove(productId).exec();
 
-    
+  try {
+    //! delete database -> delete Files
+    const product = await Product.findById(productId);
+    if (!product) {
+      throw new Error('Product not found!');
+    }
+
+    const fileDir = path.join(fileHelper.rootDir, 'images');
+    const files = product.images;
+
+    const deletedFiles = await fileHelper.deleteFiles(fileDir, files);
+    Logging.info(deletedFiles);
+
+    const response = await Product.findByIdAndRemove(productId).exec();
 
     res.status(200).json(response);
   } catch (error) {
@@ -139,12 +162,44 @@ export const removeProduct = async (req, res, next) => {
 };
 
 export const removeProducts = async (req, res, next) => {
-  const ids = req.query.ids;
+  const productIds = req.query.ids;
+  console.log('productIds: ', productIds);
   try {
-    if (!ids.length) return; //! exists ids
+    if (!productIds.length) return; //! exists productIds
+
+    const deletedProductQuene = productIds.map((productId) => {
+      return new Promise((resolve, reject) => {
+        Product.findById(productId).then((productDoc) => {
+          if (!productDoc) {
+            reject('Product not found!');
+          }
+          const fileDir = path.join(fileHelper.rootDir, 'images');
+          const files = productDoc.images;
+
+          fileHelper
+            .deleteFiles(fileDir, files)
+            .then((deletedFiles) => {
+              resolve(deletedFiles);
+            })
+            .catch((error) => {
+              console.log(error);
+            });
+        });
+      }).catch((error) => {
+        console.log(error);
+      });
+    });
+
+    await Promise.all(deletedProductQuene)
+      .then((deletedFile) => {
+        Logging.info(deletedFile);
+      })
+      .catch((error) => {
+        Logging.error(error);
+      });
 
     const deletedProducts = await Product.deleteMany({
-      _id: { $in: ids },
+      _id: { $in: productIds },
     });
 
     res.status(200).json(deletedProducts);
@@ -155,46 +210,128 @@ export const removeProducts = async (req, res, next) => {
 };
 
 //! Search: Query
-const handleSearchQuery = async (req, res, query) => {
-  const { sort, order, page, perPage } = req.body;
+const handleSearchQuery = async (req, res, next) => {
+  const { search, sort, order, page, perPage } = req.body;
   try {
-    const products = await Product.find({ $text: { $search: query } })
-      .sort([
-        ['_id', 'desc'],
-        [sort, order],
-      ])
-      .skip((page - 1) * perPage)
-      .limit(perPage)
+    const products = await Product.find({ $text: { $search: search.text } })
       .populate('category', '_id name')
       .populate('subCategories', '_id name')
       .populate('creator', '_id name')
+      .sort([
+        [sort, order],
+        ['_id', 'desc'],
+      ])
+      .skip((page - 1) * perPage)
+      .limit(perPage)
       .exec();
 
-    const productsCount = products.length;
+    const productsCount = await Product.find({
+      $text: { $search: search.text },
+    }).count();
 
-    res.status(200).json({ products, productsCount });
+    return res.status(200).json({ products, productsCount });
   } catch (error) {
     Logging.error('Error__ctrls__product: ' + error);
     res.status(400).json({ message: error.message });
   }
 };
 
-export const fetchProductsByFilter = async (req, res, next) => {
+//! Search: Price
+const handleSearchPrice = async (req, res, next) => {
   const { search, sort, order, page, perPage } = req.body;
   try {
-    if (search.query) {
-      return await handleSearchQuery(req, res, search.query);
-    }
+    const priceGte = search.price.split('-')[0];
+    const priceLte = search.price.split('-')[1];
 
+    const products = await Product.find({
+      price: {
+        $gte: priceGte,
+        $lte: priceLte,
+      },
+    })
+      .populate('category', '_id name')
+      .populate('subCategories', '_id name')
+      .populate('creator', '_id name')
+      .sort([
+        [sort, order],
+        ['_id', 'desc'],
+      ])
+      .skip((page - 1) * perPage)
+      .limit(perPage)
+      .exec();
+
+    const productsCount = await Product.find({
+      price: {
+        $gte: priceGte,
+        $lte: priceLte,
+      },
+    }).count();
+
+    return res.status(200).json({ products, productsCount });
+  } catch (error) {
+    Logging.error('Error__ctrls__product: ' + error);
+    res.status(400).json({ message: error.message });
+  }
+};
+
+//! Search: Category
+const handleSearchCategory = async (req, res, next) => {
+  const { search, sort, order, page, perPage } = req.body;
+  const categoryId = search.category;
+  try {
+    const products = await Product.find({ category: categoryId })
+      .populate('category', '_id name')
+      .populate('subCategories', '_id name')
+      .populate('creator', '_id name')
+      .sort([
+        [sort, order],
+        ['_id', 'desc'],
+      ])
+      .skip((page - 1) * perPage)
+      .limit(perPage)
+      .exec();
+
+    const productsCount = await Product.find({ category: categoryId }).count();
+
+    return res.status(200).json({ products, productsCount });
+  } catch (error) {
+    Logging.error('Error__ctrls__product: ' + error);
+    res.status(400).json({ message: error.message });
+  }
+};
+
+export const fetchProductsByFilters = async (req, res, next) => {
+  const { search, sort, order, page, perPage } = req.body;
+  console.log(
+    '__Debugger__product\n__fetchProductsByFilters__search: ',
+    search,
+    ' - sort:',
+    sort,
+    ' - order:',
+    order,
+    ' - page:',
+    page,
+    ' - perPage:',
+    perPage,
+    '\n'
+  );
+
+  try {
+    if (search.text) {
+      return await handleSearchQuery(req, res, next);
+    }
+    if (search.price) {
+      return await handleSearchPrice(req, res, next);
+    }
     if (search.category) {
-      return await handleSearchQuery(req, res, search.query);
+      return await handleSearchCategory(req, res, next);
     }
 
     //! default
     let products = await Product.find()
       .sort([
-        ['_id', 'desc'],
         [sort, order],
+        ['_id', 'desc'],
       ])
       .skip((page - 1) * perPage)
       .limit(perPage)

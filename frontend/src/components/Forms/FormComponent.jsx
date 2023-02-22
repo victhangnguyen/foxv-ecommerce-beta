@@ -34,7 +34,7 @@ const useYupValidationResolver = (validationSchema) =>
   );
 
 const FormComponent = ({
-  values,
+  initialValues,
   defaultValues,
   validationSchema,
   onSubmit,
@@ -61,19 +61,19 @@ const FormComponent = ({
   const fields = children.map((child) => child.props?.name);
   //! initialize Values
   React.useEffect(() => {
-    //! if values is Empty
-    if (Object.keys(values).length) {
+    //! if initialValues is Empty
+    if (Object.keys(initialValues).length) {
       fields.forEach((field) => {
         if (!field) return;
-        methods.setValue(field, values[field]);
+        methods.setValue(field, initialValues[field]);
       });
     }
-  }, [JSON.stringify(values)]);
+  }, [JSON.stringify(initialValues)]);
 
   // //! initialize Values
   // React.useEffect(() => {
-  //   methods.reset(values);
-  // }, [methods.reset, values]);
+  //   methods.reset(initialValues);
+  // }, [methods.reset, initialValues]);
 
   const checkKeyDown = (e) => {
     if (e.code === 'Enter') {

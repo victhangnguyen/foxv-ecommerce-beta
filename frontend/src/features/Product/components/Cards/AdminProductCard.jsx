@@ -5,16 +5,36 @@ import { Link, useNavigate } from 'react-router-dom';
 import TrashIcon from '../../../../components/Icons/TrashIcon';
 import EditRegularIcon from '../../../../components/Icons/EditRegularIcon';
 
-const AdminProductCard = ({ product, checkProductIds, handleRemove, handleCheckChange }) => {
+const REACT_APP_SERVER = 'http://127.0.0.1';
+const REACT_APP_PORT = 5000;
+
+const AdminProductCard = ({
+  product,
+  checkedProductIds,
+  handleShowDeleteModal,
+  handleCheckChange,
+}) => {
   return (
     <Card as="article" className="my-3 p-3 rounded card-admin-product">
       <Card.Header>
-        <FormCheck inline id={product._id} checked={checkProductIds.includes(product._id)} onChange={handleCheckChange} />
+        <FormCheck
+          inline
+          id={product._id}
+          checked={checkedProductIds.includes(product._id)}
+          onChange={handleCheckChange}
+        />
       </Card.Header>
       <Card.Body>
         <Link to={`/admin/product/${product._id}`}>
           {product.images.length && (
-            <Card.Img src={product.images[0]} variant="top" />
+            <Card.Img
+              src={
+                Array.isArray(product.images)
+                  ? `${REACT_APP_SERVER}:${REACT_APP_PORT}/images/${product.images[0]}`
+                  : product.images[0]
+              }
+              variant="top"
+            />
           )}
           <Card.Title as={'div'} className="card-admin-title-product">
             <strong>{product.name}</strong>
@@ -33,7 +53,7 @@ const AdminProductCard = ({ product, checkProductIds, handleRemove, handleCheckC
         <Button
           size="sm"
           variant={'danger'}
-          onClick={() => handleRemove(product._id)}
+          onClick={() => handleShowDeleteModal('single', product._id)}
         >
           <span className="me-1">
             <TrashIcon color="white" size={'0.75rem'} />

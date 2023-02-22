@@ -82,10 +82,10 @@ export const removeProducts = createAsyncThunk(
   }
 );
 
-export const fetchProductsByFilter = createAsyncThunk(
-  'product/fetchProductsByFilter',
+export const fetchProductsByFilters = createAsyncThunk(
+  'product/fetchProductsByFilters',
   async (args, thunkAPI) => {
-    const response = await productService.fetchProductsByFilter(
+    const response = await productService.fetchProductsByFilters(
       args.search,
       args.sort,
       args.order,
@@ -161,6 +161,7 @@ const productSlice = createSlice({
       })
       .addCase(removeProducts.fulfilled, (state, action) => {
         state.loading = false;
+        state.product = []; //! performent need Backend return deleted productId to improve UI
         state.productsCount = state.productsCount - action.payload.deletedCount;
       })
       .addCase(removeProducts.rejected, (state, action) => {
@@ -168,16 +169,16 @@ const productSlice = createSlice({
         state.error = action.payload;
       });
     builder
-      .addCase(fetchProductsByFilter.pending, (state, action) => {
+      .addCase(fetchProductsByFilters.pending, (state, action) => {
         state.loading = true;
       })
-      .addCase(fetchProductsByFilter.fulfilled, (state, action) => {
+      .addCase(fetchProductsByFilters.fulfilled, (state, action) => {
         //! action.payload = {products, productsCount}
         state.loading = false;
         state.products = action.payload.products;
         state.productsCount = action.payload.productsCount;
       })
-      .addCase(fetchProductsByFilter.rejected, (state, action) => {
+      .addCase(fetchProductsByFilters.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
       });

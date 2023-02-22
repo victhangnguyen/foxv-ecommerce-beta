@@ -111,11 +111,18 @@
     // flex-grow: 1;
     display: flex;
     justify-content: center;
-    padding: 1rem;
+    margin: 1rem;
     // padding-top: 100%;
     position: relative;
     object-fit: cover;
     height: 250px;
+
+    border: 1px solid rgb(214, 216, 218);
+    border-radius: 6px;
+    background-color: rgb(254, 254, 254);
+
+    overflow: hidden;
+
     img {
       // position: absolute;
 
@@ -140,9 +147,15 @@
 
   &__image-slides {
     display: flex;
-    width: 100%;
     justify-content: space-between;
+    margin: 1rem;
+
     &__image-slide {
+      border: 1px solid rgb(214, 216, 218);
+      border-radius: 6px;
+      background-color: rgb(254, 254, 254);
+      overflow: hidden;
+
       // flex-basis: 24%;
       cursor: pointer;
       img {

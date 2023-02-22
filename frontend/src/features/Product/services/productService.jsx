@@ -45,7 +45,7 @@ const productService = {
     const url = `/products?${productIdPairs}`;
     return axiosInstance.delete(url);
   },
-  fetchProductsByFilter: (search, sort, order, page, perPage) => {
+  fetchProductsByFilters: (search, sort, order, page, perPage) => {
     const url = `/search/filters`;
     return axiosInstance.post(url, { search, sort, order, page, perPage });
   },
