@@ -38,7 +38,7 @@ const ManageProductScreen = () => {
   const [isCheckAll, setIsCheckAll] = React.useState(false);
   const [checkedProductIds, setCheckedProductIds] = React.useState([]); //! Nhung doi tuong checkAll co trong product
 
-  const breadcrumbRoute = [
+  const breadcrumbItems = [
     { label: 'Home', path: '/' },
     {
       label: 'Dashboard',
@@ -68,6 +68,10 @@ const ManageProductScreen = () => {
   React.useEffect(() => {
     loadAllProducts();
   }, [search, sort, order, currentPage]);
+
+  React.useEffect(() => {
+    return () => dispatch(clearSearch());
+  }, []);
 
   //! effect Error
   React.useEffect(() => {
@@ -209,7 +213,7 @@ const ManageProductScreen = () => {
 
   return (
     <>
-      <BreadcrumbComponent breadcrumbRoute={breadcrumbRoute} />
+      <BreadcrumbComponent breadcrumbItems={breadcrumbItems} />
       <h1>Quản lý Sản phẩm </h1>
       {singleMessage ? (
         <AlertDismissibleComponent

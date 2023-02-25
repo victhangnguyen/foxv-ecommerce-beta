@@ -1,7 +1,9 @@
 import express from 'express';
 import * as productController from '../controllers/product.js';
-//! imp Middleware
-import upload from '../middleware/upload.js';
+//! imp middlewares
+import uploadHandler from '../middlewares/upload.js';
+import { validateSchema } from '../middlewares/validator.js';
+import { createProductSchema } from '../middlewares/schemaValidations/index.js';
 
 const router = express.Router();
 
@@ -10,7 +12,8 @@ const router = express.Router();
 //! @access   Private: Admin
 router.post(
   '/product',
-  upload.array('images[]', 8),
+  uploadHandler,
+  validateSchema(createProductSchema),
   productController.createProduct
 );
 
@@ -44,7 +47,7 @@ router.delete('/product/:productId', productController.removeProduct);
 //! @access   Private
 router.put(
   '/product/:productId',
-  upload.array('images[]', 8),
+  uploadHandler,
   productController.updateProduct
 );
 

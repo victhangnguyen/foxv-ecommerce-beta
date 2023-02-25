@@ -1,18 +1,18 @@
+import _, { method } from 'lodash';
 import React from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate, useParams } from 'react-router-dom';
 import { toast } from 'react-toastify';
-import _ from 'lodash';
 
+//! imp Utils
+import * as errorHandling from '../../../utils/errorHandling';
 //! imp Services
-import productService from '../services/productService';
 import categoryService from '../../Category/services/categoryService';
+import productService from '../services/productService';
 
 //! imp Components
-import ToolbarComponent from '../../../components/Toolbars/ToolbarComponent';
-import BreadcrumbComponent from '../../../components/Breadcrumbs/BreadcrumbComponent';
-import FormProductComponent from '../components/Forms/FormProductComponent';
 import AlertDismissibleComponent from '../../../components/Alerts/AlertDismissibleComponent';
+import BreadcrumbComponent from '../../../components/Breadcrumbs/BreadcrumbComponent';
+import ProductFormComponent from '../components/Forms/ProductFormComponent';
 
 const AddEditProductScreen = () => {
   const navigate = useNavigate();
@@ -28,7 +28,7 @@ const AddEditProductScreen = () => {
 
   const { productId } = useParams();
 
-  const breadcrumbRoute = [
+  const breadcrumbItems = [
     { label: 'Home', path: '/' },
     {
       label: 'Dashboard',
@@ -59,6 +59,7 @@ const AddEditProductScreen = () => {
 
   //! effect DidMount
   React.useEffect(() => {
+    console.log('productId: ', productId);
     loadCategories();
     if (productId) {
       //! Mode: Edit Product
@@ -73,9 +74,11 @@ const AddEditProductScreen = () => {
     try {
       setLoading(true);
       const productDoc = await productService.getProduct(productId);
+      console.log('productDoc: ', productDoc);
       setLoading(false);
       setProduct(productDoc);
       const categoryId = productDoc.category._id;
+      console.log('categoryId: ', categoryId);
       if (categoryId) {
         setShowSub(true);
       }
@@ -125,30 +128,27 @@ const AddEditProductScreen = () => {
     }
   };
 
-  const handleSubmit = async (productData) => {
-    console.log(
-      '__Debugger__AddEditProductScreen\n__handleSubmit__productData: ',
-      productData,
-      '\n'
-    );
-    const isSameData = _.isEqual(initialValues, productData);
+  const handleSubmit = async (data, e, methods) => {
+    const isSameData = _.isEqual(initialValues, data);
+
     if (isSameData) {
       return toast.error('Chưa có thông tin nào thay đổi.');
     }
 
-    const { images, ...ortherProps } = productData;
+    const { images } = data;
 
     try {
       //! Neu thay doi Image => FileList
       //! Khong thay doi Image => Empty Array
       let imagesData = [];
+
       //! FileList
       if (!Array.isArray(images)) {
         imagesData = Array.from(images);
       }
 
       const product = {
-        ...productData,
+        ...data,
         images: imagesData,
       };
 
@@ -165,20 +165,44 @@ const AddEditProductScreen = () => {
       } else {
         //! Mode: Create Product
         const newProduct = await productService.createProduct(product);
+        //! Error Handling
+
+        // if (response.statusCode > 300) {
+        //   setError('root.serverError', {
+        //     type: response.statusCode,
+        //     message: e.message,
+        //     // meta: {}, // something to be consider to included in the phase 2 with meta object
+        //   })
+
         setNewProduct(newProduct);
         setShowAlert(true);
         toast.success(`${newProduct.name} đã được tạo!`);
         navigate('/admin/products');
       }
     } catch (error) {
-      console.log('Error: ', error);
+      //! Error Handling
+      if (error.response?.status === 422) {
+        const errors = error.response.data.errors;
+        if (!errors.length) return;
+        errors.forEach((error) => {
+          if (error.param === 'subCategories') {
+            if (!data.category) return;
+          }
+          methods.setError(error.param, {
+            type: 'server',
+            message: error.msg,
+          });
+        });
+        console.log('errors: ', errors);
+      }
+
       toast.error(error.response?.data.message);
     }
   };
 
   return (
     <div className="screen-main mb-3 mt-md-4">
-      <BreadcrumbComponent breadcrumbRoute={breadcrumbRoute} />
+      <BreadcrumbComponent breadcrumbItems={breadcrumbItems} />
       {
         //! Show Notication Alert
       }
@@ -226,7 +250,7 @@ const AddEditProductScreen = () => {
       {
         //! FORM SubCategoryFormComponent
       }
-      <FormProductComponent
+      <ProductFormComponent
         initialValues={initialValues}
         product={product}
         categories={categories}

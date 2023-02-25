@@ -1,7 +1,10 @@
 import slugify from 'slugify';
-import Logging from '../library/Logging.js';
 import config from '../config/index.js';
 import path from 'path';
+import { validationResult } from 'express-validator';
+
+//! imp Library
+import Logging from '../library/Logging.js';
 
 //! imp Utils
 import * as fileHelper from '../utils/file.js';
@@ -56,8 +59,8 @@ export const getProductList = async (req, res, next) => {
   try {
     const products = await Product.find({})
       .sort([
-        ['_id', 'desc'],
         [sort, order],
+        ['_id', 'desc'],
       ])
       .skip((page - 1) * perPage)
       .limit(perPage)
@@ -72,12 +75,26 @@ export const getProductList = async (req, res, next) => {
 export const createProduct = async (req, res, next) => {
   let images = req.files;
   try {
+    //! Error Handling
+    const errors = validationResult(req);
+
+    if (!errors.isEmpty()) {
+      console.log(
+        '__Debugger__product\n__createProduct__errors: ',
+        errors,
+        '\n'
+      );
+      console.log(errors);
+      // throw new Error()
+    }
+
     if (!req.body.category) req.body.category = null;
     req.body.slug = slugify(req.body.name);
 
     if (images.length < 1) {
       throw new Error('Chưa đính kèm tập tin hình ảnh!');
     }
+
     images = images.map((img) => img.filename);
 
     const product = await Product.create({
@@ -96,7 +113,8 @@ export const createProduct = async (req, res, next) => {
 export const updateProduct = async (req, res, next) => {
   //! Frontend put Empty Array or Image Array
   const productId = req.params.productId;
-  let images = req.files;
+  let { images, ...otherProps } = req.body;
+
   console.log('__Debugger__product\n__updateProduct__images: ', images, '\n');
   try {
     let newProduct;
@@ -105,7 +123,7 @@ export const updateProduct = async (req, res, next) => {
     const isExistImages = images.length;
     if (isExistImages) {
       images = images.map((img) => img.filename);
-      newProduct = { ...req.body, images };
+      newProduct = { ...otherProps, images };
       //! Delete old-images
       const product = await Product.findById(productId);
       if (!product) {
@@ -118,7 +136,7 @@ export const updateProduct = async (req, res, next) => {
       const deletedFiles = await fileHelper.deleteFiles(fileDir, files);
       Logging.info(deletedFiles);
     } else {
-      newProduct = { ...req.body };
+      newProduct = { ...otherProps };
     }
 
     const updatedProduct = await Product.findByIdAndUpdate(

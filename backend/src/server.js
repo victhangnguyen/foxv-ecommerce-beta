@@ -4,8 +4,8 @@ import cors from 'cors';
 import morgan from 'morgan';
 import url from 'url';
 
-//! imp Utils
-import * as fileHelper from './utils/file.js';
+//! imp Middlewares
+import { notFound, errorHandler } from './middlewares/errorMiddleware.js';
 //! imp Library
 import Logging from './library/Logging.js';
 //! imp Config
@@ -41,6 +41,11 @@ app.use('/api', userRouter);
 app.use('/api', productRouter);
 app.use('/api', categoryRouter);
 app.use('/api', subCategoryRouter);
+
+//! Not Found
+app.use(notFound);
+//! Error Handling
+app.use(errorHandler);
 
 config.db
   .connectMongoDB()

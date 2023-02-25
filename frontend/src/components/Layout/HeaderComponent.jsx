@@ -51,7 +51,7 @@ const HeaderComponent = () => {
               }
               <Nav className="me-auto">
                 <Nav.Link as="div">
-                  <NavLink className={'nav-link'} to={'/event'}>
+                  <NavLink className={'nav-link'} to={'/promotion'}>
                     Khuyến mãi
                   </NavLink>
                 </Nav.Link>
@@ -132,12 +132,12 @@ const HeaderComponent = () => {
                 {user ? (
                   <>
                     {user.result.role === 'admin' && (
-                      <NavLink className="nav-link" to={'/addProduct'}>
+                      <NavLink className="nav-link" to={'/admin/product'}>
                         Thêm sản phẩm
                       </NavLink>
                     )}
                     {user.result.role === 'user' && (
-                      <NavLink className={'nav-link'} to={'/addProduct'}>
+                      <NavLink className={'nav-link'} to={'/cart'}>
                         Giỏ hàng
                       </NavLink>
                     )}

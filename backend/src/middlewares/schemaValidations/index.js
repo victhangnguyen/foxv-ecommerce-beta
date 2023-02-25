@@ -1,0 +1,1 @@
+export {default as createProductSchema} from './createProductSchema.js';

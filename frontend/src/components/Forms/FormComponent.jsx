@@ -42,6 +42,7 @@ const FormComponent = ({
   ...rest
 }) => {
   const resolver = useYupValidationResolver(validationSchema);
+  
   const methods = useForm({
     resolver,
     // defaultValues: defaultValues,
@@ -49,14 +50,14 @@ const FormComponent = ({
 
   const watchAllFields = useWatch({ control: methods.control });
 
-  const watchAllFieldsCountRef = React.useRef(0);
-  console.log(
-    '%c__Debugger__FormComponent\n__***__watchAllFields__',
-    'color: Brown;',
-    (watchAllFieldsCountRef.current += 1),
-    ':',
-    watchAllFields
-  );
+  // const watchAllFieldsCountRef = React.useRef(0);
+  // console.log(
+  //   '%c__Debugger__FormComponent\n__***__watchAllFields__',
+  //   'color: Brown;',
+  //   (watchAllFieldsCountRef.current += 1),
+  //   ':',
+  //   watchAllFields
+  // );
 
   const fields = children.map((child) => child.props?.name);
   //! initialize Values
@@ -85,7 +86,10 @@ const FormComponent = ({
 
   return (
     <Form
-      onSubmit={methods.handleSubmit(onSubmit)}
+      onSubmit={methods.handleSubmit((data, event) =>
+        onSubmit(data, event, methods)
+      )}
+      // onSubmit={methods.handleSubmit(onSubmit)}
       onKeyDown={(e) => checkKeyDown(e)}
       {...rest}
     >

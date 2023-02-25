@@ -1,14 +1,17 @@
 import React from 'react';
-import { createBrowserRouter, Outlet } from 'react-router-dom';
-import { Container } from 'react-bootstrap';
-import { ToastContainer } from 'react-toastify';
+import { createBrowserRouter } from 'react-router-dom';
 
-//! imp Components
+//! imp Comps/System Handling
 import RootComponent from '../components/Layout/RootComponent';
 import ErrorScreen from '../features/Error/screens/ErrorScreen';
-//! Dashboard
+
+//! imp Comps/Public
+import HomeScreen from '../features/Home/screens/HomeScreen';
+import PromotionScreen from '../features/Promotion/screens/PromotionScreen';
+import ShopScreens from '../features/Shop/screens/ShopScreens';
+import ProductDetailScreen from '../features/Product/screens/ProductDetailScreen';
+//! imp Comps/Private: Admin
 import AdminDashboardScreen from '../features/Admin/screens/AdminDashboardScreen';
-//! imp Admin
 import AddEditProductScreen from '../features/Product/screens/AddEditProductScreen';
 import ManageProductScreen from '../features/Product/screens/ManageProductScreen';
 
@@ -21,7 +24,15 @@ const router = createBrowserRouter([
     element: <RootComponent />,
     errorElement: <ErrorScreen />,
     children: [
-      //! Admin Route
+      //! Public Routes
+      { index: true, element: <HomeScreen /> },
+      { path: '/product/:productId', element: <ProductDetailScreen /> },
+      { path: '/promotion', element: <PromotionScreen /> },
+      { path: '/shop', element: <ShopScreens /> },
+      // { path: '/register', element: <RegisterScreen /> },
+      // { path: '/login', element: <LoginScreen /> },
+      
+      //! Private Routes: Admin
       {
         path: '/',
         element: <AdminRoute />,
@@ -31,9 +42,9 @@ const router = createBrowserRouter([
             element: <AdminDashboardScreen />,
             children: [
               //! Product Management
+              { path: 'product/:productId', element: <AddEditProductScreen /> },
               { path: 'products', element: <ManageProductScreen /> },
               { path: 'product', element: <AddEditProductScreen /> },
-              { path: 'product/:productId', element: <AddEditProductScreen /> },
             ],
           },
         ],

@@ -1,11 +1,11 @@
 import { Link } from 'react-router-dom';
-function BreadcrumbComponent({ breadcrumbRoute }) {
-  const renderBreadcrumbItem = breadcrumbRoute.map((bc, index) => (
+function BreadcrumbComponent({ breadcrumbItems }) {
+  const renderBreadcrumbItem = breadcrumbItems.map((item, index) => (
     <li
       key={index}
-      className={`breadcrumb-item ${bc.active ? 'active' : ''}`}
+      className={`breadcrumb-item ${item.active ? 'active' : ''}`}
     >
-      <Link to={bc.path}>{bc.label}</Link>
+      <Link to={item.path}>{item.label}</Link>
     </li>
   ));
   return (

@@ -10,13 +10,12 @@ import { searchQuery } from '../SearchSlice';
 
 const SearchComponent = () => {
   const dispatch = useDispatch();
-  const { text } = useSelector((state) => state.search);
 
   const handleChange = (e) => {
     e.preventDefault();
     const delayed = setTimeout(() => {
-      dispatch(dispatch(searchQuery(e.target.value)));
-    }, 300);
+      dispatch(searchQuery(e.target.value));
+    }, 500);
     return () => clearTimeout(delayed);
   };
 
@@ -32,7 +31,6 @@ const SearchComponent = () => {
         placeholder="Search"
         aria-label="Search"
         onChange={handleChange}
-        defaultValue={text}
       />
       <Button variant="light">
         <SearchIcon />
