@@ -23,17 +23,21 @@ export const getProduct = async (req, res, next) => {
       .populate('subCategories')
       .exec();
     res.status(200).json(product);
-  } catch (error) {
-    Logging.error('Error__ctrls__product: ' + error);
-    res.status(400).json({ message: error.message });
+  } catch (err) {
+    Logging.error('Error__ctrls__product: ' + err);
+    const error = new Error(err);
+    error.httpStatusCode = 400; //! 500;
+    return next(error);
   }
 };
 
 export const getProducts = async (req, res, next) => {
   try {
-  } catch (error) {
-    Logging.error('Error__ctrls__product: ' + error);
-    res.status(400).json({ message: error.message });
+  } catch (err) {
+    Logging.error('Error__ctrls__product: ' + err);
+    const error = new Error(err);
+    error.httpStatusCode = 400; //! 500;
+    return next(error);
   }
 };
 
@@ -42,9 +46,11 @@ export const productsCount = async (req, res, next) => {
     const total = await Product.find({}).estimatedDocumentCount().exec();
     console.log('__Debugger__ctrls/product/productsCount__total: ', total);
     res.status(200).json(total);
-  } catch (error) {
-    Logging.error('Error__ctrls__Category: ' + error);
-    res.status(400).json({ message: error.message });
+  } catch (err) {
+    Logging.error('Error__ctrls__product: ' + err);
+    const error = new Error(err);
+    error.httpStatusCode = 400; //! 500;
+    return next(error);
   }
 };
 
@@ -66,9 +72,11 @@ export const getProductList = async (req, res, next) => {
       .limit(perPage)
       .exec();
     res.status(200).json(products);
-  } catch (error) {
-    Logging.error('Error__ctrls__product: ' + error);
-    res.status(400).json({ message: error.message });
+  } catch (err) {
+    Logging.error('Error__ctrls__product: ' + err);
+    const error = new Error(err);
+    error.httpStatusCode = 400; //! 500;
+    return next(error);
   }
 };
 
@@ -104,9 +112,11 @@ export const createProduct = async (req, res, next) => {
     });
 
     return res.status(201).json(product);
-  } catch (error) {
-    Logging.error('Error__ctrls__product: ' + error);
-    res.status(400).json({ message: error.message });
+  } catch (err) {
+    Logging.error('Error__ctrls__product: ' + err);
+    const error = new Error(err);
+    error.httpStatusCode = 400; //! 500;
+    return next(error);
   }
 };
 
@@ -148,9 +158,11 @@ export const updateProduct = async (req, res, next) => {
     );
 
     return res.status(201).json(updatedProduct);
-  } catch (error) {
-    Logging.error('Error__ctrls__product: ' + error);
-    res.status(400).json({ message: error.message });
+  } catch (err) {
+    Logging.error('Error__ctrls__product: ' + err);
+    const error = new Error(err);
+    error.httpStatusCode = 400; //! 500;
+    return next(error);
   }
 };
 
@@ -173,9 +185,11 @@ export const removeProduct = async (req, res, next) => {
     const response = await Product.findByIdAndRemove(productId).exec();
 
     res.status(200).json(response);
-  } catch (error) {
-    Logging.error('Error__ctrls__product: ' + error);
-    res.status(400).json({ message: error.message });
+  } catch (err) {
+    Logging.error('Error__ctrls__product: ' + err);
+    const error = new Error(err);
+    error.httpStatusCode = 400; //! 500;
+    return next(error);
   }
 };
 
@@ -221,9 +235,11 @@ export const removeProducts = async (req, res, next) => {
     });
 
     res.status(200).json(deletedProducts);
-  } catch (error) {
-    Logging.error('Error__ctrls__product: ' + error);
-    res.status(400).json({ message: error.message });
+  } catch (err) {
+    Logging.error('Error__ctrls__product: ' + err);
+    const error = new Error(err);
+    error.httpStatusCode = 400; //! 500;
+    return next(error);
   }
 };
 
@@ -286,9 +302,11 @@ const handleSearchPrice = async (req, res, next) => {
     }).count();
 
     return res.status(200).json({ products, productsCount });
-  } catch (error) {
-    Logging.error('Error__ctrls__product: ' + error);
-    res.status(400).json({ message: error.message });
+  } catch (err) {
+    Logging.error('Error__ctrls__product: ' + err);
+    const error = new Error(err);
+    error.httpStatusCode = 400; //! 500;
+    return next(error);
   }
 };
 
@@ -312,28 +330,16 @@ const handleSearchCategory = async (req, res, next) => {
     const productsCount = await Product.find({ category: categoryId }).count();
 
     return res.status(200).json({ products, productsCount });
-  } catch (error) {
-    Logging.error('Error__ctrls__product: ' + error);
-    res.status(400).json({ message: error.message });
+  } catch (err) {
+    Logging.error('Error__ctrls__product: ' + err);
+    const error = new Error(err);
+    error.httpStatusCode = 400; //! 500;
+    return next(error);
   }
 };
 
 export const fetchProductsByFilters = async (req, res, next) => {
   const { search, sort, order, page, perPage } = req.body;
-  console.log(
-    '__Debugger__product\n__fetchProductsByFilters__search: ',
-    search,
-    ' - sort:',
-    sort,
-    ' - order:',
-    order,
-    ' - page:',
-    page,
-    ' - perPage:',
-    perPage,
-    '\n'
-  );
-
   try {
     if (search.text) {
       return await handleSearchQuery(req, res, next);
@@ -360,5 +366,10 @@ export const fetchProductsByFilters = async (req, res, next) => {
       .exec();
 
     res.status(200).json({ products, productsCount });
-  } catch (error) {}
+  } catch (err) {
+    Logging.error('Error__ctrls__product: ' + err);
+    const error = new Error(err);
+    error.httpStatusCode = 400; //! 500;
+    return next(error);
+  }
 };

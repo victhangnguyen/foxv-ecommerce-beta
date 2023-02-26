@@ -1,3 +1,5 @@
+import bcrypt from 'bcryptjs';
+
 //! library
 import Logging from './library/Logging.js';
 import slugify from 'slugify';
@@ -9,12 +11,16 @@ import userDatas from './data/userDatas.js';
 import productDatas from './data/productDatas.js';
 import categoryDatas from './data/categoryDatas.js';
 import subCategoryDatas from './data/subCategoryDatas.js';
+import cartDatas from './data/cartDatas.js';
+import orderDatas from './data/orderDatas.js';
 
 //! imp Models
 import User from '../src/models/User.js';
 import Product from '../src/models/Product.js';
 import Category from '../src/models/Category.js';
 import SubCategory from './models/SubCategory.js';
+import Cart from './models/Cart.js';
+import Order from './models/Order.js';
 
 const importData = async () => {
   try {
@@ -22,6 +28,13 @@ const importData = async () => {
     await Category.deleteMany();
     await SubCategory.deleteMany();
     await Product.deleteMany();
+    await Cart.deleteMany();
+    await Order.deleteMany();
+
+    const users = userDatas.map((user) => ({
+      ...user,
+      password: bcrypt.hashSync(user.password, 10),
+    }));
 
     const categories = categoryDatas.map((category) => ({
       ...category,
@@ -38,10 +51,12 @@ const importData = async () => {
       slug: slugify(product.name),
     }));
 
-    const userDocs = await User.insertMany(userDatas);
+    const userDocs = await User.insertMany(users);
     const productDocs = await Product.insertMany(products);
     const categoryDocs = await Category.insertMany(categories);
     const subCategoryDocs = await SubCategory.insertMany(subCategories);
+    const cartDocs = await Cart.insertMany(cartDatas);
+    const orderDocs = await Order.insertMany(orderDatas);
 
     Logging.log('Data Imported!!!');
     process.exit();

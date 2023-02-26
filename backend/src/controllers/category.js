@@ -9,9 +9,11 @@ export const getCategories = async (req, res, next) => {
   try {
     const categories = await Category.find({}).sort({ createdAt: -1 }).exec();
     res.status(200).json(categories);
-  } catch (error) {
-    Logging.error('Error__ctrls__SubCategory: ' + error);
-    res.status(404).json({ message: error.message });
+  } catch (err) {
+    Logging.error('Error__ctrls__category: ' + err);
+    const error = new Error(err);
+    error.httpStatusCode = 400; //! 500;
+    return next(error);
   }
 };
 
@@ -20,8 +22,10 @@ export const getSubCategoriesByCategoryId = async (req, res, next) => {
   try {
     const subCategories = await SubCategory.find({ parent: categoryId }).exec();
     res.status(200).json(subCategories);
-  } catch (error) {
-    Logging.error('Error__ctrls__SubCategory: ' + error);
-    res.status(404).json({ message: error.message });
+  } catch (err) {
+    Logging.error('Error__ctrls__category: ' + err);
+    const error = new Error(err);
+    error.httpStatusCode = 400; //! 500;
+    return next(error);
   }
 };

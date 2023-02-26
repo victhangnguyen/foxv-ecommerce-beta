@@ -7,16 +7,22 @@ import SubCategory from '../models/SubCategory.js';
 export const getSubCategory = async (req, res, next) => {
   try {
     
-  } catch (error) {
-    
+  } catch (err) {
+    Logging.error('Error__ctrls__subCategory: ' + err);
+    const error = new Error(err);
+    error.httpStatusCode = 400; //! 500;
+    return next(error);
   }
 };
 
 export const getSubCaregories = async (req, res, next) => {
   try {
     
-  } catch (error) {
-    
+  } catch (err) {
+    Logging.error('Error__ctrls__subCategory: ' + err);
+    const error = new Error(err);
+    error.httpStatusCode = 400; //! 500;
+    return next(error);
   }
 };
 
