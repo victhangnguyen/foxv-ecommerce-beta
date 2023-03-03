@@ -3,6 +3,8 @@ import { Col, Row } from 'react-bootstrap';
 import { useDispatch, useSelector } from 'react-redux';
 import { toast } from 'react-toastify';
 import _ from 'lodash';
+//! imp Hooks
+import { useItemsPerPage } from '../../../hooks/itemsPerPage';
 
 //! imp Actions RTK
 import {
@@ -15,16 +17,16 @@ import { clearSearch } from '../../Search/SearchSlice';
 
 //! imp Components
 import BreadcrumbComponent from '../../../components/Breadcrumbs/BreadcrumbComponent';
-import DeleteConfirmationModalComponent from '../components/Modals/DeleteConfirmationModalComponent';
+import DeleteConfirmationModalComponent from '../../../components/Modals/DeleteConfirmationModalComponent';
 import PaginationComponent from '../../../components/Pagination/PaginationComponent';
 import ToolbarComponent from '../../../components/Toolbars/ToolbarComponent';
 import AdminLoadingProductCard from '../components/Cards/AdminLoadingProductCard';
 import AdminProductCard from '../components/Cards/AdminProductCard';
 import AlertDismissibleComponent from '../../../components/Alerts/AlertDismissibleComponent';
 
-const REACT_APP_PERPAGE = 18;
-
 const ManageProductScreen = () => {
+  const itemsPerPage = useItemsPerPage(10, 15, 20, 30, 30) || 10;
+
   const [sort, setSort] = React.useState('createdAt');
   const [order, setOrder] = React.useState('desc');
 
@@ -32,19 +34,21 @@ const ManageProductScreen = () => {
   // const productsPerPage = useHookWidth
   //! used to make LoadingCard by PaginationComponent
   const [productsCountPerPage, setProductsCountPerPage] =
-    React.useState(REACT_APP_PERPAGE);
+    React.useState(itemsPerPage);
 
   //! Toolbars
   const [isCheckAll, setIsCheckAll] = React.useState(false);
   const [checkedProductIds, setCheckedProductIds] = React.useState([]); //! Nhung doi tuong checkAll co trong product
 
   const breadcrumbItems = [
-    { label: 'Home', path: '/' },
+    { key: 'breadcrumb-item-1', label: 'Home', path: '/' },
+    { key: 'breadcrumb-item-2', label: 'Dashboard', path: '/admin' },
     {
-      label: 'Dashboard',
-      path: '/admin',
+      key: 'breadcrumb-item-3',
+      label: 'Quản lý Sản phẩm',
+      path: '/admin/products',
+      active: true,
     },
-    { label: 'Quản lý Sản phẩm', path: '/admin/products', active: true },
   ];
 
   //! local state DeleteComfirmationModalComponent
@@ -67,7 +71,7 @@ const ManageProductScreen = () => {
   //! effect deps: Pagination, Search
   React.useEffect(() => {
     loadAllProducts();
-  }, [search, sort, order, currentPage]);
+  }, [search, sort, order, currentPage, itemsPerPage]);
 
   React.useEffect(() => {
     return () => dispatch(clearSearch());
@@ -86,9 +90,29 @@ const ManageProductScreen = () => {
         sort,
         order,
         page: currentPage,
-        perPage: REACT_APP_PERPAGE,
+        perPage: itemsPerPage,
       })
     );
+  };
+
+  const deleteProduct = async (productId) => {
+    try {
+      const deletedProduct = await dispatch(removeProduct(productId)).unwrap();
+      toast.success(`Sản phẩm ${deletedProduct.name} đã được xóa`);
+    } catch (error) {
+      toast.error(error);
+    }
+  };
+
+  const deleteProducts = (productIds) => {
+    dispatch(removeProducts(productIds))
+      .unwrap()
+      .then((result) => {
+        setCheckedProductIds([]);
+      })
+      .catch((error) => {
+        toast.error(error);
+      });
   };
 
   const handleSelectAll = () => {
@@ -98,28 +122,6 @@ const ManageProductScreen = () => {
     } else {
       setCheckedProductIds([]); //! unticked
     }
-  };
-
-  const handleDelete = async (productId) => {
-    try {
-      const deletedProduct = await dispatch(removeProduct(productId)).unwrap();
-      toast.success(`Sản phẩm ${deletedProduct.name} đã được xóa`);
-      loadAllProducts();
-    } catch (error) {
-      toast.error(error);
-    }
-  };
-
-  const handleDeleteAll = (productIds) => {
-    dispatch(removeProducts(productIds))
-      .unwrap()
-      .then((result) => {
-        setCheckedProductIds([]);
-        loadAllProducts();
-      })
-      .catch((error) => {
-        toast.error(error);
-      });
   };
 
   const handleCardCheckChange = (e) => {
@@ -138,22 +140,11 @@ const ManageProductScreen = () => {
   };
 
   //! DeleteConfirmationModal
-
-  const deleteTypeCountRef = React.useRef(0);
   const handleShowDeleteModal = (type, productIds) => {
     setDeleteIds(productIds); //! string or array
     setDeleteType(type); //! single or multiple
     setSingleMessage(null);
     setMultipleMessage(null);
-
-    console.log(
-      '%c__Debugger__ManageProductScreen\n__handleShowDeleteModal__deleteType__',
-      'color: chartreuse;',
-      (deleteTypeCountRef.current += 1),
-      ':',
-      deleteType,
-      '\n'
-    );
 
     if (type === 'single') {
       setDeleteMessage(
@@ -185,21 +176,15 @@ const ManageProductScreen = () => {
   };
 
   //! handle the deletion of the product
-  const consCountRef = React.useRef(0);
-  const handleSubmitDelete = () => {
-    console.log(
-      '%c__Debugger__ManageProductScreen\n__handleSubmitDelete__',
-      'color: Gold;',
-      (consCountRef.current += 1),
-      '\n'
-    );
+  const handleSubmitDelete = async () => {
     if (deleteType === 'single') {
       //! single Id
-      handleDelete(deleteIds);
+      await deleteProduct(deleteIds);
     } else if (deleteType === 'multiple') {
       //! multiple Ids
-      handleDeleteAll(deleteIds);
+      await deleteProducts(deleteIds);
     }
+    loadAllProducts();
     handleHideModal();
     setShowAlert(true);
     // clearMessage();
@@ -220,6 +205,7 @@ const ManageProductScreen = () => {
           show={showAlert}
           setShow={setShowAlert}
           variant="success"
+          alwaysShown={false}
         >
           {singleMessage}
         </AlertDismissibleComponent>
@@ -259,7 +245,6 @@ const ManageProductScreen = () => {
                   <Col key={product._id} xs={6} sm={4} md={3} lg={2}>
                     <AdminProductCard
                       product={product}
-                      handleDelete={handleDelete}
                       checkedProductIds={checkedProductIds}
                       handleCheckChange={handleCardCheckChange}
                       handleShowDeleteModal={handleShowDeleteModal}
@@ -272,15 +257,14 @@ const ManageProductScreen = () => {
             <PaginationComponent
               currentPage={currentPage}
               itemsCount={product.productsCount}
-              itemsPerPage={REACT_APP_PERPAGE}
+              itemsPerPage={itemsPerPage}
               setCurrentPage={setCurrentPage}
             />
           </div>
         </>
       )}
       <DeleteConfirmationModalComponent
-        type={deleteType}
-        ids={deleteIds}
+        title={'Xác nhận xóa sản phẩm'}
         showModal={showConfirmationModal}
         message={deleteMessage}
         handleHideModal={handleHideModal}

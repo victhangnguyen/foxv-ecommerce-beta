@@ -1,12 +1,15 @@
 import multer from 'multer';
 
+//! name: product
+//! dest: products
+
 const fileStorage = multer.diskStorage({
   destination: (req, file, cb) => {
-    cb(null, 'backend/images');
+    cb(null, 'backend/images/products');
   },
   filename: (req, file, cb) => {
     const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
-    cb(null, 'images-' + uniqueSuffix + '.jpg');
+    cb(null, 'product-' + uniqueSuffix + '.jpg');
   },
 });
 
@@ -22,12 +25,13 @@ const fileFilter = (req, file, cb) => {
   }
 };
 
-const upload = multer({ storage: fileStorage, fileFilter: fileFilter }).array(
-  'images[]'
+const uploadImages = multer({ storage: fileStorage, fileFilter: fileFilter }).array(
+  'images[]',
+  12
 );
 
 const uploadHandler = (req, res, next) => {
-  upload(req, res, (err) => {
+  uploadImages(req, res, (err) => {
     if (err) {
       // res.status(400).json({ message: `Bad request, ${err.message}` }).end();
       return res.status(400).json({ message: `Bad request, ${err.message}` });

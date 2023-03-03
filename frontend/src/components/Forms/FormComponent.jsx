@@ -2,36 +2,8 @@ import React from 'react';
 import { Form } from 'react-bootstrap';
 import { useForm, useWatch } from 'react-hook-form';
 
-const useYupValidationResolver = (validationSchema) =>
-  React.useCallback(
-    async (data) => {
-      try {
-        const values = await validationSchema.validate(data, {
-          abortEarly: false,
-        });
-
-        return {
-          values,
-          errors: {},
-        };
-      } catch (errors) {
-        return {
-          values: {},
-          errors: errors.inner.reduce(
-            (allErrors, currentError) => ({
-              ...allErrors,
-              [currentError.path]: {
-                type: currentError.type ?? 'validation',
-                message: currentError.message,
-              },
-            }),
-            {}
-          ),
-        };
-      }
-    },
-    [validationSchema]
-  );
+//! imp Hooks
+import { useYupValidationResolver } from '../../hooks/yupResolver';
 
 const FormComponent = ({
   initialValues,
@@ -42,22 +14,13 @@ const FormComponent = ({
   ...rest
 }) => {
   const resolver = useYupValidationResolver(validationSchema);
-  
+
   const methods = useForm({
     resolver,
     // defaultValues: defaultValues,
   });
 
   const watchAllFields = useWatch({ control: methods.control });
-
-  // const watchAllFieldsCountRef = React.useRef(0);
-  // console.log(
-  //   '%c__Debugger__FormComponent\n__***__watchAllFields__',
-  //   'color: Brown;',
-  //   (watchAllFieldsCountRef.current += 1),
-  //   ':',
-  //   watchAllFields
-  // );
 
   const fields = children.map((child) => child.props?.name);
   //! initialize Values

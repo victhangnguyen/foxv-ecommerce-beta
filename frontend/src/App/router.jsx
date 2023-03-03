@@ -14,6 +14,8 @@ import ProductDetailScreen from '../features/Product/screens/ProductDetailScreen
 import AdminDashboardScreen from '../features/Admin/screens/AdminDashboardScreen';
 import AddEditProductScreen from '../features/Product/screens/AddEditProductScreen';
 import ManageProductScreen from '../features/Product/screens/ManageProductScreen';
+import ManageUserScreen from '../features/User/screens/ManageUserScreen';
+import ManageOrderScreen from '../features/Order/screens/ManageOrderScreen';
 
 //! imp Routes
 import AdminRoute from '../components/Routes/AdminRoute';
@@ -31,7 +33,7 @@ const router = createBrowserRouter([
       { path: '/shop', element: <ShopScreens /> },
       // { path: '/register', element: <RegisterScreen /> },
       // { path: '/login', element: <LoginScreen /> },
-      
+
       //! Private Routes: Admin
       {
         path: '/',
@@ -45,6 +47,8 @@ const router = createBrowserRouter([
               { path: 'product/:productId', element: <AddEditProductScreen /> },
               { path: 'products', element: <ManageProductScreen /> },
               { path: 'product', element: <AddEditProductScreen /> },
+              { path: 'users', element: <ManageUserScreen /> },
+              { path: 'orders', element: <ManageOrderScreen /> },
             ],
           },
         ],

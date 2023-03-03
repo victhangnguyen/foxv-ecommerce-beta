@@ -23,21 +23,21 @@ export const getProduct = async (req, res, next) => {
       .populate('subCategories')
       .exec();
     res.status(200).json(product);
-  } catch (err) {
-    Logging.error('Error__ctrls__product: ' + err);
-    const error = new Error(err);
-    error.httpStatusCode = 400; //! 500;
-    return next(error);
+  } catch (error) {
+    Logging.error('Error__ctrls__product: ' + error);
+    const err = new Error(error);
+    err.httpStatusCode = 400; //! 500;
+    return next(err);
   }
 };
 
 export const getProducts = async (req, res, next) => {
   try {
-  } catch (err) {
-    Logging.error('Error__ctrls__product: ' + err);
-    const error = new Error(err);
-    error.httpStatusCode = 400; //! 500;
-    return next(error);
+  } catch (error) {
+    Logging.error('Error__ctrls__product: ' + error);
+    const err = new Error(error);
+    err.httpStatusCode = 400; //! 500;
+    return next(err);
   }
 };
 
@@ -46,17 +46,18 @@ export const productsCount = async (req, res, next) => {
     const total = await Product.find({}).estimatedDocumentCount().exec();
     console.log('__Debugger__ctrls/product/productsCount__total: ', total);
     res.status(200).json(total);
-  } catch (err) {
-    Logging.error('Error__ctrls__product: ' + err);
-    const error = new Error(err);
-    error.httpStatusCode = 400; //! 500;
-    return next(error);
+  } catch (error) {
+    Logging.error('Error__ctrls__product: ' + error);
+    const err = new Error(error);
+    err.httpStatusCode = 400; //! 500;
+    return next(err);
   }
 };
 
 //! All of Products with skip and limit
 export const getProductList = async (req, res, next) => {
-  let { sort, order, page, perPage } = req.body;
+  console.log('__Debugger__product\n__getProductList__req.query: ', req.query, '\n');
+  let { sort, order, page, perPage } = req.query;
 
   if (page < 1) {
     page = 1;
@@ -71,12 +72,13 @@ export const getProductList = async (req, res, next) => {
       .skip((page - 1) * perPage)
       .limit(perPage)
       .exec();
+
     res.status(200).json(products);
-  } catch (err) {
-    Logging.error('Error__ctrls__product: ' + err);
-    const error = new Error(err);
-    error.httpStatusCode = 400; //! 500;
-    return next(error);
+  } catch (error) {
+    Logging.error('Error__ctrls__product: ' + error);
+    const err = new Error(error);
+    err.httpStatusCode = 400; //! 500;
+    return next(err);
   }
 };
 
@@ -112,11 +114,11 @@ export const createProduct = async (req, res, next) => {
     });
 
     return res.status(201).json(product);
-  } catch (err) {
-    Logging.error('Error__ctrls__product: ' + err);
-    const error = new Error(err);
-    error.httpStatusCode = 400; //! 500;
-    return next(error);
+  } catch (error) {
+    Logging.error('Error__ctrls__product: ' + error);
+    const err = new Error(error);
+    err.httpStatusCode = 400; //! 500;
+    return next(err);
   }
 };
 
@@ -140,7 +142,7 @@ export const updateProduct = async (req, res, next) => {
         throw new Error('Product not found!');
       }
 
-      const fileDir = path.join(fileHelper.rootDir, 'images');
+      const fileDir = path.join(fileHelper.rootDir, 'images', 'products');
       const files = product.images;
 
       const deletedFiles = await fileHelper.deleteFiles(fileDir, files);
@@ -158,39 +160,39 @@ export const updateProduct = async (req, res, next) => {
     );
 
     return res.status(201).json(updatedProduct);
-  } catch (err) {
-    Logging.error('Error__ctrls__product: ' + err);
-    const error = new Error(err);
-    error.httpStatusCode = 400; //! 500;
-    return next(error);
+  } catch (error) {
+    Logging.error('Error__ctrls__product: ' + error);
+    const err = new Error(error);
+    err.httpStatusCode = 400; //! 500;
+    return next(err);
   }
 };
 
 export const removeProduct = async (req, res, next) => {
-  const productId = req.params.productId;
+    const productId = req.params.productId;
 
-  try {
-    //! delete database -> delete Files
-    const product = await Product.findById(productId);
-    if (!product) {
-      throw new Error('Product not found!');
+    try {
+      //! delete database -> delete Files
+      const product = await Product.findById(productId);
+      if (!product) {
+        throw new Error('Product not found!');
+      }
+
+      const fileDir = path.join(fileHelper.rootDir, 'images', 'products');
+      const files = product.images;
+
+      const deletedFiles = await fileHelper.deleteFiles(fileDir, files);
+      Logging.info(deletedFiles);
+
+      const response = await Product.findByIdAndRemove(productId).exec();
+
+      res.status(200).json(response);
+    } catch (error) {
+      Logging.error('Error__ctrls__product: ' + error);
+      const err = new Error(error);
+      err.httpStatusCode = 400; //! 500;
+      return next(err);
     }
-
-    const fileDir = path.join(fileHelper.rootDir, 'images');
-    const files = product.images;
-
-    const deletedFiles = await fileHelper.deleteFiles(fileDir, files);
-    Logging.info(deletedFiles);
-
-    const response = await Product.findByIdAndRemove(productId).exec();
-
-    res.status(200).json(response);
-  } catch (err) {
-    Logging.error('Error__ctrls__product: ' + err);
-    const error = new Error(err);
-    error.httpStatusCode = 400; //! 500;
-    return next(error);
-  }
 };
 
 export const removeProducts = async (req, res, next) => {
@@ -205,7 +207,7 @@ export const removeProducts = async (req, res, next) => {
           if (!productDoc) {
             reject('Product not found!');
           }
-          const fileDir = path.join(fileHelper.rootDir, 'images');
+          const fileDir = path.join(fileHelper.rootDir, 'images', 'products');
           const files = productDoc.images;
 
           fileHelper
@@ -235,11 +237,11 @@ export const removeProducts = async (req, res, next) => {
     });
 
     res.status(200).json(deletedProducts);
-  } catch (err) {
-    Logging.error('Error__ctrls__product: ' + err);
-    const error = new Error(err);
-    error.httpStatusCode = 400; //! 500;
-    return next(error);
+  } catch (error) {
+    Logging.error('Error__ctrls__product: ' + error);
+    const err = new Error(error);
+    err.httpStatusCode = 400; //! 500;
+    return next(err);
   }
 };
 
@@ -302,11 +304,11 @@ const handleSearchPrice = async (req, res, next) => {
     }).count();
 
     return res.status(200).json({ products, productsCount });
-  } catch (err) {
-    Logging.error('Error__ctrls__product: ' + err);
-    const error = new Error(err);
-    error.httpStatusCode = 400; //! 500;
-    return next(error);
+  } catch (error) {
+    Logging.error('Error__ctrls__product: ' + error);
+    const err = new Error(error);
+    err.httpStatusCode = 400; //! 500;
+    return next(err);
   }
 };
 
@@ -330,11 +332,11 @@ const handleSearchCategory = async (req, res, next) => {
     const productsCount = await Product.find({ category: categoryId }).count();
 
     return res.status(200).json({ products, productsCount });
-  } catch (err) {
-    Logging.error('Error__ctrls__product: ' + err);
-    const error = new Error(err);
-    error.httpStatusCode = 400; //! 500;
-    return next(error);
+  } catch (error) {
+    Logging.error('Error__ctrls__product: ' + error);
+    const err = new Error(error);
+    err.httpStatusCode = 400; //! 500;
+    return next(err);
   }
 };
 
@@ -366,10 +368,10 @@ export const fetchProductsByFilters = async (req, res, next) => {
       .exec();
 
     res.status(200).json({ products, productsCount });
-  } catch (err) {
-    Logging.error('Error__ctrls__product: ' + err);
-    const error = new Error(err);
-    error.httpStatusCode = 400; //! 500;
-    return next(error);
+  } catch (error) {
+    Logging.error('Error__ctrls__product: ' + error);
+    const err = new Error(error);
+    err.httpStatusCode = 400; //! 500;
+    return next(err);
   }
 };

@@ -5,14 +5,13 @@ const DeleteConfirmationModalComponent = ({
   showModal,
   handleHideModal,
   handleSubmitDelete,
-  ids,
-  type,
   message,
+  title,
 }) => {
   return (
     <Modal show={showModal} onHide={handleHideModal}>
       <Modal.Header closeButton>
-        <Modal.Title>Xác minh xóa sản phẩm</Modal.Title>
+        <Modal.Title>{title}</Modal.Title>
       </Modal.Header>
       <Modal.Body>
         <div className="alert alert-danger">{message}</div>
@@ -21,7 +20,7 @@ const DeleteConfirmationModalComponent = ({
         <Button variant="default" onClick={handleHideModal}>
           Cancel
         </Button>
-        <Button variant="danger" onClick={() => handleSubmitDelete(type, ids)}>
+        <Button variant="danger" onClick={() => handleSubmitDelete()}>
           Delete
         </Button>
       </Modal.Footer>

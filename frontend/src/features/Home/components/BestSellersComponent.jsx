@@ -31,7 +31,12 @@ const BestSellersComponent = ({ title }) => {
   const loadAllProducts = () => {
     setLoading(true);
     productService
-      .getProductList('sold', 'desc', currentPage, PRODUCT_PERPAGE)
+      .getProductList({
+        sort: 'sold',
+        order: 'desc',
+        page: currentPage,
+        perPage: PRODUCT_PERPAGE,
+      })
       .then((res) => {
         setProducts(res);
         setLoading(false);

@@ -3,30 +3,6 @@ import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 //! imp Services
 import productService from './services/productService';
 
-export const getProductList = createAsyncThunk(
-  'product/getProductList',
-  async (args, thunkAPI) => {
-    //! arg -> { object }
-    try {
-      const response = await productService.getProductList(
-        args.sort,
-        args.order,
-        args.page,
-        args.perPage
-      );
-      //! response -> products
-
-      return thunkAPI.fulfillWithValue(response);
-    } catch (error) {
-      if (error.response && error.response.data.message) {
-        return thunkAPI.rejectWithValue(error.response.data.message);
-      } else {
-        return thunkAPI.rejectWithValue(error.message);
-      }
-    }
-  }
-);
-
 export const getProductsCount = createAsyncThunk(
   'product/getProductsCount',
   async (_, thunkAPI) => {
@@ -84,13 +60,13 @@ export const removeProducts = createAsyncThunk(
 
 export const fetchProductsByFilters = createAsyncThunk(
   'product/fetchProductsByFilters',
-  async (args, thunkAPI) => {
+  async (arg, thunkAPI) => {
     const response = await productService.fetchProductsByFilters(
-      args.search,
-      args.sort,
-      args.order,
-      args.page,
-      args.perPage
+      arg.search,
+      arg.sort,
+      arg.order,
+      arg.page,
+      arg.perPage
     );
     try {
       return thunkAPI.fulfillWithValue(response);
@@ -108,26 +84,13 @@ const initialState = {
   products: [],
   productsCount: 0,
   loading: false,
-  error: false,
+  error: null,
 };
 
 const productSlice = createSlice({
   name: 'product',
   initialState: initialState,
   extraReducers: (builder) => {
-    builder
-      .addCase(getProductList.pending, (state, action) => {
-        state.loading = true;
-        // state.products = initialState.products;
-      })
-      .addCase(getProductList.fulfilled, (state, action) => {
-        state.loading = false;
-        state.products = action.payload;
-      })
-      .addCase(getProductList.rejected, (state, action) => {
-        state.loading = false;
-        state.error = action.payload;
-      });
     builder
       .addCase(getProductsCount.pending, (state, action) => {
         state.loading = true;

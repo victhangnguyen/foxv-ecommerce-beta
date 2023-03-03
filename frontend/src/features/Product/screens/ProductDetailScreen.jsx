@@ -10,6 +10,10 @@ import BreadcrumbComponent from '../../../components/Breadcrumbs/BreadcrumbCompo
 import ProductImageComponent from '../components/ProductImageComponent';
 
 const ProductDetail = () => {
+  const REACT_APP_SERVER = 'http://127.0.0.1';
+  const REACT_APP_PORT = 5000;
+  const imagesUrl = `${REACT_APP_SERVER}:${REACT_APP_PORT}/images/products/`;
+
   // const [loading, setLoading] = React.useState(false);
   const [product, setProduct] = React.useState({});
   const { productId } = useParams();
@@ -55,13 +59,9 @@ const ProductDetail = () => {
             <Col as="aside" md={4}>
               <article className="gallery-wrap">
                 <div className="card img-product-main-wrap">
-                  <Card.Img
-                    src={
-                      product.image
-                        ? `http://127.0.0.1:5000/${product.image}`
-                        : ``
-                    }
-                  />
+                  {/* <Card.Img
+                    src={product.images ? imagesUrl + product.images[0] : ``}
+                  /> */}
                 </div>
                 <div className="thumbs-wrap">
                   <ProductImageComponent product={product} />

@@ -11,7 +11,7 @@ import productService from '../../../features/Product/services/productService';
 
 const PRODUCT_PERPAGE = 4;
 
-const NewArrivalsComponent = ({title}) => {
+const NewArrivalsComponent = ({ title }) => {
   // const [productsPerPage, setProductsPerPage] = React.useState(4);
   const [currentPage, setCurrentPage] = React.useState(1);
   const [productsCount, setProductsCount] = React.useState(0);
@@ -31,7 +31,12 @@ const NewArrivalsComponent = ({title}) => {
   const loadAllProducts = () => {
     setLoading(true);
     productService
-      .getProductList('createdAt', 'desc', currentPage, PRODUCT_PERPAGE)
+      .getProductList({
+        sort: 'createdAt',
+        order: 'desc',
+        page: currentPage,
+        perPage: PRODUCT_PERPAGE,
+      })
       .then((res) => {
         setProducts(res);
         setLoading(false);

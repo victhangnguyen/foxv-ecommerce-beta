@@ -7,15 +7,18 @@ const AlertDismissibleComponent = ({
   children,
   title,
   labelButton,
-  variant,
+  variant = 'success',
+  alwaysShown = true,
 }) => {
-  const [seconds, setSeconds] = React.useState(5);
+  const [seconds, setSeconds] = React.useState(5); //! used to countdown
 
   React.useEffect(() => {
-    const timer = setTimeout(() => {
-      setShow(false);
-    }, 5000);
-    return () => clearTimeout(timer);
+    if (!alwaysShown) {
+      const timer = setTimeout(() => {
+        setShow(false);
+      }, 5000);
+      return () => clearTimeout(timer);
+    }
   });
 
   // //! count seconds
@@ -28,11 +31,15 @@ const AlertDismissibleComponent = ({
     <>
       <Alert show={show} variant={variant}>
         <Alert.Heading>{title}</Alert.Heading>
-        <div>{children}</div>
+        <p>{children}</p>
         <hr />
         <div className="d-flex justify-content-end">
-          <Button onClick={() => setShow(false)} variant="outline-success">
-            {labelButton ? labelButton : `Ẩn ngay sau (${seconds}s)`}
+          <Button onClick={() => setShow(false)} variant={`outline-${variant}`}>
+            {labelButton
+              ? labelButton
+              : alwaysShown
+              ? 'Ẩn ngay'
+              : `Ẩn ngay sau (${seconds}s)`}
           </Button>
         </div>
       </Alert>

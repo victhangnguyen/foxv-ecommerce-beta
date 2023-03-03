@@ -1,10 +1,11 @@
 import React from 'react';
 import _ from 'lodash';
 
-const REACT_APP_SERVER = 'http://127.0.0.1';
-const REACT_APP_PORT = 5000;
-
 const ImageComponent = ({ product, className, ...rest }) => {
+  const REACT_APP_SERVER = 'http://127.0.0.1';
+  const REACT_APP_PORT = 5000;
+  const imagesUrl = `${REACT_APP_SERVER}:${REACT_APP_PORT}/images/products/`;
+
   const [imageMain, setImageMain] = React.useState(null);
 
   const images = product?.images;
@@ -27,10 +28,7 @@ const ImageComponent = ({ product, className, ...rest }) => {
         className="form-image__image-slides__image-slide"
         onClick={() => handleImage(index)}
       >
-        <img
-          src={`${REACT_APP_SERVER}:${REACT_APP_PORT}/images/${image}`}
-          alt=""
-        />
+        <img src={imagesUrl + image} alt="" />
       </div>
     );
   });
@@ -42,9 +40,9 @@ const ImageComponent = ({ product, className, ...rest }) => {
           <img
             src={
               imageMain
-                ? `${REACT_APP_SERVER}:${REACT_APP_PORT}/images/${imageMain}`
+                ? imagesUrl + imageMain
                 : images
-                ? `${REACT_APP_SERVER}:${REACT_APP_PORT}/images/${images[0]}`
+                ? imagesUrl + images[0]
                 : null
             }
             alt=""

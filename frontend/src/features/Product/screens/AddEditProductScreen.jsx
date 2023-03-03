@@ -29,12 +29,10 @@ const AddEditProductScreen = () => {
   const { productId } = useParams();
 
   const breadcrumbItems = [
-    { label: 'Home', path: '/' },
+    { key: 'breadcrumb-item-1', label: 'Home', path: '/' },
+    { key: 'breadcrumb-item-2', label: 'Dashboard', path: '/admin' },
     {
-      label: 'Dashboard',
-      path: '/admin',
-    },
-    {
+      key: 'breadcrumb-item-3',
       label: isExistProduct ? 'Cập nhật Sản phẩm' : 'Thêm mới Sản phẩm',
       path: '/admin/product',
       active: true,

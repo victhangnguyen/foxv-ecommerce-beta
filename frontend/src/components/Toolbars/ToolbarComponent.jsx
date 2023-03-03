@@ -117,9 +117,9 @@ const ToolbarComponent = ({
             onChange={handleSearchTypeChange}
             value={searchType}
           >
-            <option value="text">Tìm kiếm theo Text</option>
-            <option value="price">Tìm kiếm theo Giá</option>
-            <option value="category">Tìm kiếm theo Category</option>
+            <option value="text">Tìm kiếm Text</option>
+            <option value="price">Tìm kiếm Giá</option>
+            <option value="category">Tìm kiếm Loại (Category)</option>
           </Form.Select>
         </div>
       </Col>

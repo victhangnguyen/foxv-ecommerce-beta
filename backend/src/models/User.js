@@ -13,6 +13,10 @@ const userSchema = new mongoose.Schema(
       type: Date,
       require: true,
     },
+    phoneNumber: {
+      type: String,
+      default: '',
+    },
     email: {
       type: String,
       required: true,
@@ -35,6 +39,10 @@ const userSchema = new mongoose.Schema(
       enum: ['user', 'subscriber', 'admin'],
       default: 'user',
       required: true,
+    },
+    status: {
+      type: String,
+      default: 'inactive',
     },
   },
   { timestamps: true }

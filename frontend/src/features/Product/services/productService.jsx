@@ -1,20 +1,24 @@
 import axiosInstance from '../../../services/axiosInstance';
 
+//! imp Utils
+import * as urlHandling from '../../../utils/url';
+
 const productService = {
   getProductsCount: () => {
     const url = `/products/total`;
     return axiosInstance.get(url);
   },
   getProduct: (productId) => {
-    const url = `/product/${productId}`;
+    const url = `/products/${productId}`;
     return axiosInstance.get(url, productId);
   },
-  getProductList: (sort, order, page, perPage) => {
+  getProductList: (params) => {
     const url = `/products`;
-    return axiosInstance.post(url, { sort, order, page, perPage });
+    const urlQueryParams = urlHandling.queryParam(url, params);
+    return axiosInstance.get(urlQueryParams);
   },
   createProduct: (product) => {
-    const url = `/product`;
+    const url = `/products`;
     const config = {
       headers: {
         'Content-Type': 'multipart/form-data',
@@ -23,7 +27,7 @@ const productService = {
     return axiosInstance.post(url, product, config);
   },
   updateProduct: (productId, product) => {
-    const url = `/product/${productId}`;
+    const url = `/products/${productId}`;
     const config = {
       headers: {
         'Content-Type': 'multipart/form-data',
@@ -32,7 +36,7 @@ const productService = {
     return axiosInstance.put(url, product, config);
   },
   removeProduct: (productId) => {
-    const url = `/product/${productId}`;
+    const url = `/products/${productId}`;
     return axiosInstance.delete(url);
   },
   removeProducts: (productIdArray) => {

@@ -233,6 +233,11 @@ main {
   font-size: 23px;
 }
 
+.btn-EllipsisV {
+  width: 2rem;
+  height: 2rem;
+}
+
 .rating span {
   margin: 0.1rem;
 }
@@ -470,6 +475,14 @@ a {
   margin: 0.1rem;
   padding: 0.25rem 0.2rem;
   font-size: 0.65rem !important;
+}
+.card.card-admin-user {
+  padding: 0.2rem !important;
+}
+.card.card-admin-user .card-admin-user__header {
+  display: flex;
+  justify-content: end;
+  padding: 0rem !important;
 }
 
 .jumbotron {

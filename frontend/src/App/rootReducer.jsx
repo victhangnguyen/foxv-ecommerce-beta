@@ -4,6 +4,7 @@ import storage from 'redux-persist/lib/storage';
 
 //! imp Reducers
 import productReducer from '../features/Product/ProductSlice';
+import userReducer from '../features/User/UserSlice';
 import searchReducer from '../features/Search/SearchSlice';
 
 const rootPersistConfig = {
@@ -22,7 +23,7 @@ const authPersistConfig = {
 const productPersistConfig = {
   key: 'product',
   storage: storage,
-  blacklist: ['loading', 'error', 'productsCount'],
+  blacklist: ['loading', 'error'],
 };
 
 const cartPersistConfig = {
@@ -41,7 +42,7 @@ const rootReducer = combineReducers({
   // auth: persistReducer(authPersistConfig, authReducer),
   product: persistReducer(productPersistConfig, productReducer),
   // cart: persistReducer(cartPersistConfig, cartReducer),
-  // user: persistReducer(userPersistConfig, userReducer),
+  user: persistReducer(userPersistConfig, userReducer),
   search: searchReducer,
 });
 

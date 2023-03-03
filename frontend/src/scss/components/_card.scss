@@ -67,4 +67,15 @@ a {
       font-size: 0.65rem !important;
     }
   }
+
+  &.card-admin-user {
+    padding: 0.2rem !important;
+
+    .card-admin-user__header {
+      display: flex;
+      justify-content: end;
+      padding: 0rem !important;
+
+    }
+  }
 }

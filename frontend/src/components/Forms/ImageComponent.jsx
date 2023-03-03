@@ -1,12 +1,13 @@
 import React from 'react';
 import { Col, Form, Row } from 'react-bootstrap';
 
-const REACT_APP_SERVER = 'http://127.0.0.1';
-const REACT_APP_PORT = 5000;
-
 const ImageComponent = ({ methods, name, label, className, ...rest }) => {
   const [imageMain, setImageMain] = React.useState(null);
   const [images, setImages] = React.useState();
+
+  const REACT_APP_SERVER = 'http://127.0.0.1';
+  const REACT_APP_PORT = 5000;
+  const imagesUrl = `${REACT_APP_SERVER}:${REACT_APP_PORT}/images/products/`;
 
   const imageFiles = methods.getValues(name) || [];
 
@@ -77,11 +78,7 @@ const ImageComponent = ({ methods, name, label, className, ...rest }) => {
         onClick={() => handleImage(index)}
       >
         <img
-          src={
-            image.includes('data:image/')
-              ? image
-              : `${REACT_APP_SERVER}:${REACT_APP_PORT}/images/${image}`
-          }
+          src={image.includes('data:image/') ? image : imagesUrl + image}
           alt=""
         />
       </div>
@@ -102,7 +99,7 @@ const ImageComponent = ({ methods, name, label, className, ...rest }) => {
               src={
                 imageMain.includes('data:image/')
                   ? imageMain
-                  : `${REACT_APP_SERVER}:${REACT_APP_PORT}/images/${imageMain}`
+                  : imagesUrl + imageMain
               }
               alt=""
             />

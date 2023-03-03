@@ -1,1 +1,5 @@
-export {default as createProductSchema} from './createProductSchema.js';
+export {
+  createProductSchema,
+  updateProductSchema,
+} from './productSchemaValidations.js';
+// export {default as updateProductSchema} from './updateProductSchema.js';

@@ -3,7 +3,10 @@ import * as productController from '../controllers/product.js';
 //! imp middlewares
 import uploadHandler from '../middlewares/upload.js';
 import { validateSchema } from '../middlewares/validator.js';
-import { createProductSchema } from '../middlewares/schemaValidations/index.js';
+import {
+  createProductSchema,
+  updateProductSchema,
+} from '../middlewares/schemaValidations/index.js';
 
 const router = express.Router();
 
@@ -11,7 +14,7 @@ const router = express.Router();
 //! @route    POST /api/products
 //! @access   Private: Admin
 router.post(
-  '/product',
+  '/products',
   uploadHandler,
   validateSchema(createProductSchema),
   productController.createProduct
@@ -23,14 +26,14 @@ router.post(
 router.get('/products/total', productController.productsCount);
 
 //! @desc     Fetch all products with Pagination
-//! @route    POST /api/products
+//! @route    GET /api/products
 //! @access   Public
-router.post('/products', productController.getProductList);
+router.get('/products', productController.getProductList);
 
 //! @desc     Fetch one Product by Id
 //! @route    GET /api/product/:productId
 //! @access   Public
-router.get('/product/:productId', productController.getProduct);
+router.get('/products/:productId', productController.getProduct);
 
 //! @desc     Delete multiple Product(s)
 //! @route    DEL /api/products
@@ -40,14 +43,15 @@ router.delete('/products', productController.removeProducts);
 //! @desc     Delete one Product
 //! @route    DEL /api/product/:productId
 //! @access   Private: Admin
-router.delete('/product/:productId', productController.removeProduct);
+router.delete('/products/:productId', productController.removeProduct);
 
 //! @desc     Update one Product
 //! @route    PUT /api/product/:productId
 //! @access   Private
 router.put(
-  '/product/:productId',
+  '/products/:productId',
   uploadHandler,
+  validateSchema(updateProductSchema),
   productController.updateProduct
 );
 
