@@ -61,6 +61,16 @@ h2 {
   padding: 0.5rem 0;
 }
 
+.card-main {
+  -webkit-border-radius: 10px;
+  -moz-border-radius: 10px;
+  border-radius: 10px;
+}
+.card-main .card-line-top {
+  background-color: #2c3e50;
+  height: 10px;
+}
+
 .form-group-name {
   grid-area: name;
 }
@@ -207,7 +217,13 @@ main {
   padding: 1rem 0;
 }
 
+.btn-EllipsisV {
+  width: 2rem;
+  height: 2rem;
+}
+
 .back-to-top-btn {
+  z-index: 250;
   position: fixed;
   right: 25px;
   bottom: 25px;
@@ -222,6 +238,7 @@ main {
   opacity: 0;
   background-color: #f4a866;
   border: none;
+  cursor: pointer;
 }
 
 .back-to-top-btn--visible {
@@ -231,11 +248,6 @@ main {
 
 .back-to-top-btn svg {
   font-size: 23px;
-}
-
-.btn-EllipsisV {
-  width: 2rem;
-  height: 2rem;
 }
 
 .rating span {
@@ -480,9 +492,11 @@ a {
   padding: 0.2rem !important;
 }
 .card.card-admin-user .card-admin-user__header {
+  padding: 0.25rem !important;
+}
+.card.card-admin-user .card-admin-user__header__title-name {
   display: flex;
-  justify-content: end;
-  padding: 0rem !important;
+  justify-content: space-between;
 }
 
 .jumbotron {

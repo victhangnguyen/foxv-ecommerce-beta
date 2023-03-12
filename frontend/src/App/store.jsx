@@ -1,4 +1,5 @@
 import { configureStore } from '@reduxjs/toolkit';
+import { interceptor } from '../services/axiosInstance';
 
 import {
   FLUSH,
@@ -15,11 +16,13 @@ import rootReducer from './rootReducer';
 const store = configureStore({
   reducer: rootReducer,
   middleware: (getDefaultmiddleware) =>
-  getDefaultmiddleware({
+    getDefaultmiddleware({
       serializableCheck: {
         ignoredActions: [FLUSH, REHYDRATE, PAUSE, PERSIST, PURGE, REGISTER],
       },
     }),
 });
+
+interceptor(store);
 
 export default store;

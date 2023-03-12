@@ -3,6 +3,7 @@ import { persistReducer } from 'redux-persist';
 import storage from 'redux-persist/lib/storage';
 
 //! imp Reducers
+import authReducer from '../features/Auth/AuthSlice';
 import productReducer from '../features/Product/ProductSlice';
 import userReducer from '../features/User/UserSlice';
 import searchReducer from '../features/Search/SearchSlice';
@@ -39,7 +40,7 @@ const userPersistConfig = {
 };
 
 const rootReducer = combineReducers({
-  // auth: persistReducer(authPersistConfig, authReducer),
+  auth: persistReducer(authPersistConfig, authReducer),
   product: persistReducer(productPersistConfig, productReducer),
   // cart: persistReducer(cartPersistConfig, cartReducer),
   user: persistReducer(userPersistConfig, userReducer),

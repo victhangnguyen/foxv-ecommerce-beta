@@ -1,5 +1,6 @@
 import { NavLink, useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
+import { useDispatch, useSelector } from 'react-redux';
 
 import React from 'react';
 import Container from 'react-bootstrap/Container';
@@ -11,18 +12,23 @@ import Offcanvas from 'react-bootstrap/Offcanvas';
 
 //! imp Components
 
+//! imp Actions
+import { signout } from '../../features/Auth/AuthSlice';
+
 const HeaderComponent = () => {
+  const dispatch = useDispatch();
   const navigate = useNavigate();
-  const [user, setUser] = React.useState({
-    result: {
-      name: 'Victhangnguyen',
-      role: 'admin',
-    },
-  });
+
+  //! reduxState
+  const auth = useSelector((state) => state.auth);
+  const roles = auth.user?.role.map((role) => role.name);
+  const isAuthenticated = roles?.includes('user');
+  const isAdmin = roles?.includes('admin');
 
   const handleLogout = () => {
-    toast.success(`${user?.result?.name} logout`);
-    navigate('/login');
+    dispatch(signout());
+    navigate('/auth/login');
+    toast.success(`${auth.user.lastName} has successfully signed out!`);
   };
 
   return (
@@ -129,24 +135,23 @@ const HeaderComponent = () => {
                 //! Nav
               }
               <Nav className="justify-content-end flex-grow-1 pe-3">
-                {user ? (
+                {isAuthenticated ? (
                   <>
-                    {user.result.role === 'admin' && (
+                    {isAdmin ? (
                       <NavLink className="nav-link" to={'/admin/product'}>
                         Thêm sản phẩm
                       </NavLink>
-                    )}
-                    {user.result.role === 'user' && (
+                    ) : (
                       <NavLink className={'nav-link'} to={'/cart'}>
                         Giỏ hàng
                       </NavLink>
                     )}
                     <NavDropdown
-                      title={user.result.name}
+                      title={auth.user?.firstName}
                       id={`offcanvasNavbarDropdown-expand-lg`}
                     >
                       <NavDropdown.Item as="div">Profile</NavDropdown.Item>
-                      {user.result.role === 'admin' && (
+                      {isAdmin && (
                         <NavDropdown.Item as="div">
                           <NavLink className="nav-link" to={'/admin'}>
                             Dashboard
@@ -161,10 +166,10 @@ const HeaderComponent = () => {
                   </>
                 ) : (
                   <>
-                    <NavLink className="nav-link" to="/register">
+                    <NavLink className="nav-link" to="/auth/register">
                       Đăng ký
                     </NavLink>
-                    <NavLink className="nav-link" to="/login">
+                    <NavLink className="nav-link" to="/auth/login">
                       Đăng nhập
                     </NavLink>
                   </>

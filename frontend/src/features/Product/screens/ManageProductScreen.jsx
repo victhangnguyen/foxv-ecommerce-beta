@@ -17,7 +17,7 @@ import { clearSearch } from '../../Search/SearchSlice';
 
 //! imp Components
 import BreadcrumbComponent from '../../../components/Breadcrumbs/BreadcrumbComponent';
-import DeleteConfirmationModalComponent from '../../../components/Modals/DeleteConfirmationModalComponent';
+import DeleteConfirmationModalComponent from '../../../components/Modals/ConfirmationModalComponent';
 import PaginationComponent from '../../../components/Pagination/PaginationComponent';
 import ToolbarComponent from '../../../components/Toolbars/ToolbarComponent';
 import AdminLoadingProductCard from '../components/Cards/AdminLoadingProductCard';

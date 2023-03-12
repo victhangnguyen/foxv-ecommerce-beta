@@ -9,7 +9,7 @@ const userService = {
     return axiosInstance.get(urlQueryParams);
   },
   removeUser: async (userId) => {
-    const url = `users/${userId}`;
+    const url = `/users/${userId}`;
     return axiosInstance.delete(url);
   },
 };

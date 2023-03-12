@@ -60,15 +60,15 @@ export const removeProducts = createAsyncThunk(
 
 export const fetchProductsByFilters = createAsyncThunk(
   'product/fetchProductsByFilters',
-  async (arg, thunkAPI) => {
-    const response = await productService.fetchProductsByFilters(
-      arg.search,
-      arg.sort,
-      arg.order,
-      arg.page,
-      arg.perPage
-    );
+  async ({ search, sort, order, page, perPage }, thunkAPI) => {
     try {
+      const response = await productService.fetchProductsByFilters(
+        search,
+        sort,
+        order,
+        page,
+        perPage
+      );
       return thunkAPI.fulfillWithValue(response);
     } catch (error) {
       if (error.response && error.response.data.message) {

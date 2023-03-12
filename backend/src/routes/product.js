@@ -1,12 +1,12 @@
 import express from 'express';
 import * as productController from '../controllers/product.js';
-//! imp middlewares
-import uploadHandler from '../middlewares/upload.js';
-import { validateSchema } from '../middlewares/validator.js';
+//! imp middleware
+import uploadHandler from '../middleware/upload.js';
+import { validateSchema } from '../middleware/validator.js';
 import {
   createProductSchema,
   updateProductSchema,
-} from '../middlewares/schemaValidations/index.js';
+} from '../middleware/schemaValidations/index.js';
 
 const router = express.Router();
 

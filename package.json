@@ -34,7 +34,10 @@
     "morgan": "^1.10.0",
     "multer": "^1.4.5-lts.1",
     "nodemailer": "^6.9.1",
+    "nodemailer-smtp-transport": "^2.7.4",
     "nodemon": "^2.0.20",
+    "passport": "^0.6.0",
+    "passport-jwt": "^4.0.1",
     "qs": "^6.11.0",
     "slugify": "^1.6.5"
   },

@@ -1,27 +1,42 @@
 import React from 'react';
-import { Row, Col, Button } from 'react-bootstrap';
+import { Button, Col, Row } from 'react-bootstrap';
 import { useDispatch, useSelector } from 'react-redux';
 import { toast } from 'react-toastify';
 
 //! imp Hooks
-import { useWindowSize } from '../../../hooks/windowSize';
 import { useItemsPerPage } from '../../../hooks/itemsPerPage';
+import { useScroll } from '../../../hooks/scroll';
 
 //! imp Actions
 import { fetchUsersByFilters, removeUser } from '../UserSlice';
 
 //! imp Comps
 import BreadcrumbComponent from '../../../components/Breadcrumbs/BreadcrumbComponent';
+import ConfirmationModalComponent from '../../../components/Modals/ConfirmationModalComponent';
 import PaginationComponent from '../../../components/Pagination/PaginationComponent';
 import ToolbarSearchComponent from '../../../components/Toolbars/ToolbarSearchComponent';
 import AdminUserCard from '../components/Cards/AdminUserCard';
-import DeleteConfirmationModalComponent from '../../../components/Modals/DeleteConfirmationModalComponent';
 //! imp Comps/Modals
 import AlertDismissibleComponent from '../../../components/Alerts/AlertDismissibleComponent';
+//! imp Comps/Button
+import GoToButtonComponent from '../../../components/Button/GoToButtonComponent';
 
 const ManageUserScreen = () => {
+  const breadcrumbItems = [
+    { key: 'breadcrumb-item-1', label: 'Home', path: '/' },
+    { key: 'breadcrumb-item-2', label: 'Dashboard', path: '/admin' },
+    {
+      key: 'breadcrumb-item-3',
+      label: 'Quản lý Tài khoản',
+      path: '/admin/users',
+      active: true,
+    },
+  ];
+  const scrollPosition = useScroll();
   const itemsPerPage = useItemsPerPage(10, 15, 15, 20) || 10;
   const dispatch = useDispatch();
+
+  const [typeAction, setTypeAction] = React.useState('');
 
   //! localState: search
   const [search, setSearch] = React.useState({ keyword: '', age: '' });
@@ -30,23 +45,27 @@ const ManageUserScreen = () => {
   const [currentPage, setCurrentPage] = React.useState(1);
 
   const user = useSelector((state) => state.user);
-  console.log('userSlice: ', user);
 
   //! localState: delete Modal
   const [showConfirmationModal, setShowConfirmationModal] =
     React.useState(false);
+  const [modalType, setModalType] = React.useState({
+    variant: 'success',
+    title: '',
+    message: '',
+  });
   const [selectedIds, setSelectedIds] = React.useState(null);
-  const [deleteMessage, setDeleteMessage] = React.useState('');
-  const [singleDeleteMesssage, setSingleDeleteMesssage] = React.useState('');
 
   //! localState: Alert
-  const [showAlert, setShowAlert] = React.useState(false);
+  const [alertType, setAlertType] = React.useState({
+    variant: 'success',
+    title: '',
+    message: '',
+    button: '',
+  });
+  const [showConfirmationAlert, setShowConfirmationAlert] =
+    React.useState(false);
   const [showErrorAlert, setShowErrorAlert] = React.useState(false);
-
-  // React.useEffect(() => {
-  //   //! effect
-  //   loadAllUsers(search, sort, order, currentPage, REACT_PER_PAGE);
-  // }, []);
 
   React.useEffect(() => {
     //! effect
@@ -71,44 +90,58 @@ const ManageUserScreen = () => {
     );
   };
 
-  //! DeleteConfirmationModal
-  const handleShowDeleteModal = (type, ids) => {
+  const handleShowModal = (typeAction, ids) => {
+    const selectedUsers = user.entities.find((entity) => entity._id === ids);
+
+    setTypeAction(typeAction);
     setSelectedIds(ids);
 
-    if (type === 'single') {
-      const nameUser = user.entities.find((entity) => entity._id === ids).name;
-      setDeleteMessage(
-        // fruits.find((x) => x.id === id).name
-        `Bạn có muốn xóa tài khoản [${nameUser}] này không?`
-      );
-      setSingleDeleteMesssage(
-        // fruits.find((x) => x.id === id).name
-        `Bạn đã xóa tài khoản [${nameUser}] thành công.`
-      );
+    switch (typeAction) {
+      case 'removeSingleAccount':
+        //! set Modal style
+        setModalType({
+          variant: 'danger',
+          title: 'Xác nhận xóa Tài khoản',
+          message: `Bạn có muốn xóa tài khoản [${selectedUsers.email}] này không?`,
+          nameButton: 'Xác nhận Xóa',
+        });
+        //! set Alert style
+        setAlertType({
+          variant: 'success',
+          title: 'Xóa tài khoản thành công',
+          message: `Bạn đã xóa tài khoản [${selectedUsers.email}] thành công.`,
+        });
 
-      //! show Modal
-      setShowConfirmationModal(true);
+        break;
+
+      case 'resetPassword':
+        //! set Modal style
+        setModalType({
+          variant: 'warning',
+          title: 'Xác nhận Reset Password',
+          message: `Bạn có muốn Reset Password tài khoản [${selectedUsers.email}] này không?`,
+          nameButton: 'Xác nhận Reset',
+        });
+        //! set Alert style
+        setAlertType({
+          variant: 'success',
+          title: 'Reset Password thành công',
+          message: `Bạn đã Reset Password của tài khoản [${selectedUsers.email}] thành công.`,
+        });
+        break;
+
+      default:
+        //! clearMessage
+        break;
     }
-  };
 
-  const handleSearch = () => {
-    loadAllUsers();
+    //! show Modal
+    setShowConfirmationModal(true);
   };
-
-  const breadcrumbItems = [
-    { key: 'breadcrumb-item-1', label: 'Home', path: '/' },
-    { key: 'breadcrumb-item-2', label: 'Dashboard', path: '/admin' },
-    {
-      key: 'breadcrumb-item-3',
-      label: 'Quản lý Tài khoản',
-      path: '/admin/products',
-      active: true,
-    },
-  ];
 
   const deleteUser = async (userId) => {
     const deletedUser = await dispatch(removeUser(userId)).unwrap();
-    toast.success(`Tài khoản ${deletedUser.name} đã được xóa`);
+    toast.success(`Tài khoản ${deletedUser.email} đã được xóa`);
     //! clearState
     setSelectedIds(null);
     return deletedUser;
@@ -118,15 +151,26 @@ const ManageUserScreen = () => {
     setShowConfirmationModal(false);
   };
 
-  const handleSubmitDelete = async () => {
-    await deleteUser(selectedIds);
-    loadAllUsers();
-    handleHideModal();
-    //! show Alert deleted User Infomation
-    setShowAlert(true);
+  const handleSubmit = async () => {
+    try {
+      switch (typeAction) {
+        case 'removeSingleAccount':
+          await deleteUser(selectedIds);
+          break;
+
+        default:
+          break;
+      }
+      loadAllUsers();
+      handleHideModal();
+      //! show Alert deleted User Infomation
+      setShowConfirmationAlert(true);
+    } catch (error) {
+      console.log('Error: ', error);
+    }
   };
 
-  const handleSubmit = (e) => {
+  const handleSearchSubmit = (e) => {
     e.preventDefault();
     dispatch(
       fetchUsersByFilters({
@@ -149,19 +193,24 @@ const ManageUserScreen = () => {
       >
         {user.error}
       </AlertDismissibleComponent>
+
       <AlertDismissibleComponent
-        show={showAlert}
-        setShow={setShowAlert}
-        variant="success"
+        variant={alertType.variant}
+        title={alertType.title}
+        show={showConfirmationAlert}
+        setShow={setShowConfirmationAlert}
         alwaysShown={false}
       >
-        {singleDeleteMesssage}
+        {alertType.message}
       </AlertDismissibleComponent>
 
       <BreadcrumbComponent breadcrumbItems={breadcrumbItems} />
-      <form className="toolbar" onSubmit={handleSubmit}>
+
+      <form className="toolbar" onSubmit={handleSearchSubmit}>
         <ToolbarSearchComponent search={search} setSearch={setSearch} />
-        <Button onClick={handleSearch}>Lọc</Button>
+        <button type="submit" className="btn btn-success">
+          Lọc
+        </button>
       </form>
       <Row>
         {
@@ -173,7 +222,7 @@ const ManageUserScreen = () => {
               <Col key={entity._id} xs={6} sm={4} md={4} lg={3}>
                 <AdminUserCard
                   entity={entity}
-                  handleShowDeleteModal={handleShowDeleteModal}
+                  handleShowModal={handleShowModal}
                 />
               </Col>
             );
@@ -187,13 +236,16 @@ const ManageUserScreen = () => {
           setCurrentPage={setCurrentPage}
         />
       </div>
-      <DeleteConfirmationModalComponent
-        title={'Xác nhận xóa tài khoản'}
+      <ConfirmationModalComponent
         showModal={showConfirmationModal}
-        message={deleteMessage}
+        variant={modalType.variant}
+        title={modalType.title}
+        nameButton={modalType.nameButton}
+        message={modalType.message}
         handleHideModal={handleHideModal}
-        handleSubmitDelete={handleSubmitDelete}
+        handleSubmit={handleSubmit}
       />
+      <GoToButtonComponent visible={scrollPosition > 300} />
     </>
   );
 };

@@ -2,12 +2,12 @@
 export const createProductSchema = {
   name: {
     notEmpty: {
-      errorMessage: 'Name is not empty',
+      errorMessage: 'Name must not be empty',
     },
     isLength: {
-      options: { min: 3, max: 50 },
+      options: { min: 2, max: 256 },
       errorMessage:
-        'Name should be at least 3 chars long and maximum of 256 chars',
+        'Name must be between 2 and 256 characters long',
     },
     trim: true,
   },
@@ -15,31 +15,31 @@ export const createProductSchema = {
     isLength: {
       options: { min: 4, max: 1024 },
       errorMessage:
-        'Description should be at least 4 chars long and maximum of 1024 chars',
+        'Description must be between 4 and 1024 characters long',
     },
     trim: true,
   },
   category: {
     notEmpty: {
-      errorMessage: 'Cateogry is not empty',
+      errorMessage: 'Cateogry must not be empty',
     },
   },
   subCategories: {
     isArray: true,
     notEmpty: {
-      errorMessage: 'Sub-category is not empty',
+      errorMessage: 'Sub-category must not be empty',
     },
   },
   price: {
     isLength: {
       options: { min: 0, max: 10000000 },
-      errorMessage: 'Price should be at least 0 and maximum of 10000000',
+      errorMessage: 'Price must be between 0 and 10000000 characters long',
     },
   },
   images: {
     isArray: true,
     notEmpty: {
-      errorMessage: 'Images is not empty',
+      errorMessage: 'Images must not be empty',
     },
   },
 };
@@ -48,12 +48,12 @@ export const createProductSchema = {
 export const updateProductSchema = {
   name: {
     notEmpty: {
-      errorMessage: 'Name is not empty',
+      errorMessage: 'Name must not be empty',
     },
     isLength: {
-      options: { min: 3, max: 50 },
+      options: { min: 2, max: 256 },
       errorMessage:
-        'Name should be at least 3 chars long and maximum of 256 chars',
+        'Name must be between 2 and 256 characters long',
     },
     trim: true,
   },
@@ -61,23 +61,23 @@ export const updateProductSchema = {
     isLength: {
       options: { min: 4, max: 1024 },
       errorMessage:
-        'Description should be at least 4 chars long and maximum of 1024 chars',
+        'Description must be between 4 and 1024 characters long',
     },
     trim: true,
   },
   category: {
     notEmpty: true,
-    errorMessage: 'Cateogry is not empty',
+    errorMessage: 'Cateogry must not be empty',
   },
   subCategories: {
     isArray: true,
     notEmpty: true,
-    errorMessage: 'Sub-category is not empty',
+    errorMessage: 'Sub-category must not be empty',
   },
   price: {
     isLength: {
       options: { min: 0, max: 10000000 },
-      errorMessage: 'Price should be at least 0 and maximum of 10000000',
+      errorMessage: 'Price must be between 0 and 10000000 characters long',
     },
   },
   images: {

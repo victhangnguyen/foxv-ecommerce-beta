@@ -1,8 +1,7 @@
 import express from 'express';
 import * as userController from '../controllers/user.js';
-
-//! imp Middlewares
-import { validateSchema } from '../middlewares/validator.js';
+import { isAdmin } from '../middleware/passport/index.js';
+import { passport } from '../middleware/passport/index.js';
 
 const router = express.Router();
 
@@ -14,9 +13,6 @@ router.get('/users/search/filters', userController.fetchUsersByFilters);
 //! @desc     Delete one User
 //! @route    DEL /api/users/:userId
 //! @access   Private: Admin
-router.delete(
-  '/users/:userId',
-  userController.removeUser
-);
+router.delete('/users/:userId', isAdmin, userController.removeUser);
 
 export default router;

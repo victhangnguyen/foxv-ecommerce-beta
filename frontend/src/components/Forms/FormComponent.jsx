@@ -1,5 +1,4 @@
 import React from 'react';
-import { Form } from 'react-bootstrap';
 import { useForm, useWatch } from 'react-hook-form';
 
 //! imp Hooks
@@ -21,11 +20,13 @@ const FormComponent = ({
   });
 
   const watchAllFields = useWatch({ control: methods.control });
+  console.log('watchAllFields: ', watchAllFields);
 
   const fields = children.map((child) => child.props?.name);
   //! initialize Values
   React.useEffect(() => {
-    //! if initialValues is Empty
+    if (!initialValues) return;
+
     if (Object.keys(initialValues).length) {
       fields.forEach((field) => {
         if (!field) return;
@@ -48,7 +49,8 @@ const FormComponent = ({
   };
 
   return (
-    <Form
+    <form
+      noValidate
       onSubmit={methods.handleSubmit((data, event) =>
         onSubmit(data, event, methods)
       )}
@@ -69,7 +71,7 @@ const FormComponent = ({
               : child;
           })
         : children}
-    </Form>
+    </form>
   );
 };
 

@@ -7,25 +7,16 @@ export const validateSchema = (chemaValidation) => async (req, res, next) => {
     //! and return Promise that resolves when the sanitization chain ran.
     await Promise.all(validations.map((validation) => validation.run(req)));
     const errors = validationResult(req);
-    console.log(
-      '__Debugger__validateSchema\n__validate__errors: ',
-      errors,
-      '\n'
-    );
+    const validationErrorArray = errors.array({ onlyFirstError: true });
 
     if (!errors.isEmpty()) {
-      return (
-        res
-          .status(422)
-          // .json({ errors: errors.array() });
-          .json({ errors: errors.array({ onlyFirstError: true }) })
-      );
+      return res.status(422).json({ errors: validationErrorArray });
     }
 
-    //! success: true
     next();
   } catch (error) {
-    console.log('Error: ', error);
-    //! error Server => next(error)
+    const err = new Error(error);
+    err.httpStatusCode = 400;
+    return next(err);
   }
 };

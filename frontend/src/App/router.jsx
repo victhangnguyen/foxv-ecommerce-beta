@@ -7,6 +7,8 @@ import ErrorScreen from '../features/Error/screens/ErrorScreen';
 
 //! imp Comps/Public
 import HomeScreen from '../features/Home/screens/HomeScreen';
+import RegisterScreen from '../features/Auth/screens/RegisterScreen';
+import LoginScreen from '../features/Auth/screens/LoginScreen';
 import PromotionScreen from '../features/Promotion/screens/PromotionScreen';
 import ShopScreens from '../features/Shop/screens/ShopScreens';
 import ProductDetailScreen from '../features/Product/screens/ProductDetailScreen';
@@ -31,8 +33,8 @@ const router = createBrowserRouter([
       { path: '/product/:productId', element: <ProductDetailScreen /> },
       { path: '/promotion', element: <PromotionScreen /> },
       { path: '/shop', element: <ShopScreens /> },
-      // { path: '/register', element: <RegisterScreen /> },
-      // { path: '/login', element: <LoginScreen /> },
+      { path: '/auth/register', element: <RegisterScreen /> },
+      { path: '/auth/login', element: <LoginScreen /> },
 
       //! Private Routes: Admin
       {

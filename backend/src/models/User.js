@@ -1,12 +1,29 @@
 import mongoose from 'mongoose';
+import bcrypt from 'bcryptjs';
 
 // Define the [User Schema]
 const userSchema = new mongoose.Schema(
   {
-    name: {
+    username: {
+      type: String,
+      required: true,
+      unique: true,
+    },
+    email: {
+      type: String,
+      required: true,
+      unique: true,
+    },
+    firstName: {
       type: String,
       minLength: [2, 'Thấp nhất 2 ký tự'],
-      maxLength: [256, 'Nhiều nhất 256 ký tự'],
+      maxLength: [32, 'Nhiều nhất 32 ký tự'],
+      required: true,
+    },
+    lastName: {
+      type: String,
+      minLength: [2, 'Thấp nhất 2 ký tự'],
+      maxLength: [32, 'Nhiều nhất 32 ký tự'],
       required: true,
     },
     doB: {
@@ -15,16 +32,14 @@ const userSchema = new mongoose.Schema(
     },
     phoneNumber: {
       type: String,
-      default: '',
-    },
-    email: {
-      type: String,
+      minLength: [8, 'Thấp nhất 8 ký tự'],
+      maxLength: [32, 'Nhiều nhất 32 ký tự'],
       required: true,
     },
     password: {
       type: String,
       minLength: [8, 'Thấp nhất 8 ký tự'],
-      maxLength: [256, 'Nhiều nhất 256 ký tự'],
+      maxLength: [64, 'Nhiều nhất 64 ký tự'],
       required: true,
     },
     image: {
@@ -34,19 +49,39 @@ const userSchema = new mongoose.Schema(
       type: String,
       required: false,
     },
-    role: {
-      type: String,
-      enum: ['user', 'subscriber', 'admin'],
-      default: 'user',
-      required: true,
-    },
+    role: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Role',
+        default: async function () {
+          const role = await mongoose.model('Role').findOne({ name: 'user' });
+          return [role._id];
+        },
+      },
+    ],
     status: {
       type: String,
-      default: 'inactive',
+      enum: ['pending', 'active', 'deleting'],
+      default: 'pending',
     },
   },
-  { timestamps: true }
+  { timestamps: true, toObject: { virtuals: true }, toJSON: { virtuals: true } }
 );
+
+// Hash the password before saving it to the database
+userSchema.pre('save', async function (next) {
+  const user = this;
+  if (user.isModified('password')) {
+    user.password = await bcrypt.hash(user.password, 10);
+  }
+  next();
+});
+
+// Compare the given password with the hashed one
+userSchema.methods.comparePassword = async function (password) {
+  const user = this;
+  return await bcrypt.compare(password, user.password);
+};
 
 const User = mongoose.model('User', userSchema);
 export default User;

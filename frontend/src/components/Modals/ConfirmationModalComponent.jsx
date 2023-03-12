@@ -4,9 +4,11 @@ import { Modal, Button } from 'react-bootstrap';
 const DeleteConfirmationModalComponent = ({
   showModal,
   handleHideModal,
-  handleSubmitDelete,
+  handleSubmit,
   message,
   title,
+  nameButton = 'OK',
+  variant = 'success',
 }) => {
   return (
     <Modal show={showModal} onHide={handleHideModal}>
@@ -14,14 +16,16 @@ const DeleteConfirmationModalComponent = ({
         <Modal.Title>{title}</Modal.Title>
       </Modal.Header>
       <Modal.Body>
-        <div className="alert alert-danger">{message}</div>
+        <div className={`alert ${variant ? 'alert-' + variant : null}`}>
+          {message}
+        </div>
       </Modal.Body>
       <Modal.Footer>
         <Button variant="default" onClick={handleHideModal}>
           Cancel
         </Button>
-        <Button variant="danger" onClick={() => handleSubmitDelete()}>
-          Delete
+        <Button variant={variant} onClick={() => handleSubmit()}>
+          {nameButton}
         </Button>
       </Modal.Footer>
     </Modal>

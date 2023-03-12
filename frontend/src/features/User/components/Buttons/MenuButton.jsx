@@ -4,12 +4,17 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 import { faEllipsisV } from '@fortawesome/free-solid-svg-icons';
 
-const MenuButton = ({ handleDeleteUser }) => {
+const MenuButton = ({ handleSubmit }) => {
   const dropdownItems = [
     {
-      key: '1',
+      key: 'handle-1',
       label: 'Xóa tài khoản',
-      handle: handleDeleteUser,
+      typeAction: 'removeSingleAccount',
+    },
+    {
+      key: 'hanle-2',
+      label: 'Reset Password',
+      typeAction: 'resetPassword',
     },
   ];
 
@@ -29,7 +34,11 @@ const MenuButton = ({ handleDeleteUser }) => {
   ));
 
   const renderDropdownItems = dropdownItems.map((item) => (
-    <Dropdown.Item key={item.key} eventKey={item.key} onClick={item.handle}>
+    <Dropdown.Item
+      key={item.key}
+      eventKey={item.key}
+      onClick={() => handleSubmit(item.typeAction)}
+    >
       {item.label}
     </Dropdown.Item>
   ));

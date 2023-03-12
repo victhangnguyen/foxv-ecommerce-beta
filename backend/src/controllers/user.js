@@ -14,7 +14,8 @@ export const fetchUsersByFilters = async (req, res, next) => {
   try {
     if (keyword) {
       match.$or = [
-        { name: new RegExp(keyword, 'i') },
+        { firstName: new RegExp(keyword, 'i') },
+        { lastName: new RegExp(keyword, 'i') },
         { phoneNumber: new RegExp(keyword, 'i') },
       ];
     }
@@ -29,8 +30,8 @@ export const fetchUsersByFilters = async (req, res, next) => {
       },
     ]);
 
-    const users = result[0].users; //! array
-    const usersCount = result[0].usersCount[0].count; //! array
+    const users = result[0].users;
+    const usersCount = result[0].usersCount[0]?.count || 0;
 
     res.status(200).json({ users, usersCount });
   } catch (error) {
@@ -42,6 +43,7 @@ export const fetchUsersByFilters = async (req, res, next) => {
 };
 
 export const removeUser = async (req, res, next) => {
+  console.log('__Debugger__user\n__removeUser__req.user: ', req.user, '\n');
   const userId = req.params.userId;
 
   try {

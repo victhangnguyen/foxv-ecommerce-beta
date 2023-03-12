@@ -31,7 +31,7 @@ const AlertDismissibleComponent = ({
     <>
       <Alert show={show} variant={variant}>
         <Alert.Heading>{title}</Alert.Heading>
-        <p>{children}</p>
+        <div>{children}</div>
         <hr />
         <div className="d-flex justify-content-end">
           <Button onClick={() => setShow(false)} variant={`outline-${variant}`}>

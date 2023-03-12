@@ -17,6 +17,7 @@ const errorHandler = (err, req, res, next) => {
   //! Promise return 200 Rejected => 500
   res.status(statusCode);
   res.json({
+    success: false,
     message: err.message,
     stack: NODE_ENV === 'production' ? null : err.stack,
   });

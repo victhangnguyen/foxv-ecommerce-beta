@@ -8,6 +8,7 @@ import config from './config/index.js';
 
 //! imp Datas
 import userDatas from './data/userDatas.js';
+import roleDatas from './data/roleDatas.js';
 import productDatas from './data/productDatas.js';
 import categoryDatas from './data/categoryDatas.js';
 import subCategoryDatas from './data/subCategoryDatas.js';
@@ -16,6 +17,7 @@ import orderDatas from './data/orderDatas.js';
 
 //! imp Models
 import User from '../src/models/User.js';
+import Role from '../src/models/Role.js';
 import Product from '../src/models/Product.js';
 import Category from '../src/models/Category.js';
 import SubCategory from './models/SubCategory.js';
@@ -25,6 +27,7 @@ import Order from './models/Order.js';
 const importData = async () => {
   try {
     await User.deleteMany();
+    await Role.deleteMany();
     await Category.deleteMany();
     await SubCategory.deleteMany();
     await Product.deleteMany();
@@ -52,6 +55,7 @@ const importData = async () => {
     }));
 
     const userDocs = await User.insertMany(users);
+    const roleDocs = await Role.insertMany(roleDatas);
     const productDocs = await Product.insertMany(products);
     const categoryDocs = await Category.insertMany(categories);
     const subCategoryDocs = await SubCategory.insertMany(subCategories);

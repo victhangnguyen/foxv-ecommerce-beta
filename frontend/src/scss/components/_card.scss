@@ -72,9 +72,12 @@ a {
     padding: 0.2rem !important;
 
     .card-admin-user__header {
-      display: flex;
-      justify-content: end;
-      padding: 0rem !important;
+      padding: 0.25rem !important;
+      &__title-name {
+        display: flex;
+        justify-content: space-between;
+        
+      }
 
     }
   }
