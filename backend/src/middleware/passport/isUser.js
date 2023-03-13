@@ -8,7 +8,9 @@ const isUser = function (req, res, next) {
     }
     if (!user) {
       //! navigate login
-      res.status(401).json({ message: 'Unauthorized.' });
+      return res
+        .status(400)
+        .json({ success: false, message: '[passport] Unauthenticated.' });
     }
     //! check Role
     const adminUser = await mongoose
@@ -21,7 +23,9 @@ const isUser = function (req, res, next) {
       .includes('user');
 
     if (!existingRole) {
-      res.status(401).json({ message: 'Unauthorized.' });
+      return res
+        .status(400)
+        .json({ success: false, message: '[passport] Unauthorized.' });
     }
 
     req.user = user;

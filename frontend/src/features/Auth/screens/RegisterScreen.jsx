@@ -42,23 +42,20 @@ const RegisterScreen = () => {
           password,
           confirmPassword, //! send to check Password must be match
         })
-      )
-        .unwrap()
-        .then((result) => {
-          setNewUser(response.data.user);
-          toast.success(auth.message);
-        })
-        .catch((error) => {
-          toast.error(auth.message);
-        });
+      ).unwrap();
+      //! fulfilled
+      setNewUser(response.data.user);
+      toast.success(response.message);
       setShowAlert(true);
     } catch (error) {
+      toast.error(auth.message);
+
+      //! rejected
       const UNPROCESSABLE = 422;
-      if (error.response?.status === UNPROCESSABLE) {
-        const errs = error.response.errors;
-        if (!errs.length) return;
-        errs.forEach((err) => {
-          console.log('error: ', err);
+      if (error.status === UNPROCESSABLE) {
+        const { errors } = error;
+        if (!errors.length) return;
+        errors.forEach((err) => {
           methods.setError(err.param, {
             type: 'server',
             message: err.msg,

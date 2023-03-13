@@ -32,14 +32,20 @@ export const removeUser = createAsyncThunk(
   async (userId, thunkAPI) => {
     try {
       const response = await userService.removeUser(userId);
+      console.log(
+        '__Debugger__UserSlice\n__removeUser__response: ',
+        response,
+        '\n'
+      );
 
       return thunkAPI.fulfillWithValue(response);
     } catch (error) {
-      if (error.response && error.response.data.message) {
-        return thunkAPI.rejectWithValue(error.response.data.message);
-      } else {
-        return thunkAPI.rejectWithValue(error.message);
-      }
+      console.log('__Debugger__UserSlice\n__removeUser__error: ', error, '\n');
+      return thunkAPI.rejectWithValue({
+        status: error.response?.status,
+        success: error.response?.data.success,
+        error: error.response?.data.message || error.message,
+      });
     }
   }
 );
@@ -48,6 +54,7 @@ const initialState = {
   entities: [],
   entitiesCount: 0,
   loading: false,
+  success: false,
   error: null,
 };
 
@@ -76,10 +83,17 @@ const userSlice = createSlice({
         state.loading = false;
         // state.entities = minus one entity and update one behind the entity
         state.entitiesCount -= 1;
+        state.success = action.payload?.success;
       })
       .addCase(removeUser.rejected, (state, action) => {
+        console.log(
+          '__Debugger__UserSlice\n__removeUser__action.payload: ',
+          action.payload,
+          '\n'
+        );
         state.loading = false;
-        state.error = action.payload;
+        state.success = action.payload?.success;
+        state.error = action.payload?.error;
       });
   },
 });

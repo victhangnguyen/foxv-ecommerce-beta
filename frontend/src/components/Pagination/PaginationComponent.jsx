@@ -11,7 +11,8 @@ const PaginationComponent = ({
   setProductsCountPerPage,
   alwaysShown = true,
 }) => {
-  const pagesCount = Math.ceil(itemsCount / itemsPerPage);
+  const pagesCount =
+    itemsCount && itemsPerPage ? Math.ceil(itemsCount / itemsPerPage) : 1;
   const isPaginationShown = alwaysShown ? true : pagesCount > 1;
   const isCurrentPageFirst = currentPage === 1;
   const isCurrentPageLast = currentPage === pagesCount;

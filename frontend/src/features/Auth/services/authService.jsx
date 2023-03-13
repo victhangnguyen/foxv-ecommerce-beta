@@ -32,6 +32,12 @@ const authService = {
     const url = `/auth/refresh-token`;
     return axiosInstance.post(url, { refreshToken });
   },
+  forgotPassword: async (data) => {
+    try {
+    } catch (error) {
+      console.log('Error: ', error);
+    }
+  },
 };
 
 export default authService;

@@ -18,7 +18,6 @@ const JwtStrategyOptions = {
 const jwtStrategy = new JwtStrategy(JwtStrategyOptions, async (payload, done) => {
   try {
     const user = await mongoose.model('User').findById(payload.sub);
-    console.log('__Debugger__passport\n__jwtStrategy__user: ', user, '\n');
     if (!user) {
       return done(null, false); //! err: null, user: false
     }

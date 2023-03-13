@@ -18,39 +18,45 @@ export function useItemsPerPage(
   itemsLg = 18,
   itemsXl = 24
 ) {
-  // Initialize state with undefined width/height so server and client renders match
-  const [itemsPerPage, setItemsPerPage] = React.useState(0);
-
-  const handleItemsPerPage = () => {
+  const getItemsPerPage = (width) => {
     const widthXs = 567;
     const widthSm = 768;
     const widthMd = 992;
     const widthLg = 1200;
     const widthXl = 1400;
 
-    const width = window.innerWidth;
     if (width <= widthXs) {
-      return setItemsPerPage(itemsXs);
+      return itemsXs;
     } else if (width < widthSm) {
-      return setItemsPerPage(itemsSm);
+      return itemsSm;
     } else if (width < widthMd) {
-      return setItemsPerPage(itemsMd);
+      return itemsMd;
     } else if (width < widthLg) {
-      return setItemsPerPage(itemsLg);
+      return itemsLg;
     } else if (width >= widthLg) {
-      return setItemsPerPage(itemsXl);
+      return itemsXl;
     }
   };
 
-  const updateItemsPerPage = throttle(handleItemsPerPage, 100);
+  // Initialize state with undefined width/height so server and client renders match
+  const [itemsPerPage, setItemsPerPage] = React.useState((prevState) => {
+    const innerWidth = window.innerWidth;
+    return getItemsPerPage(innerWidth);
+  });
 
   React.useEffect(() => {
+    const updateItemsPerPage = throttle(() => {
+      setItemsPerPage((prevState) => {
+        const innerWidth = window.innerWidth;
+        return getItemsPerPage(innerWidth);
+      });
+    }, 100);
+
     // Add event listener
     window.addEventListener('resize', updateItemsPerPage);
     //! initial setState
-    handleItemsPerPage();
-
     return () => window.removeEventListener('resize', updateItemsPerPage);
   }, []);
+
   return itemsPerPage;
 }

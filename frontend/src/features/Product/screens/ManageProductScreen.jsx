@@ -25,7 +25,7 @@ import AdminProductCard from '../components/Cards/AdminProductCard';
 import AlertDismissibleComponent from '../../../components/Alerts/AlertDismissibleComponent';
 
 const ManageProductScreen = () => {
-  const itemsPerPage = useItemsPerPage(10, 15, 20, 30, 30) || 10;
+  const itemsPerPage = useItemsPerPage(10, 15, 20, 30, 30);
 
   const [sort, setSort] = React.useState('createdAt');
   const [order, setOrder] = React.useState('desc');
@@ -51,7 +51,7 @@ const ManageProductScreen = () => {
     },
   ];
 
-  //! local state DeleteComfirmationModalComponent
+  //! localState DeleteComfirmationModalComponent
   const [deleteType, setDeleteType] = React.useState(null); //! single or multiple
   const [deleteIds, setDeleteIds] = React.useState(null); //! id
   const [showConfirmationModal, setShowConfirmationModal] =
@@ -60,10 +60,10 @@ const ManageProductScreen = () => {
   const [singleMessage, setSingleMessage] = React.useState(null);
   const [multipleMessage, setMultipleMessage] = React.useState(null);
 
-  //! state Alert
+  //! localState Alert
   const [showAlert, setShowAlert] = React.useState(false);
 
-  //! stateRedux:
+  //! reduxState:
   const dispatch = useDispatch();
   const product = useSelector((state) => state.product);
   const search = useSelector((state) => state.search);

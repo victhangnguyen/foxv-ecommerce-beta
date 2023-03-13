@@ -2,7 +2,7 @@ import axios from 'axios';
 import Qs from 'qs';
 
 //! imp Actions
-import { refreshToken } from '../features/Auth/AuthSlice';
+import { refreshToken, signout } from '../features/Auth/AuthSlice';
 
 const axiosInstance = axios.create({
   baseURL: 'http://127.0.0.1:5000/api',
@@ -24,7 +24,9 @@ export const interceptor = (store) => {
   //! inject store into interceptor
   axiosInstance.interceptors.request.use(
     function (config) {
-      let token = store.getState().auth?.token;
+      // let token = store.getState().auth?.token;
+      const token = store.getState().auth?.token;
+      console.log('__Debugger__interceptors.request__token: ', token);
       if (token) {
         config.headers.Authorization = `bearer ${token}`;
         // config.headers['x-access-header'] = token;
@@ -46,17 +48,20 @@ export const interceptor = (store) => {
       return response;
     },
     async function (error) {
-      console.log('__Debugger__interceptors.response__error: ', error);
-
       let originalConfig = error.config;
       //! No retry when auth/signin
-      console.log(
-        '__Debugger__axiosInstance\n__interceptior-response__error.response: ',
-        error.response,
-        '\n'
-      );
       if (error.url !== '/auth/signin' && error.response) {
         //! check AccessToken is unauthorized and retry flag
+        //! 403
+        if (error.response.status === FORBIDDEN) {
+          try {
+            console.log('__Dispatch Acton: Sign Out');
+            store.dispatch(signout());
+          } catch (error) {
+            Promise.reject(error.error);
+          }
+        }
+        //! 401
         if (error.response.status === UNAUTHORIZED && !originalConfig._retry) {
           //! toggle flag: true
           originalConfig._retry = true;
@@ -68,13 +73,14 @@ export const interceptor = (store) => {
                 })
               )
               .unwrap();
+            console.log('refresh-token');
             // return a request with config
             return axiosInstance(originalConfig);
-          } catch (err) {
-            return Promise.reject(err);
+          } catch (error) {
+            //! sign out
+            // If Promise.reject(err) -> throw this error to handleSubmit
+            Promise.reject(error.error);
           }
-        }
-        if (error.response.status === UNAUTHORIZED) {
         }
       }
 

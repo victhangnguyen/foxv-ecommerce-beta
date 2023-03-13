@@ -26,13 +26,21 @@ export const signup = createAsyncThunk(
       });
       return response;
     } catch (error) {
+      console.log('__Debugger__AuthSlice\n__signiup__error: ', error, '\n');
+      //! 422
       if (error.response?.status === 422) {
-        const response = {
-          status: 422,
-          errors: error.response.data.errors,
-        };
-        return thunkAPI.rejectWithValue({ response });
+        return thunkAPI.rejectWithValue({
+          status: error.response.status,
+          success: error.response?.data.success,
+          errors: error.response?.data.errors,
+        });
       }
+      //! 400 - 500
+      return thunkAPI.rejectWithValue({
+        status: error.response.status,
+        success: error.response?.data.success,
+        error: error.response?.data.message || error.message,
+      });
     }
   }
 );
@@ -49,21 +57,20 @@ export const signin = createAsyncThunk(
 
       return thunkAPI.fulfillWithValue(response);
     } catch (error) {
-      let response;
+      //! 422
       if (error.response?.status === 422) {
-        response = {
-          status: 422,
-          errors: error.response.data.errors,
-        };
-        return thunkAPI.rejectWithValue({ response });
+        return thunkAPI.rejectWithValue({
+          status: error.response.status,
+          success: error.response?.data.success,
+          errors: error.response?.data.errors,
+        });
       }
-      response = {
+      //! 400 - 500
+      return thunkAPI.rejectWithValue({
         status: error.response.status,
-        error: error.message,
         success: error.response?.data.success,
-        message: error.response?.data.message,
-      };
-      return thunkAPI.rejectWithValue(response);
+        error: error.response?.data.message || error.message,
+      });
     }
   }
 );
@@ -77,10 +84,18 @@ export const refreshToken = createAsyncThunk(
       const response = await authService.refreshToken({
         refreshToken,
       });
-
+      console.log(
+        '__Debugger__AuthSlice\n__refreshToken__response: ',
+        response,
+        '\n'
+      );
       return thunkAPI.fulfillWithValue(response);
     } catch (error) {
-      return thunkAPI.rejectWithValue(error);
+      return thunkAPI.rejectWithValue({
+        status: error.response.status,
+        success: error.response?.data.success,
+        error: error.response?.data.message || error.message,
+      });
     }
   }
 );
@@ -114,10 +129,13 @@ const authSlice = createSlice({
         state.success = action.payload.success;
       })
       .addCase(signup.rejected, (state, action) => {
-        if (action.payload?.response?.status === 422) return;
         state.loading = false;
-        state.error = action.payload;
         state.success = action.payload.success;
+        if (action.payload?.status === 422) {
+          state.error = action.payload.errors[0].msg;
+        } else {
+          state.error = action.payload.error;
+        }
       });
     builder
       .addCase(signin.pending, (state, action) => {
@@ -148,13 +166,16 @@ const authSlice = createSlice({
         // state.error = initialState.error;
       })
       .addCase(refreshToken.fulfilled, (state, action) => {
+        console.log('refreshToken.fulfilled action.payload: ', action.payload);
         state.loading = false;
-        state.success = action.payload.success;
-        state.token = action.payload.data.token;
+        state.success = action.payload?.success;
+        state.token = action.payload?.data.token;
       })
       .addCase(refreshToken.rejected, (state, action) => {
+        console.log('refreshToken.rejected action.payload: ', action.payload);
         state.loading = false;
-        state.error = action.payload;
+        state.success = action.payload?.success;
+        state.error = action.payload?.error;
       });
   },
 });

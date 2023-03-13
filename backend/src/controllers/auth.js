@@ -156,8 +156,18 @@ export const refreshToken = async (req, res, next) => {
 
     verifyRefreshToken(refreshToken)
       .then((payload) => {
+        console.log(
+          '__Debugger__auth\n__verifyRefreshToken__payload: ',
+          payload,
+          '\n'
+        );
         const token = generateAccessToken(payload.sub);
-        
+        console.log(
+          '__Debugger__auth\n__verifyRefreshToken__token: ',
+          token,
+          '\n'
+        );
+
         return res.status(201).json({
           success: true,
           message: 'refresh AccessToken successful',
@@ -166,14 +176,29 @@ export const refreshToken = async (req, res, next) => {
       })
       .catch((error) => {
         if (error instanceof jwt.TokenExpiredError) {
-          return res
-            .status(403)
-            .send({ message: 'Unauthorized! Access Token was expired!' });
+          return res.status(403).send({
+            success: false,
+            message: 'Unauthorized! Refresh Token was expired!',
+          });
         }
 
-        return res.sendStatus(401).send({ message: 'Unauthorized!' });
+        return res
+          .sendStatus(401)
+          .send({ success: false, message: 'Unauthorized!' });
       });
   } catch (error) {
     next(error);
   }
+};
+
+export const forgotPassword = async (req, res, next) => {
+  const { email } = req.body;
+
+  
+
+
+
+  try {
+
+  } catch (error) {}
 };

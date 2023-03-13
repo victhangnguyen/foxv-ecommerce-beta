@@ -10,13 +10,15 @@ export const validateSchema = (chemaValidation) => async (req, res, next) => {
     const validationErrorArray = errors.array({ onlyFirstError: true });
 
     if (!errors.isEmpty()) {
-      return res.status(422).json({ errors: validationErrorArray });
+      return res
+        .status(422)
+        .json({ success: false, errors: validationErrorArray });
     }
 
     next();
   } catch (error) {
     const err = new Error(error);
-    err.httpStatusCode = 400;
+    err.statusCode = 400;
     return next(err);
   }
 };

@@ -7,7 +7,7 @@ import { Container, Row } from 'react-bootstrap';
 import { useScroll } from '../../../hooks/scroll';
 
 //! imp Components
-// import GoToButtonComponent from '../../../components/button/GoToButtonComponent';
+import GoToButtonComponent from '../../../components/Button/GoToButtonComponent';
 import CarouselComponent from '../components/Carousel/CarouselComponent';
 // import Jumbotron from '../../../components/jumbotron/Jumbotron';
 import BestSellersComponent from '../components/BestSellersComponent';
@@ -49,7 +49,7 @@ const HomeScreen = () => {
       <NewArrivalsComponent title={'Sản phẩm mới'} />
       <BestSellersComponent title={'Sản phẩm bán chạy'} />
 
-      {/* <GoToButtonComponent visible={scrollPosition > 400} /> */}
+      <GoToButtonComponent visible={scrollPosition > 300} />
     </>
   );
 };

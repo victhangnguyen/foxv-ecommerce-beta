@@ -1,5 +1,6 @@
 import bcrypt from 'bcryptjs';
 import mongoose from 'mongoose';
+import User from '../../models/User.js';
 
 //! String contains only letters
 const isLetter = (value) => {

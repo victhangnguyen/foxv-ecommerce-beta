@@ -24,6 +24,8 @@ router.post(
   authController.signin
 );
 
-router.post('/auth/refresh-token', authController.refreshToken)
+router.post('/auth/refresh-token', authController.refreshToken);
+
+router.post('/auth/forgot-password', authController.forgotPassword);
 
 export default router;

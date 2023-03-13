@@ -5,44 +5,36 @@ import { Button } from 'react-bootstrap';
 import FormComponent from '../../../components/Forms/FormComponent';
 import InputComponent from '../../../components/Forms/InputComponent';
 
-const LoginFormComponent = ({ onSubmit }) => {
+const ForgotPasswordFormScreen = ({ onSubmit }) => {
   const validationSchema = yup.object({
-    username: yup.string().required('Yêu cầu nhập Username'),
-    password: yup.string().required('Yêu cầu nhập Mật khẩu'),
+    email: yup
+      .string()
+      .email('Email không hợp lệ')
+      .required('Yêu cầu nhập email của bạn'),
   });
 
   return (
     <FormComponent
       validationSchema={validationSchema}
       onSubmit={onSubmit}
-      className="form-login"
+      className="form-forgot-pasword"
     >
       {
-        //! username
+        //! email
       }
       <InputComponent
-        type={'text'}
-        name="username"
-        label={'Username'}
-        placeholder={'Nhập username của bạn'}
-      />
-      {
-        //! password
-      }
-      <InputComponent
-        type={'password'}
-        name="password"
-        label={'Mật khẩu'}
-        placeholder={'Nhập mật khẩu'}
-        autoComplete={'true'}
+        type={'email'}
+        name="email"
+        label={'Email'}
+        placeholder={'Nhập email của bạn'}
       />
       <div className="d-flex justify-content-center">
         <Button className="btn-submit w-100" variant="primary" type="submit">
-          Đăng nhập
+          Khôi phục mật khẩu
         </Button>
       </div>
     </FormComponent>
   );
 };
 
-export default LoginFormComponent;
+export default ForgotPasswordFormScreen;

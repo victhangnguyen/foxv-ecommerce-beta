@@ -9,9 +9,12 @@ import ErrorScreen from '../features/Error/screens/ErrorScreen';
 import HomeScreen from '../features/Home/screens/HomeScreen';
 import RegisterScreen from '../features/Auth/screens/RegisterScreen';
 import LoginScreen from '../features/Auth/screens/LoginScreen';
+import ForgotPasswordScreen from '../features/Auth/screens/ForgotPasswordScreen';
 import PromotionScreen from '../features/Promotion/screens/PromotionScreen';
 import ShopScreens from '../features/Shop/screens/ShopScreens';
 import ProductDetailScreen from '../features/Product/screens/ProductDetailScreen';
+//! imp Comps/Private: User
+import CartScreen from '../features/Cart/screens/CartScreen';
 //! imp Comps/Private: Admin
 import AdminDashboardScreen from '../features/Admin/screens/AdminDashboardScreen';
 import AddEditProductScreen from '../features/Product/screens/AddEditProductScreen';
@@ -21,6 +24,7 @@ import ManageOrderScreen from '../features/Order/screens/ManageOrderScreen';
 
 //! imp Routes
 import AdminRoute from '../components/Routes/AdminRoute';
+import UserRoute from '../components/Routes/UserRoute';
 
 const router = createBrowserRouter([
   {
@@ -35,7 +39,13 @@ const router = createBrowserRouter([
       { path: '/shop', element: <ShopScreens /> },
       { path: '/auth/register', element: <RegisterScreen /> },
       { path: '/auth/login', element: <LoginScreen /> },
-
+      { path: '/auth/forgot-password', element: <ForgotPasswordScreen /> },
+      //! Private Routes: User
+      {
+        path: '/',
+        element: <UserRoute />,
+        children: [{ path: 'cart', element: <CartScreen /> }],
+      },
       //! Private Routes: Admin
       {
         path: '/',

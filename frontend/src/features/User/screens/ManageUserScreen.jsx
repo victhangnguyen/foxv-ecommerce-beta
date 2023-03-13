@@ -33,18 +33,24 @@ const ManageUserScreen = () => {
     },
   ];
   const scrollPosition = useScroll();
-  const itemsPerPage = useItemsPerPage(10, 15, 15, 20) || 10;
+  const itemsPerPage = useItemsPerPage(10, 15, 15, 20);
+
   const dispatch = useDispatch();
 
+  // reduxState
+  const user = useSelector((state) => state.user);
+  const auth = useSelector((state) => state.auth);
+
   const [typeAction, setTypeAction] = React.useState('');
+
+  //! localState: message Error
+  const [messageError, setMessageError] = React.useState('');
 
   //! localState: search
   const [search, setSearch] = React.useState({ keyword: '', age: '' });
   const [sort, setSort] = React.useState('createdAt');
   const [order, setOrder] = React.useState('desc');
   const [currentPage, setCurrentPage] = React.useState(1);
-
-  const user = useSelector((state) => state.user);
 
   //! localState: delete Modal
   const [showConfirmationModal, setShowConfirmationModal] =
@@ -68,15 +74,20 @@ const ManageUserScreen = () => {
   const [showErrorAlert, setShowErrorAlert] = React.useState(false);
 
   React.useEffect(() => {
+    setMessageError(user.error);
+  }, [user.error]);
+
+  React.useEffect(() => {
     //! effect
     loadAllUsers();
   }, [currentPage, itemsPerPage]);
 
-  React.useEffect(() => {
-    if (user.error) {
-      setShowErrorAlert(true);
-    }
-  }, [user.error]);
+  // React.useEffect(() => {
+  //   if (user.error) {
+  //     setMessageError(user.error);
+  //     setShowErrorAlert(true);
+  //   }
+  // }, [user.error]);
 
   const loadAllUsers = () => {
     dispatch(
@@ -140,11 +151,15 @@ const ManageUserScreen = () => {
   };
 
   const deleteUser = async (userId) => {
-    const deletedUser = await dispatch(removeUser(userId)).unwrap();
-    toast.success(`Tài khoản ${deletedUser.email} đã được xóa`);
-    //! clearState
-    setSelectedIds(null);
-    return deletedUser;
+    try {
+      const deletedUser = await dispatch(removeUser(userId)).unwrap();
+      toast.success(`Tài khoản ${deletedUser.email} đã được xóa`);
+      //! clearState
+      setSelectedIds(null);
+      return deletedUser;
+    } catch (error) {
+      throw error;
+    }
   };
 
   const handleHideModal = () => {
@@ -166,7 +181,9 @@ const ManageUserScreen = () => {
       //! show Alert deleted User Infomation
       setShowConfirmationAlert(true);
     } catch (error) {
-      console.log('Error: ', error);
+      setMessageError(error.error);
+      setShowErrorAlert(true);
+      handleHideModal();
     }
   };
 
@@ -191,7 +208,7 @@ const ManageUserScreen = () => {
         variant={'danger'}
         alwaysShown={true}
       >
-        {user.error}
+        {messageError}
       </AlertDismissibleComponent>
 
       <AlertDismissibleComponent

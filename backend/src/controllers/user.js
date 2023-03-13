@@ -37,7 +37,7 @@ export const fetchUsersByFilters = async (req, res, next) => {
   } catch (error) {
     Logging.error('Error__ctrls__user: ' + error);
     const err = new Error(error);
-    err.httpStatusCode = 400; //! 500;
+    err.statusCode = 400; //! 500;
     return next(err);
   }
 };
@@ -66,7 +66,7 @@ export const removeUser = async (req, res, next) => {
   } catch (error) {
     Logging.error('Error__ctrls__user: ' + error);
     const err = new Error(error);
-    err.httpStatusCode = 400; //! 500;
+    err.statusCode = 400; //! 500;
     return next(err);
   }
 };

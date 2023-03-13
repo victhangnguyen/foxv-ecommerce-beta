@@ -6,10 +6,11 @@ const isAdmin = function (req, res, next) {
     if (err) {
       return next(err);
     }
-    console.log('__Debugger__isAdmin\n__authenticate__user: ', user, '\n');
     if (!user) {
       //! navigate login
-      return res.status(401).json({ message: 'Unauthorized.' });
+      return res
+        .status(401)
+        .json({ success: false, message: '[passport] Unauthorized.' });
     }
     //! check Role
     const adminUser = await mongoose
@@ -18,13 +19,14 @@ const isAdmin = function (req, res, next) {
       .populate('role');
     console.log('adminUser: ', adminUser);
 
-
     const existingRole = adminUser.role
       .map((role) => role.name)
       .includes('admin');
 
     if (!existingRole) {
-      return res.status(401).json({ message: 'Unauthorized.' });
+      return res
+        .status(400)
+        .json({ success: false, message: '[passport] Unauthorized.' });
     }
 
     req.user = user;

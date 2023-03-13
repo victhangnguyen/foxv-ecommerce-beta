@@ -28,20 +28,20 @@ const LoginScreen = () => {
     try {
       const response = await dispatch(signin({ username, password })).unwrap();
 
-      const roles = response.data.user.role.map(role => role.name)
+      const roles = response.data.user.role.map((role) => role.name);
 
       //! navigate
-      if (roles.includes('admin')) navigate('/admin/users')
-      else if (roles.includes('user')) navigate('/')
-      
+      if (roles.includes('admin')) navigate('/admin/users');
+      else if (roles.includes('user')) navigate('/');
+
       toast.success(response.message);
       // setShowAlert(true);
     } catch (error) {
       toast.error(auth.error);
-      //! Error Handling
+      //! rejected
       const UNPROCESSABLE = 422;
-      if (error.response?.status === UNPROCESSABLE) {
-        const errors = error.response.errors;
+      if (error.status === UNPROCESSABLE) {
+        const { errors } = error;
         if (!errors.length) return;
         errors.forEach((err) => {
           methods.setError(err.param, {
@@ -49,7 +49,6 @@ const LoginScreen = () => {
             message: err.msg,
           });
         });
-        return true;
       }
       setShowAlert(true);
     }
@@ -84,14 +83,24 @@ const LoginScreen = () => {
             <div className="card-line-top"></div>
             <Card.Body className="px-3 px-md-5">
               <div className="mb-3 mt-md-4">
-                <h2 className="fw-bold mb-2 text-uppercase ">FOXV ECOMERCE</h2>
+                <h2 className="fw-bold mb-2 text-uppercase ">ĐĂNG NHẬP</h2>
                 <p className="mb-2">
                   Đăng nhập để tích điểm và hưởng nhiều ưu đãi thành viên khi
                   mua hàng.
                 </p>
                 <p className="mb-2">Nhập Email để đăng nhập thành viên FOXV.</p>
-                <div className="my-4">
+                <div className="mt-4">
                   <LoginFormComponent onSubmit={handleSubmit} />
+                </div>
+                <div className="mb-3">
+                  <p className="mb-0">
+                    <Link
+                      to={'/auth/forgot-password'}
+                      className="text-primary fst-italic"
+                    >
+                      Quên mật khẩu ?
+                    </Link>
+                  </p>
                 </div>
                 <div className="mb-3">
                   <p className="mb-0  text-center">

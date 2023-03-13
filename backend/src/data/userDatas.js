@@ -1,5 +1,17 @@
 const userDatas = [
   {
+    _id: '640f1dc131eef93e7a5b3bd9',
+    firstName: 'Thắng Funix',
+    lastName: 'Nguyễn',
+    username: 'thangfunix',
+    email: 'thangncfx16840@funix.edu.vn',
+    doB: '1992-08-10T15:46:00.643Z',
+    phoneNumber: '0397139377',
+    password: 'thangfunix',
+    status: 'active',
+    role: ['6402f3c82dc0a95cd2903b37', '6402f3c82dc0a95cd2903b39'],
+  },
+  {
     _id: '63ddf086f48acedfbe5db53d',
     firstName: 'Thắng Nguyễn',
     lastName: 'vic',
