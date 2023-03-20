@@ -21,7 +21,8 @@ const HeaderComponent = () => {
 
   //! reduxState
   const auth = useSelector((state) => state.auth);
-  const roles = auth.user?.role.map((role) => role.name);
+  const userId = auth?.user?._id;
+  const roles = auth.user?.roles?.map((role) => role.name);
   const isAuthenticated = roles?.includes('user');
   const isAdmin = roles?.includes('admin');
 
@@ -138,7 +139,10 @@ const HeaderComponent = () => {
                 {isAuthenticated ? (
                   <>
                     {isAdmin ? (
-                      <NavLink className="nav-link" to={'/admin/product'}>
+                      <NavLink
+                        className="nav-link"
+                        to={'/admin/products/create'}
+                      >
                         Thêm sản phẩm
                       </NavLink>
                     ) : (
@@ -150,14 +154,23 @@ const HeaderComponent = () => {
                       title={auth.user?.firstName}
                       id={`offcanvasNavbarDropdown-expand-lg`}
                     >
-                      <NavDropdown.Item as="div">Profile</NavDropdown.Item>
-                      {isAdmin && (
-                        <NavDropdown.Item as="div">
-                          <NavLink className="nav-link" to={'/admin'}>
-                            Dashboard
-                          </NavLink>
-                        </NavDropdown.Item>
-                      )}
+                      <NavDropdown.Item as="div">
+                        {' '}
+                        <NavLink
+                          className="nav-link"
+                          to={isAdmin ? `/admin/users/${userId}/update` : `/users/${userId}/update`}
+                        >
+                          Profiles
+                        </NavLink>
+                      </NavDropdown.Item>
+                      <NavDropdown.Item as="div">
+                        <NavLink
+                          className="nav-link"
+                          to={isAdmin ? '/admin' : `/users/${userId}`}
+                        >
+                          Dashboard
+                        </NavLink>
+                      </NavDropdown.Item>
                       <NavDropdown.Divider />
                       <NavDropdown.Item as="div" onClick={handleLogout}>
                         Logout

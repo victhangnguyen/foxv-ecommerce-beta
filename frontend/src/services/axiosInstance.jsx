@@ -48,6 +48,11 @@ export const interceptor = (store) => {
       return response;
     },
     async function (error) {
+      console.log(
+        '__Debugger__axiosInstance\n__interceptors__error: ',
+        error,
+        '\n'
+      );
       let originalConfig = error.config;
       //! No retry when auth/signin
       if (error.url !== '/auth/signin' && error.response) {
@@ -55,8 +60,8 @@ export const interceptor = (store) => {
         //! 403
         if (error.response.status === FORBIDDEN) {
           try {
-            console.log('__Dispatch Acton: Sign Out');
             store.dispatch(signout());
+            
           } catch (error) {
             Promise.reject(error.error);
           }
@@ -73,7 +78,6 @@ export const interceptor = (store) => {
                 })
               )
               .unwrap();
-            console.log('refresh-token');
             // return a request with config
             return axiosInstance(originalConfig);
           } catch (error) {

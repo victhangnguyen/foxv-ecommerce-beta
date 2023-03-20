@@ -1,3 +1,5 @@
+import jwt from 'jsonwebtoken';
+
 const { TokenExpiredError } = jwt;
 
 export const catchError = (err, res) => {
@@ -10,11 +12,13 @@ export const catchError = (err, res) => {
   return res.sendStatus(401).send({ message: 'Unauthorized!' });
 };
 
-export function CustomError(statusCode, message) {
-  // create an error object
-  const error = new Error(message);
-  // add custom properties
-  error.statusCode = statusCode;
-  // return the error object
-  return error;
+class HttpError extends Error {
+  constructor(statusCode, message) {
+    super(message);
+    // Call parent constructor
+    this.statusCode = statusCode;
+    // this.name = 'HttpError';
+  }
 }
+
+export default HttpError;

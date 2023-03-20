@@ -5,7 +5,7 @@ const AdminRoute = ({ children }) => {
   const outlet = useOutlet();
 
   const { user, token } = useSelector((state) => ({ ...state.auth }));
-  const roles = user?.role.map((role) => role.name);
+  const roles = user?.roles.map((role) => role.name);
   const isAdmin = roles?.includes('admin');
 
   const isAllowed = token && isAdmin;

@@ -12,7 +12,7 @@ export const getCategories = async (req, res, next) => {
   } catch (err) {
     Logging.error('Error__ctrls__category: ' + err);
     const error = new Error(err);
-    error.httpStatusCode = 400; //! 500;
+    error.httpStatusCode = 400;
     return next(error);
   }
 };
@@ -25,7 +25,7 @@ export const getSubCategoriesByCategoryId = async (req, res, next) => {
   } catch (err) {
     Logging.error('Error__ctrls__category: ' + err);
     const error = new Error(err);
-    error.httpStatusCode = 400; //! 500;
+    error.httpStatusCode = 400;
     return next(error);
   }
 };

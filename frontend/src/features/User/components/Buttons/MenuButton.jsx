@@ -7,14 +7,14 @@ import { faEllipsisV } from '@fortawesome/free-solid-svg-icons';
 const MenuButton = ({ handleSubmit }) => {
   const dropdownItems = [
     {
-      key: 'handle-1',
+      key: 'action-menu-0',
       label: 'Xóa tài khoản',
-      typeAction: 'removeSingleAccount',
+      typeAction: 'deleteUsers',
     },
     {
-      key: 'hanle-2',
+      key: 'action-menu-1',
       label: 'Reset Password',
-      typeAction: 'resetPassword',
+      typeAction: 'resetPasswords',
     },
   ];
 

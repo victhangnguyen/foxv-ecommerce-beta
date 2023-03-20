@@ -1,23 +1,17 @@
-import jwt from 'jsonwebtoken';
-import bcrypt from 'bcryptjs';
-//! imp Library
-import Logging from '../library/Logging.js';
-//! imp Models
-import User from '../models/User.js';
-import RefreshToken from '../models/RefreshToken.js';
-//! imp Configs
-import config from '../config/index.js';
-//! imp utils
-import generatePassword from '../utils/generatePassword.js';
-
-import {
-  generateAccessToken,
-  generateRefreshToken,
-  findOrGenerateRefreshToken,
-  verifyRefreshToken,
-} from '../services/authService.js';
 import nodemailer from 'nodemailer';
 import smtpTransport from 'nodemailer-smtp-transport';
+import jwt from 'jsonwebtoken';
+//! imp Library
+import Logging from '../library/Logging.js';
+//! imp Utils
+import sendEmail from '../utils/sendEmail.js';
+//! imp Services
+import userService from '../services/userService.js';
+import authService from '../services/authService.js';
+//! imp Models
+import User from '../models/User.js';
+//! imp Configs
+import config from '../config/index.js';
 
 export const signup = async (req, res, next) => {
   const { firstName, lastName, username, email, phoneNumber, password } =
@@ -34,9 +28,7 @@ export const signup = async (req, res, next) => {
     }
 
     //! generatePassword and hash password
-    const password = generatePassword(12);
-    // const salt = await bcrypt.genSalt(10);
-    // const hashedPassword = await bcrypt.hash(password, salt);
+    const password = userService.generatePassword(12);
 
     // create newUser with hashed password
     const newUser = new User({
@@ -108,21 +100,15 @@ export const signin = async (req, res, next) => {
   const { username, password } = req.body;
 
   try {
-    const user = await User.findOne({ username }).populate('role').exec();
+    const user = await User.findOne({ username }).populate('roles').exec();
     if (!user || !user.comparePassword(password))
       return res.status(400).json({
         success: false,
         message: 'Invalid email or password.',
       });
 
-    const token = generateAccessToken(user._id);
-    console.log('__Debugger__auth\n__signin__token: ', token, '\n');
-    const refreshToken = await generateRefreshToken(user._id);
-    console.log(
-      '__Debugger__auth\n__signin__refreshToken: ',
-      refreshToken,
-      '\n'
-    );
+    const token = authService.generateAccessToken(user._id);
+    const refreshToken = await authService.generateRefreshToken(user._id);
 
     return res.status(201).json({
       success: true,
@@ -154,19 +140,9 @@ export const refreshToken = async (req, res, next) => {
         .json({ success: false, message: 'Refresh token is required' });
     }
 
-    verifyRefreshToken(refreshToken)
+    authService.verifyRefreshToken(refreshToken)
       .then((payload) => {
-        console.log(
-          '__Debugger__auth\n__verifyRefreshToken__payload: ',
-          payload,
-          '\n'
-        );
-        const token = generateAccessToken(payload.sub);
-        console.log(
-          '__Debugger__auth\n__verifyRefreshToken__token: ',
-          token,
-          '\n'
-        );
+        const token = authService.generateAccessToken(payload.sub);
 
         return res.status(201).json({
           success: true,
@@ -193,12 +169,36 @@ export const refreshToken = async (req, res, next) => {
 
 export const forgotPassword = async (req, res, next) => {
   const { email } = req.body;
-
-  
-
-
-
   try {
+    const user = await User.findOne({ email }).exec();
+    if (!user) {
+      return res
+        .status(403)
+        .json({ success: false, message: 'User does not exist' });
+    }
 
-  } catch (error) {}
+    const newPassword = userService.generatePassword(12);
+
+    user.password = newPassword;
+
+    const htmlTemplate = `
+      <div>
+        <p>Bạn đã khôi phục mật khẩu</p>
+        <p>Mật khẩu hiện tại của bạn là: ${user.password}</p>
+      </div>
+      `;
+
+    // email, subject, text, template
+    const info = await sendEmail(
+      email,
+      'Khôi phục mật khẩu',
+      'Khôi phục mật khẩu',
+      htmlTemplate
+    );
+
+    await user.save();
+  } catch (error) {
+    console.log('__Debugger__auth\n__forgotPassword__error: ', error, '\n');
+    next(error);
+  }
 };

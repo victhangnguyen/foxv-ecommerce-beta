@@ -7,6 +7,9 @@ import { toast } from 'react-toastify';
 import AlertDismissibleComponent from '../../../components/Alerts/AlertDismissibleComponent';
 import ForgotPasswordFormComponent from '../components/ForgotPasswordFormComponent';
 
+//! imp Services
+import authService from '../services/authService';
+
 const ForgotPasswordScreen = () => {
   //! localState: alert
   const [showAlert, setShowAlert] = React.useState();
@@ -18,7 +21,9 @@ const ForgotPasswordScreen = () => {
 
   const handleSubmit = async (data, e, methods) => {
     const { email } = data;
+
     try {
+      await authService.forgotPassword({ email });
       // const response = await dispatch(signin({ username, password })).unwrap();
     } catch (error) {}
   };

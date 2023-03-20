@@ -5,42 +5,48 @@ import { Link, NavLink } from 'react-router-dom';
 const AdminNavComponent = () => {
   const adminNavItems = [
     {
-      key: 'nav-item-1',
+      key: 'admin-nav-item-0',
       label: 'Dashboard',
       path: '/admin/dashboard',
     },
+
     {
-      key: 'nav-item-2',
-      label: 'Thêm sản phẩm',
-      path: '/admin/product',
-    },
-    {
-      key: 'nav-item-3',
+      key: 'admin-nav-item-1',
       label: 'Thêm Loại (Category)',
       path: '/admin/category',
     },
     {
-      key: 'nav-item-4',
+      key: 'admin-nav-item-2',
       label: 'Thêm Kiểu (Sub)',
       path: '/admin/subcategory',
     },
     {
-      key: 'nav-item-5',
-      label: 'Quản lý Sản phẩm',
+      key: 'admin-nav-item-3',
+      label: 'Quản lý Sản phẩm (Product)',
       path: '/admin/products',
     },
     {
-      key: 'nav-item-6',
+      key: 'admin-nav-item-4',
+      label: 'Thêm sản phẩm',
+      path: '/admin/products/create',
+    },
+    {
+      key: 'admin-nav-item-5',
       label: 'Quản lý Tài khoản (User)',
       path: '/admin/users',
     },
     {
-      key: 'nav-item-7',
+      key: 'admin-nav-item-6',
+      label: 'Thêm Tài khoản',
+      path: '/admin/users/create',
+    },
+    {
+      key: 'admin-nav-item-7',
       label: 'Quản lý Mua hàng (Order)',
       path: '/admin/orders',
     },
     {
-      key: 'nav-item-8',
+      key: 'admin-nav-item-8',
       label: 'Thay đổi mật khẩu',
       path: '/user/password',
     },

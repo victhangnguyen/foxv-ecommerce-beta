@@ -138,11 +138,6 @@ export const signinSchema = {
     },
     custom: {
       options: async (value, { req, location, path }) => {
-        console.log(
-          '__Debugger__authSchemaValidations\n__password: ',
-          req.body.password,
-          '\n'
-        );
         if (!isAlphaNumberLetter(value)) {
           throw new Error('Username may only contain alphanumeric characters');
         }

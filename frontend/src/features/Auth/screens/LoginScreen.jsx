@@ -28,7 +28,7 @@ const LoginScreen = () => {
     try {
       const response = await dispatch(signin({ username, password })).unwrap();
 
-      const roles = response.data.user.role.map((role) => role.name);
+      const roles = response.data.user.roles.map((role) => role.name);
 
       //! navigate
       if (roles.includes('admin')) navigate('/admin/users');

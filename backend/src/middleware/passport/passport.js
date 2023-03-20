@@ -15,17 +15,24 @@ const JwtStrategyOptions = {
 };
 
 //! create JwtStrategy Instance
-const jwtStrategy = new JwtStrategy(JwtStrategyOptions, async (payload, done) => {
-  try {
-    const user = await mongoose.model('User').findById(payload.sub);
-    if (!user) {
-      return done(null, false); //! err: null, user: false
+const jwtStrategy = new JwtStrategy(
+  JwtStrategyOptions,
+  async (payload, done) => {
+    try {
+      const user = await mongoose
+        .model('User')
+        .findById(payload.sub)
+        .populate('roles');
+        
+      if (!user) {
+        return done(null, false); //! err: null, user: false
+      }
+      done(null, user); //! err: null, user: user
+    } catch (error) {
+      done(error, false); //! err: error, user: false
     }
-    done(null, user); //! err: null, user: user
-  } catch (error) {
-    done(error, false); //! err: error, user: false
   }
-});
+);
 
 //! tell Passport use the jwtLogin
 passport.use('jwt', jwtStrategy);

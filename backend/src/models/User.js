@@ -1,6 +1,9 @@
 import mongoose from 'mongoose';
 import bcrypt from 'bcryptjs';
 
+//! imp Services
+import userService from '../services/userService.js';
+
 // Define the [User Schema]
 const userSchema = new mongoose.Schema(
   {
@@ -49,7 +52,7 @@ const userSchema = new mongoose.Schema(
       type: String,
       required: false,
     },
-    role: [
+    roles: [
       {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Role',
@@ -61,7 +64,7 @@ const userSchema = new mongoose.Schema(
     ],
     status: {
       type: String,
-      enum: ['pending', 'active', 'deleting'],
+      enum: ['pending', 'active', 'inactive', 'deleting'],
       default: 'pending',
     },
   },
@@ -70,17 +73,24 @@ const userSchema = new mongoose.Schema(
 
 // Hash the password before saving it to the database
 userSchema.pre('save', async function (next) {
-  const user = this;
-  if (user.isModified('password')) {
-    user.password = await bcrypt.hash(user.password, 10);
+  if (this.isModified('password')) {
+    this.password = await bcrypt.hash(this.password, 10);
   }
   next();
 });
 
 // Compare the given password with the hashed one
 userSchema.methods.comparePassword = async function (password) {
-  const user = this;
-  return await bcrypt.compare(password, user.password);
+  return await bcrypt.compare(password, this.password);
+};
+
+userSchema.methods.resetPassword = async function (session) {
+  const newPassword = userService.generatePassword();
+  this.password = newPassword;
+  // this.password = new
+  await this.save({ session });
+
+  return newPassword;
 };
 
 const User = mongoose.model('User', userSchema);

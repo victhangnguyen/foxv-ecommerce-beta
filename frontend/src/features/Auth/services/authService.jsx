@@ -1,7 +1,7 @@
 import axiosInstance from '../../../services/axiosInstance';
 
 const authService = {
-  signup: async (data) => {
+  signup: (data) => {
     const {
       firstName,
       lastName,
@@ -22,21 +22,20 @@ const authService = {
       confirmPassword,
     });
   },
-  signin: async (data) => {
+  signin: (data) => {
     const { username, password } = data;
     const url = `/auth/signin`;
     return axiosInstance.post(url, { username, password });
   },
-  refreshToken: async (data) => {
+  refreshToken: (data) => {
     const { refreshToken } = data;
     const url = `/auth/refresh-token`;
     return axiosInstance.post(url, { refreshToken });
   },
-  forgotPassword: async (data) => {
-    try {
-    } catch (error) {
-      console.log('Error: ', error);
-    }
+  forgotPassword: (data) => {
+    const { email } = data;
+    const url = `/auth/forgot-password`;
+    return axiosInstance.post(url, { email });
   },
 };
 

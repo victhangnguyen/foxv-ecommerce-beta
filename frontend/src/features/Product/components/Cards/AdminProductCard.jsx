@@ -25,7 +25,7 @@ const AdminProductCard = ({
         />
       </Card.Header>
       <Card.Body>
-        <Link to={`/admin/product/${product._id}`}>
+        <Link to={`/admin/products/${product._id}/update`}>
           {product.images.length && (
             <Card.Img
               src={

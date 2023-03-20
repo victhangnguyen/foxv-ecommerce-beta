@@ -17,16 +17,19 @@ const throttle = (callback, sleepTime) => {
   };
 };
 
-export const useScroll = () => {
-  const [scrollPosition, setScrollPosition] = React.useState(window.scrollY);
-
-  const updateScrollPosition = throttle(() => {
-    setScrollPosition(window.scrollY);
-  }, 50);
+export const useScrollPosition = () => {
+  const [scrollPosition, setScrollPosition] = React.useState(0); //! or init: window.scrollY
 
   React.useEffect(() => {
-    window.addEventListener('scroll', updateScrollPosition);
-    return () => window.removeEventListener('scroll', updateScrollPosition);
+    const updatePosition = throttle(() => {
+      setScrollPosition(window.pageYOffset);
+    }, 50);
+
+    window.addEventListener('scroll', updatePosition);
+    //! init once
+    updatePosition();
+    
+    return () => window.removeEventListener('scroll', updatePosition);
   }, []);
 
   return scrollPosition;

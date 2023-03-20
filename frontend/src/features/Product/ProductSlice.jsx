@@ -44,9 +44,9 @@ export const removeProduct = createAsyncThunk(
 
 export const removeProducts = createAsyncThunk(
   'product/removeProducts',
-  async (productIdArray, thunkAPI) => {
+  async (productIds, thunkAPI) => {
     try {
-      const response = await productService.removeProducts(productIdArray);
+      const response = await productService.removeProducts(productIds);
       return thunkAPI.fulfillWithValue(response);
     } catch (error) {
       if (error.response && error.response.data.message) {

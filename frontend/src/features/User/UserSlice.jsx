@@ -27,16 +27,11 @@ export const fetchUsersByFilters = createAsyncThunk(
   }
 );
 
-export const removeUser = createAsyncThunk(
-  'user/removeUser',
-  async (userId, thunkAPI) => {
+export const deleteUsers = createAsyncThunk(
+  'user/deleteUsers',
+  async (userIds, thunkAPI) => {
     try {
-      const response = await userService.removeUser(userId);
-      console.log(
-        '__Debugger__UserSlice\n__removeUser__response: ',
-        response,
-        '\n'
-      );
+      const response = await userService.deleteUsers(userIds);
 
       return thunkAPI.fulfillWithValue(response);
     } catch (error) {
@@ -76,21 +71,16 @@ const userSlice = createSlice({
         state.error = action.payload;
       });
     builder
-      .addCase(removeUser.pending, (state, action) => {
+      .addCase(deleteUsers.pending, (state, action) => {
         state.loading = true;
       })
-      .addCase(removeUser.fulfilled, (state, action) => {
+      .addCase(deleteUsers.fulfilled, (state, action) => {
         state.loading = false;
         // state.entities = minus one entity and update one behind the entity
         state.entitiesCount -= 1;
         state.success = action.payload?.success;
       })
-      .addCase(removeUser.rejected, (state, action) => {
-        console.log(
-          '__Debugger__UserSlice\n__removeUser__action.payload: ',
-          action.payload,
-          '\n'
-        );
+      .addCase(deleteUsers.rejected, (state, action) => {
         state.loading = false;
         state.success = action.payload?.success;
         state.error = action.payload?.error;

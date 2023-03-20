@@ -14,7 +14,9 @@ import PromotionScreen from '../features/Promotion/screens/PromotionScreen';
 import ShopScreens from '../features/Shop/screens/ShopScreens';
 import ProductDetailScreen from '../features/Product/screens/ProductDetailScreen';
 //! imp Comps/Private: User
+import UserDashboardScreen from '../features/User/screens/UserDashboardScreen';
 import CartScreen from '../features/Cart/screens/CartScreen';
+import AddEditUserScreen from '../features/User/screens/AddEditUserScreen';
 //! imp Comps/Private: Admin
 import AdminDashboardScreen from '../features/Admin/screens/AdminDashboardScreen';
 import AddEditProductScreen from '../features/Product/screens/AddEditProductScreen';
@@ -42,24 +44,38 @@ const router = createBrowserRouter([
       { path: '/auth/forgot-password', element: <ForgotPasswordScreen /> },
       //! Private Routes: User
       {
-        path: '/',
+        path: 'users/:userId',
         element: <UserRoute />,
-        children: [{ path: 'cart', element: <CartScreen /> }],
+        children: [
+          { path: 'cart/:cartId', element: <CartScreen /> },
+          {
+            path: '',
+            element: <UserDashboardScreen />,
+            children: [{ path: 'update', element: <AddEditUserScreen /> }],
+          },
+        ],
       },
       //! Private Routes: Admin
       {
-        path: '/',
+        // path: '/',
+        path: '',
         element: <AdminRoute />,
         children: [
           {
-            path: '/admin',
+            // path: '/admin',
+            path: 'admin',
             element: <AdminDashboardScreen />,
             children: [
               //! Product Management
-              { path: 'product/:productId', element: <AddEditProductScreen /> },
-              { path: 'products', element: <ManageProductScreen /> },
-              { path: 'product', element: <AddEditProductScreen /> },
-              { path: 'users', element: <ManageUserScreen /> },
+              { path: 'users', element: <ManageUserScreen /> }, //! users management
+              { path: 'users/create', element: <AddEditUserScreen /> },
+              { path: 'users/:userId/update', element: <AddEditUserScreen /> },
+              { path: 'products', element: <ManageProductScreen /> }, //! products management
+              { path: 'products/create', element: <AddEditProductScreen /> },
+              {
+                path: 'products/:productId/update',
+                element: <AddEditProductScreen />,
+              },
               { path: 'orders', element: <ManageOrderScreen /> },
             ],
           },

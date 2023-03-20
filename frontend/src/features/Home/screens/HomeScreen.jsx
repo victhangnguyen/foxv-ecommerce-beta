@@ -4,7 +4,7 @@ import React from 'react';
 import { Container, Row } from 'react-bootstrap';
 
 //! imp helpers
-import { useScroll } from '../../../hooks/scroll';
+import { useScrollPosition } from '../../../hooks/scroll';
 
 //! imp Components
 import GoToButtonComponent from '../../../components/Button/GoToButtonComponent';
@@ -38,7 +38,7 @@ const HomeScreen = () => {
   //! textArr of Jumbotron
   const textArr = ['Welcome to Foxv Ecommer', 'Trung tâm thương mại điện tử'];
 
-  const scrollPosition = useScroll();
+  const scrollPosition = useScrollPosition();
 
   // ) : error ? (
   //   <MessageCommponent variant="danger">{error}</MessageCommponent>

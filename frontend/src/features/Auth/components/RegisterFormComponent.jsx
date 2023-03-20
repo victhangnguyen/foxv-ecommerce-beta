@@ -8,8 +8,6 @@ import InputComponent from '../../../components/Forms/InputComponent';
 
 const RegisterFormComponent = ({ onSubmit }) => {
   const phoneNumerRegExp = /^[+]*[(]{0,1}[0-9]{1,4}[)]{0,1}[-\s\./0-9]*$/;
-
-  //! Matches any ASCII letters or Unicode letters (including accented letters, etc.) with space
   const unicodeLetters = /^[A-Za-z\u00C0-\u024F\u1E00-\u1EFF ]+$/;
   const alphanumbericLetters = /^[a-zA-Z0-9]+$/;
 

@@ -39,14 +39,9 @@ const productService = {
     const url = `/products/${productId}`;
     return axiosInstance.delete(url);
   },
-  removeProducts: (productIdArray) => {
-    const query = 'ids[]=';
-
-    const productIdPairs = productIdArray
-      .map((productId) => query + encodeURIComponent(productId))
-      .join('&');
-
-    const url = `/products?${productIdPairs}`;
+  removeProducts: (productIds) => {
+    const idPairs = urlHandling.queryIds(productIds);
+    const url = `/products?${idPairs}`;
     return axiosInstance.delete(url);
   },
   fetchProductsByFilters: (search, sort, order, page, perPage) => {

@@ -1,10 +1,15 @@
 import mongoose from 'mongoose';
 import jwt from 'jsonwebtoken';
 import bcrypt from 'bcryptjs';
+import nodemailer from 'nodemailer';
+import smtpTransport from 'nodemailer-smtp-transport';
+//! imp Library
+import Logging from '../library/Logging.js';
+
 //! imp Configs
 import config from '../config/index.js';
 
-export const generateAccessToken = (userId) => {
+function generateAccessToken(userId) {
   const payload = {
     sub: userId,
   };
@@ -13,10 +18,9 @@ export const generateAccessToken = (userId) => {
     expiresIn: config.general.node.accessTokenExpiry,
   };
   return jwt.sign(payload, secretOrPrivateKey, options);
-};
+}
 
-// Generate a new refresh token
-export function generateRefreshToken(userId) {
+function generateRefreshToken(userId) {
   const payload = {
     sub: userId,
   };
@@ -27,7 +31,16 @@ export function generateRefreshToken(userId) {
   return jwt.sign(payload, secretOrPrivateKey, options);
 }
 
-export async function findOrGenerateRefreshToken(userId) {
+function generateResetPasswordToken(payload) {
+  //! payload: { email: ... }
+  const secretOrPrivateKey = config.general.node.resetPasswordTokenSecret;
+  const options = {
+    expiresIn: config.general.node.resetPasswordTokenExpiry,
+  };
+  return jwt.sign(payload, secretOrPrivateKey, options);
+}
+
+async function findOrGenerateRefreshToken(userId) {
   try {
     //! find refreshToken by userId
     let refreshToken = await mongoose
@@ -54,7 +67,7 @@ export async function findOrGenerateRefreshToken(userId) {
   }
 }
 
-export async function verifyRefreshToken(refreshToken) {
+async function verifyRefreshToken(refreshToken) {
   try {
     return jwt.verify(
       refreshToken,
@@ -72,3 +85,11 @@ export async function verifyRefreshToken(refreshToken) {
     throw error;
   }
 }
+
+export default {
+  generateAccessToken,
+  generateRefreshToken,
+  generateResetPasswordToken,
+  findOrGenerateRefreshToken,
+  verifyRefreshToken,
+};

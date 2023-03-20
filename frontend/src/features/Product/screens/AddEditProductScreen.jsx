@@ -1,14 +1,10 @@
-import _, { method } from 'lodash';
+import _ from 'lodash';
 import React from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { toast } from 'react-toastify';
-
-//! imp Utils
-import * as errorHandling from '../../../utils/errorHandling';
 //! imp Services
 import categoryService from '../../Category/services/categoryService';
 import productService from '../services/productService';
-
 //! imp Components
 import AlertDismissibleComponent from '../../../components/Alerts/AlertDismissibleComponent';
 import BreadcrumbComponent from '../../../components/Breadcrumbs/BreadcrumbComponent';
@@ -16,6 +12,8 @@ import ProductFormComponent from '../components/Forms/ProductFormComponent';
 
 const AddEditProductScreen = () => {
   const navigate = useNavigate();
+  const { productId } = useParams();
+
   const [loading, setLoading] = React.useState(false);
   const [product, setProduct] = React.useState({});
   const [newProduct, setNewProduct] = React.useState({});
@@ -26,15 +24,16 @@ const AddEditProductScreen = () => {
   const [showAlert, setShowAlert] = React.useState(false);
   const isExistProduct = !_.isEmpty(product);
 
-  const { productId } = useParams();
 
   const breadcrumbItems = [
     { key: 'breadcrumb-item-1', label: 'Home', path: '/' },
-    { key: 'breadcrumb-item-2', label: 'Dashboard', path: '/admin' },
+    { key: 'breadcrumb-item-2', label: 'Quản lý Sản phẩm', path: '/admin/products' },
     {
       key: 'breadcrumb-item-3',
       label: isExistProduct ? 'Cập nhật Sản phẩm' : 'Thêm mới Sản phẩm',
-      path: '/admin/product',
+      path: isExistProduct
+        ? `/admin/products/${productId}/update`
+        : `/admin/products/create`,
       active: true,
     },
   ];
@@ -191,7 +190,6 @@ const AddEditProductScreen = () => {
             message: error.msg,
           });
         });
-        console.log('errors: ', errors);
       }
 
       toast.error(error.response?.data.message);

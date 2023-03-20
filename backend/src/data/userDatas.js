@@ -7,9 +7,10 @@ const userDatas = [
     email: 'thangncfx16840@funix.edu.vn',
     doB: '1992-08-10T15:46:00.643Z',
     phoneNumber: '0397139377',
-    password: 'thangfunix',
+    password: 'thang@Thang1',
     status: 'active',
-    role: ['6402f3c82dc0a95cd2903b37', '6402f3c82dc0a95cd2903b39'],
+    // roles: ['6402f3c82dc0a95cd2903b37', '6402f3c82dc0a95cd2903b39'],
+    roles: ['6402f3c82dc0a95cd2903b37'],
   },
   {
     _id: '63ddf086f48acedfbe5db53d',
@@ -21,7 +22,7 @@ const userDatas = [
     phoneNumber: '0397139377',
     password: 'victhangnguyen',
     status: 'active',
-    role: ['6402f3c82dc0a95cd2903b37', '6402f3c82dc0a95cd2903b39'],
+    roles: ['6402f3c82dc0a95cd2903b37', '6402f3c82dc0a95cd2903b39'],
   },
   {
     _id: '63ddf086f48acedfbe5db53e',
@@ -33,7 +34,7 @@ const userDatas = [
     email: 'admin001@gmail.com',
     password: 'admin001',
     status: 'active',
-    role: ['6402f3c82dc0a95cd2903b37', '6402f3c82dc0a95cd2903b39'],
+    roles: ['6402f3c82dc0a95cd2903b37', '6402f3c82dc0a95cd2903b39'],
   },
   {
     _id: '63ddf3bc751df7bb7533495a',
@@ -45,7 +46,7 @@ const userDatas = [
     email: 'admin002@gmail.com',
     password: 'admin002',
     status: 'active',
-    role: ['6402f3c82dc0a95cd2903b37', '6402f3c82dc0a95cd2903b39'],
+    roles: ['6402f3c82dc0a95cd2903b37', '6402f3c82dc0a95cd2903b39'],
   },
   {
     _id: '6405e9b6cd4bab62e1465da0',
@@ -57,7 +58,7 @@ const userDatas = [
     email: 'tranvietanh@gmail.com',
     password: 'tvanh1967',
     status: 'active',
-    role: ['6402f3c82dc0a95cd2903b37'],
+    roles: ['6402f3c82dc0a95cd2903b37'],
   },
   {
     _id: '6405e9b6cd4bab62e1465da1',
@@ -69,7 +70,7 @@ const userDatas = [
     email: 'luongquoccuong@gmail.com',
     password: 'lqcuong1974',
     status: 'active',
-    role: ['6402f3c82dc0a95cd2903b37'],
+    roles: ['6402f3c82dc0a95cd2903b37'],
   },
   {
     _id: '63ddf465f8c7870ddde148ac',
@@ -81,7 +82,7 @@ const userDatas = [
     email: 'thanhdung@gmail.com',
     password: 'pttdung1993',
     status: 'active',
-    role: ['6402f3c82dc0a95cd2903b37'],
+    roles: ['6402f3c82dc0a95cd2903b37'],
   },
   {
     _id: '63ddf4ba6d47e8f5f0da4e2d',
@@ -93,7 +94,7 @@ const userDatas = [
     email: 'leminhhoang@gmail.com',
     password: 'lmhoang1984',
     status: 'active',
-    role: ['6402f3c82dc0a95cd2903b37'],
+    roles: ['6402f3c82dc0a95cd2903b37'],
   },
   {
     _id: '63ddf54b3bdb0ab3268272f6',
@@ -105,7 +106,7 @@ const userDatas = [
     email: 'nguyenvankhang@gmail.com',
     password: 'nvkhang2003',
     status: 'active',
-    role: ['6402f3c82dc0a95cd2903b37'],
+    roles: ['6402f3c82dc0a95cd2903b37'],
   },
   {
     _id: '63ddf59c52c5308878ba709b',
@@ -117,7 +118,7 @@ const userDatas = [
     email: 'tranbinhlong@gmail.com',
     password: 'tblong1986',
     status: 'active',
-    role: ['6402f3c82dc0a95cd2903b37'],
+    roles: ['6402f3c82dc0a95cd2903b37'],
   },
   {
     _id: '63ddf5d48102117c490939ed',
@@ -129,7 +130,7 @@ const userDatas = [
     email: 'nguyendangkhoa@gmail.com',
     password: 'ndkhoa1993',
     status: 'active',
-    role: ['6402f3c82dc0a95cd2903b37'],
+    roles: ['6402f3c82dc0a95cd2903b37'],
   },
   {
     _id: '63ddf60d2feb706fc621c3a9',
@@ -141,7 +142,7 @@ const userDatas = [
     email: 'tranduyhung@gmail.com',
     password: 'tdhung1987',
     status: 'active',
-    role: ['6402f3c82dc0a95cd2903b37'],
+    roles: ['6402f3c82dc0a95cd2903b37'],
   },
   {
     _id: '63ddfcd73f3dcf377a3ef1db',
@@ -153,7 +154,7 @@ const userDatas = [
     email: 'nguyennhattin@gmail.com',
     password: 'nntin1991',
     status: 'active',
-    role: ['6402f3c82dc0a95cd2903b37'],
+    roles: ['6402f3c82dc0a95cd2903b37'],
   },
   {
     _id: '63ddfd797197f95937b5296a',
@@ -165,7 +166,7 @@ const userDatas = [
     email: 'nguyenngocthien@gmail.com',
     password: 'nnthien1996',
     status: 'active',
-    role: ['6402f3c82dc0a95cd2903b37'],
+    roles: ['6402f3c82dc0a95cd2903b37'],
   },
   {
     _id: '63ddfe26b27bcc091cb5a9f2',
@@ -177,7 +178,7 @@ const userDatas = [
     email: 'tranhuyentran@gmail.com',
     password: 'thtran1971',
     status: 'active',
-    role: ['6402f3c82dc0a95cd2903b37'],
+    roles: ['6402f3c82dc0a95cd2903b37'],
   },
   {
     _id: '63ddff5708a9e660cce1886e',
@@ -189,7 +190,7 @@ const userDatas = [
     email: 'nguyenquoctri@gmail.com',
     password: 'nqtri1968',
     status: 'active',
-    role: ['6402f3c82dc0a95cd2903b37'],
+    roles: ['6402f3c82dc0a95cd2903b37'],
   },
   {
     _id: '63ddff8bbf6767d4158ff56f',
@@ -201,7 +202,7 @@ const userDatas = [
     email: 'nguyenquangtrung@gmail.com',
     password: 'nqtrung1968',
     status: 'active',
-    role: ['6402f3c82dc0a95cd2903b37'],
+    roles: ['6402f3c82dc0a95cd2903b37'],
   },
   {
     _id: '63ddffd955d17feb36f32da1',
@@ -213,7 +214,7 @@ const userDatas = [
     email: 'lethevinh@gmail.com',
     password: 'ltvinh1999',
     status: 'active',
-    role: ['6402f3c82dc0a95cd2903b37'],
+    roles: ['6402f3c82dc0a95cd2903b37'],
   },
   {
     _id: '63de004e90b8bbfff6d25c49',
@@ -225,7 +226,7 @@ const userDatas = [
     email: 'caohoangtuan@gmail.com',
     password: 'chtuan2003',
     status: 'active',
-    role: ['6402f3c82dc0a95cd2903b37'],
+    roles: ['6402f3c82dc0a95cd2903b37'],
   },
   {
     _id: '63de0092ab325b65e50cbff1',
@@ -237,7 +238,7 @@ const userDatas = [
     email: 'hoangthanhphong@gmail.com',
     password: 'htphong1995',
     status: 'active',
-    role: ['6402f3c82dc0a95cd2903b37'],
+    roles: ['6402f3c82dc0a95cd2903b37'],
   },
   {
     _id: '63de00e59783a916c85f01a8',
@@ -249,7 +250,7 @@ const userDatas = [
     email: 'phamminhhieu@gmail.com',
     password: 'pmhieu1979',
     status: 'active',
-    role: ['6402f3c82dc0a95cd2903b37'],
+    roles: ['6402f3c82dc0a95cd2903b37'],
   },
   {
     _id: '63de0124b0f5d4a910ca9938',
@@ -261,7 +262,7 @@ const userDatas = [
     email: 'phamtantai@gmail.com',
     password: 'pttai1986',
     status: 'active',
-    role: ['6402f3c82dc0a95cd2903b37'],
+    roles: ['6402f3c82dc0a95cd2903b37'],
   },
   {
     _id: '63de01647b72571c18627733',
@@ -273,7 +274,7 @@ const userDatas = [
     email: 'nguyenthithuyvan@gmail.com',
     password: 'nttvan1997',
     status: 'active',
-    role: ['6402f3c82dc0a95cd2903b37'],
+    roles: ['6402f3c82dc0a95cd2903b37'],
   },
 ];
 

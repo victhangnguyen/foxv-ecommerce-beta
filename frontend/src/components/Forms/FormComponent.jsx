@@ -1,5 +1,6 @@
 import React from 'react';
 import { useForm, useWatch } from 'react-hook-form';
+import _ from 'lodash';
 
 //! imp Hooks
 import { useYupValidationResolver } from '../../hooks/yupResolver';
@@ -16,6 +17,7 @@ const FormComponent = ({
 
   const methods = useForm({
     resolver,
+    mode: 'onTouched',
     // defaultValues: defaultValues,
   });
 
@@ -23,6 +25,7 @@ const FormComponent = ({
   console.log('watchAllFields: ', watchAllFields);
 
   const fields = children.map((child) => child.props?.name);
+
   //! initialize Values
   React.useEffect(() => {
     if (!initialValues) return;
@@ -33,12 +36,8 @@ const FormComponent = ({
         methods.setValue(field, initialValues[field]);
       });
     }
-  }, [JSON.stringify(initialValues)]);
-
-  // //! initialize Values
-  // React.useEffect(() => {
-  //   methods.reset(initialValues);
-  // }, [methods.reset, initialValues]);
+    // }, [JSON.stringify(initialValues)]);
+  }, [initialValues]);
 
   const checkKeyDown = (e) => {
     if (e.code === 'Enter') {

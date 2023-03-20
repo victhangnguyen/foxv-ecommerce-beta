@@ -39,6 +39,7 @@ export function useItemsPerPage(
   };
 
   // Initialize state with undefined width/height so server and client renders match
+  // const [itemsPerPage, setItemsPerPage] = React.useState(0);
   const [itemsPerPage, setItemsPerPage] = React.useState((prevState) => {
     const innerWidth = window.innerWidth;
     return getItemsPerPage(innerWidth);
@@ -54,7 +55,6 @@ export function useItemsPerPage(
 
     // Add event listener
     window.addEventListener('resize', updateItemsPerPage);
-    //! initial setState
     return () => window.removeEventListener('resize', updateItemsPerPage);
   }, []);
 

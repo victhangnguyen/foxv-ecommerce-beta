@@ -3,35 +3,38 @@ import mongoose from 'mongoose';
 
 const isAdmin = function (req, res, next) {
   passport.authenticate('jwt', async function (err, user, info, status) {
-    if (err) {
-      return next(err);
-    }
-    if (!user) {
-      //! navigate login
-      return res
-        .status(401)
-        .json({ success: false, message: '[passport] Unauthorized.' });
-    }
-    //! check Role
-    const adminUser = await mongoose
-      .model('User')
-      .findById(user._id)
-      .populate('role');
-    console.log('adminUser: ', adminUser);
+    try {
+      if (err) {
+        return next(err);
+      }
 
-    const existingRole = adminUser.role
-      .map((role) => role.name)
-      .includes('admin');
+      const userDoc = await mongoose
+        .model('User')
+        .findById(user._id)
+        .populate('roles')
+        .exec();
 
-    if (!existingRole) {
-      return res
-        .status(400)
-        .json({ success: false, message: '[passport] Unauthorized.' });
+      if (!userDoc) {
+        //! navigate login
+        return res
+          .status(401)
+          .json({ success: false, message: '[passport] Unauthorized.' });
+      }
+
+      //! check Role
+      const isAdmin = userDoc.roles.map((role) => role.name).includes('admin');
+
+      if (!isAdmin) {
+        return res
+          .status(403) //! signout
+          .json({ success: false, message: '[passport] Unauthenticated.' });
+      }
+
+      req.user = userDoc;
+      next();
+    } catch (error) {
+      next(error);
     }
-
-    req.user = user;
-    //! navigate main
-    next();
   })(req, res, next);
 };
 

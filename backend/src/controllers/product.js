@@ -26,7 +26,7 @@ export const getProduct = async (req, res, next) => {
   } catch (error) {
     Logging.error('Error__ctrls__product: ' + error);
     const err = new Error(error);
-    err.httpStatusCode = 400; //! 500;
+    err.httpStatusCode = 400;
     return next(err);
   }
 };
@@ -36,7 +36,7 @@ export const getProducts = async (req, res, next) => {
   } catch (error) {
     Logging.error('Error__ctrls__product: ' + error);
     const err = new Error(error);
-    err.httpStatusCode = 400; //! 500;
+    err.httpStatusCode = 400;
     return next(err);
   }
 };
@@ -49,7 +49,7 @@ export const productsCount = async (req, res, next) => {
   } catch (error) {
     Logging.error('Error__ctrls__product: ' + error);
     const err = new Error(error);
-    err.httpStatusCode = 400; //! 500;
+    err.httpStatusCode = 400;
     return next(err);
   }
 };
@@ -77,7 +77,7 @@ export const getProductList = async (req, res, next) => {
   } catch (error) {
     Logging.error('Error__ctrls__product: ' + error);
     const err = new Error(error);
-    err.httpStatusCode = 400; //! 500;
+    err.httpStatusCode = 400;
     return next(err);
   }
 };
@@ -117,7 +117,7 @@ export const createProduct = async (req, res, next) => {
   } catch (error) {
     Logging.error('Error__ctrls__product: ' + error);
     const err = new Error(error);
-    err.httpStatusCode = 400; //! 500;
+    err.httpStatusCode = 400;
     return next(err);
   }
 };
@@ -163,7 +163,7 @@ export const updateProduct = async (req, res, next) => {
   } catch (error) {
     Logging.error('Error__ctrls__product: ' + error);
     const err = new Error(error);
-    err.httpStatusCode = 400; //! 500;
+    err.httpStatusCode = 400;
     return next(err);
   }
 };
@@ -190,7 +190,7 @@ export const removeProduct = async (req, res, next) => {
     } catch (error) {
       Logging.error('Error__ctrls__product: ' + error);
       const err = new Error(error);
-      err.httpStatusCode = 400; //! 500;
+      err.httpStatusCode = 400;
       return next(err);
     }
 };
@@ -240,7 +240,7 @@ export const removeProducts = async (req, res, next) => {
   } catch (error) {
     Logging.error('Error__ctrls__product: ' + error);
     const err = new Error(error);
-    err.httpStatusCode = 400; //! 500;
+    err.httpStatusCode = 400;
     return next(err);
   }
 };
@@ -307,7 +307,7 @@ const handleSearchPrice = async (req, res, next) => {
   } catch (error) {
     Logging.error('Error__ctrls__product: ' + error);
     const err = new Error(error);
-    err.httpStatusCode = 400; //! 500;
+    err.httpStatusCode = 400;
     return next(err);
   }
 };
@@ -335,7 +335,7 @@ const handleSearchCategory = async (req, res, next) => {
   } catch (error) {
     Logging.error('Error__ctrls__product: ' + error);
     const err = new Error(error);
-    err.httpStatusCode = 400; //! 500;
+    err.httpStatusCode = 400;
     return next(err);
   }
 };
@@ -371,7 +371,7 @@ export const fetchProductsByFilters = async (req, res, next) => {
   } catch (error) {
     Logging.error('Error__ctrls__product: ' + error);
     const err = new Error(error);
-    err.httpStatusCode = 400; //! 500;
+    err.httpStatusCode = 400;
     return next(err);
   }
 };
