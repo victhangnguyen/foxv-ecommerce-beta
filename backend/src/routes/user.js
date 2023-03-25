@@ -16,7 +16,7 @@ router.get('/users/:userId', userController.getUser);
 //! @desc     Fetch all products by Filters
 //! @route    GET /api/users/search/filters
 //! @access   Public
-router.get('/users/search/filters', userController.fetchUsersByFilters);
+router.get('/users/search/filters', userController.getUsersByFilters);
 
 //! @desc     Delete Multitple User
 //! @route    DEL /api/admin/users/delete-multiple'

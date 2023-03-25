@@ -3,11 +3,12 @@ import Logging from '../library/Logging.js';
 
 //! imp Models
 import SubCategory from '../models/SubCategory.js';
+import Product from '../models/Product.js';
 
 //! imp Utils
 import generateSlug from '../utils/generateSlug.js';
 
-export const getSubCategory = async (req, res, next) => {
+export async function getSubCategory(req, res, next) {
   try {
   } catch (err) {
     Logging.error('Error__ctrls__subCategory: ' + err);
@@ -15,7 +16,7 @@ export const getSubCategory = async (req, res, next) => {
     error.httpStatusCode = 400;
     return next(error);
   }
-};
+}
 
 export async function getSubCategoryBySlug(req, res, next) {
   const slug = req.params.slug;
@@ -26,10 +27,12 @@ export async function getSubCategoryBySlug(req, res, next) {
       throw new Error('SubCategory does not exist!');
     }
 
+    const products = await Product.find({ subCategories: subCategory }).exec();
+
     res.status(200).json({
       success: true,
       message: 'Fetch a SubCategory by slug successful!',
-      data: { subCategory },
+      data: { subCategory, products },
     });
   } catch (error) {
     Logging.error('Error__ctrls__category: ' + error);
@@ -68,6 +71,62 @@ export async function getSubCategories(req, res, next) {
     });
   } catch (error) {
     Logging.error('Error__ctrls__category: ' + error);
+    const err = new Error(error);
+    err.statusCode = 400;
+    return next(err);
+  }
+}
+
+export async function getSubCategoriesByFilters(req, res, next) {
+  const { keyword, sort, order, page, perPage } = req.query;
+  let match = {};
+  if (keyword) {
+    match.$or = [
+      { name: new RegExp(keyword, 'i') },
+      { slug: new RegExp(keyword, 'i') },
+    ];
+  }
+
+  const skip = (page - 1) * perPage;
+
+  try {
+    const result = await SubCategory.aggregate([
+      // {
+      //   ! populate
+      //   $lookup: {
+      //     from: 'roles',
+      //     localField: 'roles',
+      //     foreignField: '_id',
+      //     as: 'roles',
+      //   },
+      // },
+      { $match: match },
+      { $sort: { [sort]: +order } },
+      { $skip: skip },
+      { $limit: +perPage },
+      {
+        $facet: {
+          subCategories: [
+            { $match: match },
+            { $sort: { [sort]: +order } },
+            { $skip: skip },
+            { $limit: +perPage },
+          ],
+          subCategoriesCount: [{ $count: 'total' }],
+        },
+      },
+    ]).exec();
+
+    const subCategories = result[0].subCategories;
+    const subCategoriesCount = result[0].subCategoriesCount[0]?.total || 0;
+
+    res.status(200).json({
+      success: true,
+      messsage: 'Fetch SubCategories by Filters successful!',
+      data: { subCategories, subCategoriesCount },
+    });
+  } catch (error) {
+    Logging.error('Error__ctrls__user: ' + error);
     const err = new Error(error);
     err.statusCode = 400;
     return next(err);

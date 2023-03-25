@@ -1,16 +1,17 @@
 import { NavLink, useNavigate } from 'react-router-dom';
+import React from 'react';
 import { toast } from 'react-toastify';
 import { useDispatch, useSelector } from 'react-redux';
 
-import React from 'react';
 import Container from 'react-bootstrap/Container';
 import Image from 'react-bootstrap/Image';
 import Nav from 'react-bootstrap/Nav';
 import Navbar from 'react-bootstrap/Navbar';
 import NavDropdown from 'react-bootstrap/NavDropdown';
 import Offcanvas from 'react-bootstrap/Offcanvas';
-
-//! imp Components
+//! imp Services
+import categoryService from '../../features/Category/services/categoryService';
+import subCategoryService from '../../features/SubCategory/services/subCategoryService';
 
 //! imp Actions
 import { signout } from '../../features/Auth/AuthSlice';
@@ -26,12 +27,64 @@ const HeaderComponent = () => {
   const isAuthenticated = roles?.includes('user');
   const isAdmin = roles?.includes('admin');
 
+  //! localState: selected
+  const [categories, setCategories] = React.useState([]);
+  const [subCategories, setSubCategories] = React.useState([]);
+
   const handleLogout = () => {
     dispatch(signout());
     navigate('/auth/login');
     toast.success(`${auth.user.lastName} has successfully signed out!`);
   };
 
+  React.useEffect(() => {
+    loadCategories();
+    loadSubCategories();
+  }, []);
+
+  const loadCategories = async () => {
+    const filterOptions = {
+      sort: 'createdAt',
+      order: -1,
+      page: 1,
+      perPage: 10,
+    };
+    const response = await categoryService.getCategoriesByFilters(
+      filterOptions
+    );
+    setCategories(response.data.categories);
+  };
+
+  const loadSubCategories = async () => {
+    const filterOptions = {
+      sort: 'createdAt',
+      order: -1,
+      page: 1,
+      perPage: 10,
+    };
+    const response = await subCategoryService.getSubCategoriesByFilters(filterOptions);
+    setSubCategories(response.data.subCategories);
+  };
+
+  const renderCategoryHeader = categories?.map((category) => (
+    <NavLink
+      key={category._id}
+      className={'nav-link'}
+      to={`/collections/${category.slug}`}
+    >
+      <NavDropdown.Item as="div">{category.name}</NavDropdown.Item>
+    </NavLink>
+  ));
+
+  const renderSubCategoryHeader = subCategories?.map((sub) => (
+    <NavLink
+      key={sub._id}
+      className={'nav-link'}
+      to={`/collections/sub/${sub.slug}`}
+    >
+      <NavDropdown.Item as="div">{sub.name}</NavDropdown.Item>
+    </NavLink>
+  ));
   return (
     <>
       <Navbar bg="light" expand="lg" className="mb-3">
@@ -72,47 +125,14 @@ const HeaderComponent = () => {
                   title="Sản phẩm"
                   id="collasible-nav-dropdown"
                 >
-                  <NavDropdown.Item as="div">
-                    <NavLink className={'nav-link'} to={`/collections/ao`}>
-                      Áo
-                    </NavLink>
-                  </NavDropdown.Item>
-                  <NavDropdown.Item as="div">
-                    <NavLink className={'nav-link'} to={`/collections/dam`}>
-                      Đầm
-                    </NavLink>
-                  </NavDropdown.Item>
-                  <NavDropdown.Item as="div">
-                    <NavLink className={'nav-link'} to={`/collections/vay`}>
-                      Váy
-                    </NavLink>
-                  </NavDropdown.Item>
-                  <NavDropdown.Item as="div">
-                    <NavLink className={'nav-link'} to={`/collections/quan`}>
-                      Quần
-                    </NavLink>
-                  </NavDropdown.Item>
-                  <NavDropdown.Divider />
-                  <NavDropdown.Item href="#action/3.4">
-                    Phụ kiện thời trang
-                  </NavDropdown.Item>
+                  {renderCategoryHeader}
                 </NavDropdown>{' '}
                 <NavDropdown
                   className={'nav-link'}
-                  title="SALE OFF"
+                  title="Loại sản phẩm"
                   id="collasible-nav-dropdown"
                 >
-                  <NavDropdown.Item href="#action/3.1">Action</NavDropdown.Item>
-                  <NavDropdown.Item href="#action/3.2">
-                    Another action
-                  </NavDropdown.Item>
-                  <NavDropdown.Item href="#action/3.3">
-                    Something
-                  </NavDropdown.Item>
-                  <NavDropdown.Divider />
-                  <NavDropdown.Item href="#action/3.4">
-                    Separated link
-                  </NavDropdown.Item>
+                  {renderSubCategoryHeader}
                 </NavDropdown>
                 <NavDropdown
                   className={'nav-link'}
@@ -139,11 +159,8 @@ const HeaderComponent = () => {
                 {isAuthenticated ? (
                   <>
                     {isAdmin ? (
-                      <NavLink
-                        className="nav-link"
-                        to={'/admin/products/create'}
-                      >
-                        Thêm sản phẩm
+                      <NavLink className="nav-link" to={'/admin/products'}>
+                        Quản lý Sản phẩm
                       </NavLink>
                     ) : (
                       <NavLink
@@ -172,17 +189,11 @@ const HeaderComponent = () => {
                       </NavDropdown.Item>
                       <NavDropdown.Item as="div">
                         {isAdmin ? (
-                          <NavLink
-                            className="nav-link"
-                            to={'/admin'}
-                          >
+                          <NavLink className="nav-link" to={'/admin'}>
                             Dashboard
                           </NavLink>
                         ) : (
-                          <NavLink
-                            className="nav-link"
-                            to={`/users/${userId}`}
-                          >
+                          <NavLink className="nav-link" to={`/users/${userId}`}>
                             Setting
                           </NavLink>
                         )}

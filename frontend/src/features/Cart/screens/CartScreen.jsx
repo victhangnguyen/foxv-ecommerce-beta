@@ -126,7 +126,7 @@ const CartScreen = () => {
                   <tr key={item._id}>
                     <th scope="row">
                       <div className="p-2">
-                        <Link to={`/products/${item._id}`}>
+                        <Link to={`/products/${item.slug}`}>
                           <img
                             src={imagesUrl + item.image}
                             alt=""
@@ -136,7 +136,7 @@ const CartScreen = () => {
                         </Link>
                         <div className="ml-3 d-inline-block align-middle">
                           <h5 className="mb-0">
-                            <Link to={`/products/${item._id}`}>
+                            <Link to={`/products/${item.slug}`}>
                               {item.name}
                             </Link>
                           </h5>

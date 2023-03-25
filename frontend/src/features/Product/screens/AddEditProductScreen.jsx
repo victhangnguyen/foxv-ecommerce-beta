@@ -60,7 +60,6 @@ const AddEditProductScreen = () => {
 
   //! effect DidMount
   React.useEffect(() => {
-    console.log('productId: ', productId);
     loadCategories();
     if (productId) {
       //! Mode: Edit Product
@@ -75,7 +74,6 @@ const AddEditProductScreen = () => {
     try {
       setLoading(true);
       const productDoc = await productService.getProduct(productId);
-      console.log('productDoc: ', productDoc);
       setLoading(false);
       setProduct(productDoc);
       const categoryId = productDoc.category._id;

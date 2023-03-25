@@ -10,7 +10,11 @@ const productService = {
   },
   getProduct: (productId) => {
     const url = `/products/${productId}`;
-    return axiosInstance.get(url, productId);
+    return axiosInstance.get(url);
+  },
+  getProductBySlug: (slug) => {
+    const url = `/products/slug/${slug}`;
+    return axiosInstance.get(url);
   },
   getProductList: (params) => {
     const url = `/products`;
@@ -44,7 +48,7 @@ const productService = {
     const url = `/products?${idPairs}`;
     return axiosInstance.delete(url);
   },
-  fetchProductsByFilters: (search, sort, order, page, perPage) => {
+  getProductsByFilters: (search, sort, order, page, perPage) => {
     const url = `/search/filters`;
     return axiosInstance.post(url, { search, sort, order, page, perPage });
   },

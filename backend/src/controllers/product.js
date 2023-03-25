@@ -31,6 +31,29 @@ export const getProduct = async (req, res, next) => {
   }
 };
 
+export async function getProductBySlug(req, res, next) {
+  const slug = req.params.slug;
+  try {
+    const product = await Product.findOne({ slug })
+      .populate('category')
+      .populate('subCategories')
+      .exec();
+    if (!product) {
+      throw new Error('Product does not exist!');
+    }
+    res.status(200).json({
+      success: true,
+      message: 'Get Product by Slug successful!',
+      data: { product },
+    });
+  } catch (error) {
+    Logging.error('Error__ctrls__product: ' + error);
+    const err = new Error(error);
+    err.statusCode = 400;
+    return next(err);
+  }
+}
+
 export const getProducts = async (req, res, next) => {
   try {
   } catch (error) {
@@ -56,7 +79,6 @@ export const productsCount = async (req, res, next) => {
 
 //! All of Products with skip and limit
 export const getProductList = async (req, res, next) => {
-  console.log('__Debugger__product\n__getProductList__req.query: ', req.query, '\n');
   let { sort, order, page, perPage } = req.query;
 
   if (page < 1) {
@@ -169,30 +191,30 @@ export const updateProduct = async (req, res, next) => {
 };
 
 export const removeProduct = async (req, res, next) => {
-    const productId = req.params.productId;
+  const productId = req.params.productId;
 
-    try {
-      //! delete database -> delete Files
-      const product = await Product.findById(productId);
-      if (!product) {
-        throw new Error('Product not found!');
-      }
-
-      const fileDir = path.join(fileHelper.rootDir, 'images', 'products');
-      const files = product.images;
-
-      const deletedFiles = await fileHelper.deleteFiles(fileDir, files);
-      Logging.info(deletedFiles);
-
-      const response = await Product.findByIdAndRemove(productId).exec();
-
-      res.status(200).json(response);
-    } catch (error) {
-      Logging.error('Error__ctrls__product: ' + error);
-      const err = new Error(error);
-      err.statusCode = 400;
-      return next(err);
+  try {
+    //! delete database -> delete Files
+    const product = await Product.findById(productId);
+    if (!product) {
+      throw new Error('Product not found!');
     }
+
+    const fileDir = path.join(fileHelper.rootDir, 'images', 'products');
+    const files = product.images;
+
+    const deletedFiles = await fileHelper.deleteFiles(fileDir, files);
+    Logging.info(deletedFiles);
+
+    const response = await Product.findByIdAndRemove(productId).exec();
+
+    res.status(200).json(response);
+  } catch (error) {
+    Logging.error('Error__ctrls__product: ' + error);
+    const err = new Error(error);
+    err.statusCode = 400;
+    return next(err);
+  }
 };
 
 export const removeProducts = async (req, res, next) => {
@@ -340,7 +362,7 @@ const handleSearchCategory = async (req, res, next) => {
   }
 };
 
-export const fetchProductsByFilters = async (req, res, next) => {
+export const getProductsByFilters = async (req, res, next) => {
   const { search, sort, order, page, perPage } = req.body;
   try {
     if (search.text) {

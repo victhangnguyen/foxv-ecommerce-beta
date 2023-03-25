@@ -4,15 +4,14 @@ import { Link, NavLink } from 'react-router-dom';
 
 const AdminNavComponent = () => {
   const adminNavItems = [
-    {
-      key: 'admin-nav-item-0',
-      label: 'Dashboard',
-      path: '/admin/dashboard',
-    },
-
+    // {
+    //   key: 'admin-nav-item-0',
+    //   label: 'Dashboard',
+    //   path: '/admin/dashboard',
+    // },
     {
       key: 'admin-nav-item-1',
-      label: 'Quản lý Loại (Cate)',
+      label: 'Quản lý Loại (Cat)',
       path: '/admin/categories/create',
     },
     {

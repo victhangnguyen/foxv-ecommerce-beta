@@ -1,4 +1,6 @@
 import axiosInstance from '../../../services/axiosInstance';
+//! imp Utils
+import * as urlHandling from '../../../utils/url';
 
 const subCategoryService = {
   getSubCategoryBySlug: (slug) => {
@@ -13,10 +15,12 @@ const subCategoryService = {
     const url = `/subcategories`;
     return axiosInstance.get(url);
   },
-  // getSubCategory: (slug, config) => {
-  //   const url = `/subcategory/${slug}`;
-  //   return axiosInstance.get(url, config);
-  // },
+  getSubCategoriesByFilters: (filterOptions) => {
+    // const { keyword, sort, order, page, perPage } = filterOptions
+    const url = `/subcategories/search/filters`;
+    const urlQueryParams = urlHandling.queryParam(url, filterOptions);
+    return axiosInstance.get(urlQueryParams);
+  },
   createSubCategory: (subCategory) => {
     const { categoryId, name } = subCategory;
     const url = `/admin/subcategories/create`;

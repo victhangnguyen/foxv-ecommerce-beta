@@ -58,11 +58,11 @@ export const removeProducts = createAsyncThunk(
   }
 );
 
-export const fetchProductsByFilters = createAsyncThunk(
-  'product/fetchProductsByFilters',
+export const getProductsByFilters = createAsyncThunk(
+  'product/getProductsByFilters',
   async ({ search, sort, order, page, perPage }, thunkAPI) => {
     try {
-      const response = await productService.fetchProductsByFilters(
+      const response = await productService.getProductsByFilters(
         search,
         sort,
         order,
@@ -132,16 +132,16 @@ const productSlice = createSlice({
         state.error = action.payload;
       });
     builder
-      .addCase(fetchProductsByFilters.pending, (state, action) => {
+      .addCase(getProductsByFilters.pending, (state, action) => {
         state.loading = true;
       })
-      .addCase(fetchProductsByFilters.fulfilled, (state, action) => {
+      .addCase(getProductsByFilters.fulfilled, (state, action) => {
         //! action.payload = {products, productsCount}
         state.loading = false;
         state.products = action.payload.products;
         state.productsCount = action.payload.productsCount;
       })
-      .addCase(fetchProductsByFilters.rejected, (state, action) => {
+      .addCase(getProductsByFilters.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
       });

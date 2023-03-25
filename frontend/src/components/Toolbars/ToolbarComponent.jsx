@@ -7,7 +7,7 @@ import { toast } from 'react-toastify';
 import categoryService from '../../features/Category/services/categoryService';
 
 //! imp Actions
-import { fetchProductsByFilters } from '../../features/Product/ProductSlice';
+import { getProductsByFilters } from '../../features/Product/ProductSlice';
 import {
   clearSearch,
   searchCategory,

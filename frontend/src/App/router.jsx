@@ -43,12 +43,14 @@ const router = createBrowserRouter([
     children: [
       //! Public Routes
       { index: true, element: <HomeScreen /> },
-      { path: '/products/:productId', element: <ProductDetailScreen /> },
+      { path: '/products/:slug', element: <ProductDetailScreen /> },
       { path: '/promotion', element: <PromotionScreen /> },
       { path: '/shop', element: <ShopScreens /> },
       { path: '/auth/register', element: <RegisterScreen /> },
       { path: '/auth/login', element: <LoginScreen /> },
       { path: '/auth/forgot-password', element: <ForgotPasswordScreen /> },
+      { path: '/collections/:slug', element: <CollectionScreen /> }, //! catSlug
+      { path: '/collections/sub/:slug', element: <SubCollectionScreen /> }, //! subSlug
       //! Private Routes: User
       {
         path: 'users/:userId',

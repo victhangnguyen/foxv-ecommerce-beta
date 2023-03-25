@@ -7,14 +7,20 @@ const categoryService = {
     const url = `/categories/slug/${slug}`;
     return axiosInstance.get(url);
   },
-  createCategory: (category) => {
-    const { name } = category;
-    const url = `/admin/categories/create`;
-    return axiosInstance.post(url, { name });
+  getCategoriesByFilters: (filterOptions) => {
+    // const { keyword, sort, order, page, perPage } = filterOptions
+    const url = `/categories/search/filters`;
+    const urlQueryParams = urlHandling.queryParam(url, filterOptions);
+    return axiosInstance.get(urlQueryParams);
   },
   getCategories: () => {
     const url = `/categories`;
     return axiosInstance.get(url);
+  },
+  createCategory: (category) => {
+    const { name } = category;
+    const url = `/admin/categories/create`;
+    return axiosInstance.post(url, { name });
   },
   updateCategoryBySlug: (slug, category) => {
     const { name } = category;

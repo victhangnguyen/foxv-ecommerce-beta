@@ -26,7 +26,6 @@ export const interceptor = (store) => {
     function (config) {
       // let token = store.getState().auth?.token;
       const token = store.getState().auth?.token;
-      console.log('__Debugger__interceptors.request__token: ', token);
       if (token) {
         config.headers.Authorization = `bearer ${token}`;
         // config.headers['x-access-header'] = token;

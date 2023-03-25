@@ -13,9 +13,9 @@ import config from '../config/index.js';
 //! database
 const db = mongoose.connection;
 
-export const fetchUsersByFilters = async (req, res, next) => {
-  const { keyword, age, sort, order, page, perPage } = req.query;
-  console.log('req.query: ', req.query);
+export const getUsersByFilters = async (req, res, next) => {
+  const { keyword, sort, order, page, perPage } = req.query;
+
   let match = {};
 
   const skip = (page - 1) * perPage;
@@ -225,7 +225,7 @@ export async function updateRole(req, res, next) {
     //     },
     //   }
     // );
-    
+
     let updatedUser;
     if (hasRole) {
       //! exist => delelte Admin

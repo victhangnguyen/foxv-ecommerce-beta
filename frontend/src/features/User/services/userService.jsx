@@ -8,7 +8,7 @@ const userService = {
     const url = `/users/${userId}`;
     return axiosInstance.get(url);
   },
-  fetchUsersByFilters: (params) => {
+  getUsersByFilters: (params) => {
     const url = `/users/search/filters`;
     const urlQueryParams = urlHandling.queryParam(url, params);
     return axiosInstance.get(urlQueryParams);

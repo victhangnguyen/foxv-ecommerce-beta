@@ -12,14 +12,14 @@ const ProductCard = ({ product }) => {
 
   return (
     <Card as="article" className="my-3 p-3 rounded card-product">
-      <Link to={`/products/${product._id}`}>
+      <Link to={`/products/${product.slug}`}>
         <Card.Img
           src={imagesUrl + product.images[0]}
           variant="top"
         />
       </Link>
       <Card.Body>
-        <Link to={`/products/${product._id}`}>
+        <Link to={`/products/${product.slug}`}>
           <Card.Title as={'div'}>{product.name}</Card.Title>
         </Link>
         <Card.Text as={'div'}>

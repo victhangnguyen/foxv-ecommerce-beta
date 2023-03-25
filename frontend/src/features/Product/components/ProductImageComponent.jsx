@@ -9,12 +9,6 @@ const ImageComponent = ({ product, className, ...rest }) => {
   const [imageMain, setImageMain] = React.useState(null);
 
   const images = product?.images;
-  console.log(
-    '__Debugger__ProductImageComponent\n__***__images: ',
-    images,
-    '\n'
-  );
-
   //! handle FileList
   const handleImage = (index) => {
     setImageMain(images[index]);

@@ -35,6 +35,11 @@ router.get('/products', productController.getProductList);
 //! @access   Public
 router.get('/products/:productId', productController.getProduct);
 
+//! @desc     Fetch one Product by slug
+//! @route    GET /api/products/slug/:slug
+//! @access   Public
+router.get('/products/slug/:slug', productController.getProductBySlug);
+
 //! @desc     Delete multiple Product(s)
 //! @route    DEL /api/products
 //! @access   Private: Admin
@@ -58,6 +63,6 @@ router.put(
 //! @desc     Search the product
 //! @route    POST /api/search/filters
 //! @access   Public
-router.post('/search/filters', productController.fetchProductsByFilters);
+router.post('/search/filters', productController.getProductsByFilters);
 
 export default router;

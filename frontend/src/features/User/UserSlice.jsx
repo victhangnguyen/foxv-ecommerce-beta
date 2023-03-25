@@ -3,12 +3,12 @@ import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 //! imp Services
 import userService from './services/userService';
 
-export const fetchUsersByFilters = createAsyncThunk(
-  '/user/fetchUsersByFilters',
+export const getUsersByFilters = createAsyncThunk(
+  '/user/getUsersByFilters',
   async (arg, thunkAPI) => {
     const { search, sort, order, page, perPage } = arg;
     try {
-      const response = await userService.fetchUsersByFilters({
+      const response = await userService.getUsersByFilters({
         ...search,
         sort,
         order,
@@ -58,15 +58,15 @@ const userSlice = createSlice({
   initialState: initialState,
   extraReducers: (builder) => {
     builder
-      .addCase(fetchUsersByFilters.pending, (state, action) => {
+      .addCase(getUsersByFilters.pending, (state, action) => {
         state.loading = true;
       })
-      .addCase(fetchUsersByFilters.fulfilled, (state, action) => {
+      .addCase(getUsersByFilters.fulfilled, (state, action) => {
         state.loading = false;
         state.entities = action.payload.users;
         state.entitiesCount = action.payload.usersCount;
       })
-      .addCase(fetchUsersByFilters.rejected, (state, action) => {
+      .addCase(getUsersByFilters.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
       });

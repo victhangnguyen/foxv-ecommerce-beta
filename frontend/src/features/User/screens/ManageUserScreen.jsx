@@ -6,7 +6,7 @@ import { toast } from 'react-toastify';
 import { useItemsPerPage } from '../../../hooks/itemsPerPage';
 import { useScrollPosition, scrollToTop } from '../../../hooks/scroll';
 //! imp Actions
-import { fetchUsersByFilters, deleteUsers } from '../UserSlice';
+import { getUsersByFilters, deleteUsers } from '../UserSlice';
 //! imp Services
 import userService from '../services/userService';
 //! imp Comps
@@ -79,7 +79,7 @@ const ManageUserScreen = () => {
 
   const loadAllUsers = () => {
     dispatch(
-      fetchUsersByFilters({
+      getUsersByFilters({
         search: search,
         sort: sort,
         order: order,
@@ -223,7 +223,7 @@ const ManageUserScreen = () => {
   const handleSearchSubmit = (e) => {
     e.preventDefault();
     dispatch(
-      fetchUsersByFilters({
+      getUsersByFilters({
         search,
         sort,
         order,

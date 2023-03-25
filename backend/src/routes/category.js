@@ -20,6 +20,11 @@ router.get('/categories/slug/:slug', categoryController.getCategoryBySlug);
 //! @access   Public
 router.get('/categories', categoryController.getCategories);
 
+//! @desc     Fetch all of Categories by Filters
+//! @route    GET /api/categories/search/filters
+//! @access   Public
+router.get('/categories/search/filters', categoryController.getCategoriesByFilters);
+
 //! @desc     Create a new Category
 //! @route    POST /api/admin/categories/create
 //! @access   Private: Admin

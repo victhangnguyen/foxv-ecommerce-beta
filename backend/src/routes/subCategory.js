@@ -31,6 +31,14 @@ router.get(
 //! @access   Private/Public
 router.get('/subcategories', subCategoryController.getSubCategories);
 
+//! @desc     Fetch all of SubCategories by Filters
+//! @route    GET /api/subcategories/search/filters
+//! @access   Public
+router.get(
+  '/subcategories/search/filters',
+  subCategoryController.getSubCategoriesByFilters
+);
+
 //! @desc     Create a new SubCategory
 //! @route    POST /api/admin/subcategories/create
 //! @access   Private: Admin

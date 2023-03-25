@@ -8,7 +8,7 @@ import { useItemsPerPage } from '../../../hooks/itemsPerPage';
 
 //! imp Actions RTK
 import {
-  fetchProductsByFilters,
+  getProductsByFilters,
   removeProduct,
   removeProducts,
 } from '../ProductSlice';
@@ -85,7 +85,7 @@ const ManageProductScreen = () => {
   //! slug, _id,
   const loadAllProducts = () => {
     dispatch(
-      fetchProductsByFilters({
+      getProductsByFilters({
         search,
         sort,
         order,
