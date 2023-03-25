@@ -3,8 +3,8 @@ import { Button } from 'react-bootstrap';
 import * as yup from 'yup';
 
 //! imp Comps
-import FormComponent from '../../../components/Forms/FormComponent';
-import InputComponent from '../../../components/Forms/InputComponent';
+import FormComponent from '../../../components/Form/FormComponent';
+import InputComponent from '../../../components/Form/InputComponent';
 
 const RegisterFormComponent = ({ onSubmit }) => {
   const phoneNumerRegExp = /^[+]*[(]{0,1}[0-9]{1,4}[)]{0,1}[-\s\./0-9]*$/;

@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom';
 import { toast } from 'react-toastify';
 
 //! imp Comps
-import AlertDismissibleComponent from '../../../components/Alerts/AlertDismissibleComponent';
+import AlertDismissibleComponent from '../../../components/Alert/AlertDismissibleComponent';
 import ForgotPasswordFormComponent from '../components/ForgotPasswordFormComponent';
 
 //! imp Services
@@ -12,8 +12,8 @@ import authService from '../services/authService';
 
 const ForgotPasswordScreen = () => {
   //! localState: alert
-  const [showAlert, setShowAlert] = React.useState();
-  const [alertTypes, setAlertTypes] = React.useState({
+  const [showAlert, setShowAlert] = React.useState(false);
+  const [alertOptions, setAlertOptions] = React.useState({
     variant: '',
     title: '',
     message: '',
@@ -23,23 +23,42 @@ const ForgotPasswordScreen = () => {
     const { email } = data;
 
     try {
-      await authService.forgotPassword({ email });
-      // const response = await dispatch(signin({ username, password })).unwrap();
-    } catch (error) {}
+      const response = await authService.forgotPassword({ email });
+      console.log('response: ', response);
+
+      setAlertOptions({
+        variant: 'success',
+        title: 'Khôi phục mật khẩu',
+        message: 'Gửi mật khẩu sang email thành công',
+      });
+
+      setShowAlert(true);
+    } catch (error) {
+      console.log('error: ', error);
+
+      setAlertOptions({
+        variant: 'danger',
+        title: 'Lỗi hệ thống',
+        message:
+          error.response?.data?.message ||
+          error.response?.message ||
+          error.massage,
+      });
+
+      setShowAlert(true);
+    }
   };
 
   return (
     <>
       <AlertDismissibleComponent
-        variant={'success'}
-        title={'Gửi mật khẩu sang email thành công'}
         show={showAlert}
         setShow={setShowAlert}
-        alwaysShown={true}
-      >
-        {}
-      </AlertDismissibleComponent>
-
+        variant={alertOptions.variant}
+        title={alertOptions.title}
+        message={alertOptions.message}
+        alwaysShown={false}
+      />
       <Row className="d-flex justify-content-center align-items-center">
         <Col xs={12} sm={8} md={8} lg={6} xl={4}>
           <Card className="card-main shadow overflow-hidden">

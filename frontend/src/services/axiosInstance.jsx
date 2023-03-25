@@ -57,11 +57,14 @@ export const interceptor = (store) => {
       //! No retry when auth/signin
       if (error.url !== '/auth/signin' && error.response) {
         //! check AccessToken is unauthorized and retry flag
+        // error instanceof jwt.TokenExpiredError
         //! 403
-        if (error.response.status === FORBIDDEN) {
+        if (
+          error.response.status === FORBIDDEN &&
+          error.response?.data?.message === 'Your session has expired. Please log in again to continue using our service.'
+        ) {
           try {
             store.dispatch(signout());
-            
           } catch (error) {
             Promise.reject(error.error);
           }

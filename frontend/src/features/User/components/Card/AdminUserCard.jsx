@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { Card, Button } from 'react-bootstrap';
 
 //! imp Comps
-import MenuButton from '../Buttons/MenuButton';
+import MenuButton from '../Button/MenuButton';
 
 const AdminUserCard = ({ entity, handleShowModal }) => {
   const REACT_APP_SERVER = 'http://127.0.0.1';

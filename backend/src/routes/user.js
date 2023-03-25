@@ -1,9 +1,10 @@
 import express from 'express';
 import * as userController from '../controllers/user.js';
-//! imp Middleware
-import { isAdmin, isUser } from '../middleware/passport/index.js';
+//! imp Middleware: Validations
 import { validateSchema } from '../middleware/validator.js';
-import { updateUserPassword } from '../middleware/schemaValidations/index.js';
+import { updateUserPasswordSchema } from '../middleware/schemaValidations/index.js';
+//! imp Middleware: Passport
+import { isAdmin, isUser } from '../middleware/passport/index.js';
 
 const router = express.Router();
 
@@ -41,7 +42,7 @@ router.put(
 router.put(
   '/admin/users/:userId/update-password',
   isUser,
-  validateSchema(updateUserPassword),
+  validateSchema(updateUserPasswordSchema),
   userController.updateUserPassword
 );
 

@@ -8,7 +8,7 @@ import { signin } from '../AuthSlice';
 
 //! imp Comps
 import LoginFormComponent from '../components/LoginFormComponent';
-import AlertDismissibleComponent from '../../../components/Alerts/AlertDismissibleComponent';
+import AlertDismissibleComponent from '../../../components/Alert/AlertDismissibleComponent';
 
 const LoginScreen = () => {
   const dispatch = useDispatch();
@@ -19,9 +19,11 @@ const LoginScreen = () => {
 
   const auth = useSelector((state) => state.auth);
 
-  // React.useEffect(() => {
-  //   error && toast.error(error);
-  // }, [error]);
+  React.useEffect(() => {
+    if (auth.error) {
+      setShowAlert(true);
+    }
+  }, [auth.error]);
 
   const handleSubmit = async (data, e, methods) => {
     const { username, password } = data;
@@ -57,26 +59,13 @@ const LoginScreen = () => {
   return (
     <>
       <AlertDismissibleComponent
-        variant={auth.success ? 'success' : 'danger'}
-        title={auth.success ? 'Đăng nhập thành công' : 'Đăng nhập thất bại'}
         show={showAlert}
         setShow={setShowAlert}
+        variant={auth.success ? 'success' : 'danger'}
+        title={'Thông báo'}
+        message={auth.success ? '' : auth.error}
         alwaysShown={true}
-      >
-        {auth.success ? (
-          <div>
-            <p>
-              Bạn đã đăng nhập thành công tài khoản:{' '}
-              <strong>{auth.user?.username}</strong>.
-            </p>
-          </div>
-        ) : (
-          <div>
-            <p>{auth.message}</p>
-          </div>
-        )}
-      </AlertDismissibleComponent>
-
+      />
       <Row className="d-flex justify-content-center align-items-center">
         <Col xs={12} sm={8} md={8} lg={6} xl={4}>
           <Card className="card-main shadow overflow-hidden">

@@ -3,8 +3,8 @@ import { Col, Row } from 'react-bootstrap';
 
 //! imp Components
 import PaginationComponent from '../../../components/Pagination/PaginationComponent';
-import LoadingProductCard from '../../Product/components/Cards/LoadingProductCard';
-import ProductCard from '../../Product/components/Cards/ProductCard';
+import LoadingProductCard from '../../Product/components/Card/LoadingProductCard';
+import ProductCard from '../../Product/components/Card/ProductCard';
 
 //! imp API
 import productService from '../../../features/Product/services/productService';

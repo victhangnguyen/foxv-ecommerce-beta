@@ -2,8 +2,8 @@ import React from 'react';
 import * as yup from 'yup';
 //! imp Comps
 import { Button } from 'react-bootstrap';
-import FormComponent from '../../../components/Forms/FormComponent';
-import InputComponent from '../../../components/Forms/InputComponent';
+import FormComponent from '../../../components/Form/FormComponent';
+import InputComponent from '../../../components/Form/InputComponent';
 
 const LoginFormComponent = ({ onSubmit }) => {
   const validationSchema = yup.object({

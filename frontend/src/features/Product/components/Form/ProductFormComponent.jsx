@@ -4,12 +4,12 @@ import * as yup from 'yup';
 
 //! imp Components
 import { Button } from 'react-bootstrap';
-import FormComponent from '../../../../components/Forms/FormComponent';
-import ImageComponent from '../../../../components/Forms/ImageComponent';
-import InputComponent from '../../../../components/Forms/InputComponent';
-import SelectComponent from '../../../../components/Forms/SelectComponent';
-import SelectControllerComponent from '../../../../components/Forms/SelectControllerComponent';
-import TagControllerComponent from '../../../../components/Forms/TagControllerComponent';
+import FormComponent from '../../../../components/Form/FormComponent';
+import ImageComponent from '../../../../components/Form/ImageComponent';
+import InputComponent from '../../../../components/Form/InputComponent';
+import SelectComponent from '../../../../components/Form/SelectComponent';
+import SelectControllerComponent from '../../../../components/Form/SelectControllerComponent';
+import TagControllerComponent from '../../../../components/Form/TagControllerComponent';
 
 const validationSchema = yup.object({
   name: yup
@@ -44,7 +44,7 @@ const ProductFormComponent = ({
   initialValues,
   categories,
   subCategories,
-  handleCategoryChange,
+  triggerSelectCategoryChange,
   showSub,
   loading,
   onSubmit,
@@ -103,7 +103,7 @@ const ProductFormComponent = ({
           //! category
         }
         <SelectControllerComponent
-          handleChange={handleCategoryChange}
+          triggerSelectChange={triggerSelectCategoryChange}
           name={'category'}
           label={'Loại sản phẩm'}
           options={categoryOptions}

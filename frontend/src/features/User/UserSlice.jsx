@@ -39,7 +39,7 @@ export const deleteUsers = createAsyncThunk(
       return thunkAPI.rejectWithValue({
         status: error.response?.status,
         success: error.response?.data.success,
-        error: error.response?.data.message || error.message,
+        error: error.response.data?.message || error.message,
       });
     }
   }

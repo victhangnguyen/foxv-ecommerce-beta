@@ -12,13 +12,13 @@ const AdminNavComponent = () => {
 
     {
       key: 'admin-nav-item-1',
-      label: 'Thêm Loại (Category)',
-      path: '/admin/category',
+      label: 'Quản lý Loại (Cate)',
+      path: '/admin/categories/create',
     },
     {
       key: 'admin-nav-item-2',
-      label: 'Thêm Kiểu (Sub)',
-      path: '/admin/subcategory',
+      label: 'Quản lý Kiểu (Sub)',
+      path: '/admin/subcategories/create',
     },
     {
       key: 'admin-nav-item-3',

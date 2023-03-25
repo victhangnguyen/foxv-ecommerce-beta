@@ -3,4 +3,12 @@ export {
   createProductSchema,
   updateProductSchema,
 } from './productSchemaValidations.js';
-export { updateUserPassword } from './userSchemaValidations.js';
+export { updateUserPasswordSchema } from './userSchemaValidations.js';
+export {
+  createCategorySchema,
+  updateCategorySchema,
+} from './categorySchemaValidations.js';
+export {
+  createSubCategorySchema,
+  updateSubCategorySchema,
+} from './subCategorySchemaValidations.js';

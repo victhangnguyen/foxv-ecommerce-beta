@@ -16,7 +16,7 @@ const isUser = function (req, res, next) {
         //! navigate login
         return res
           .status(401)
-          .json({ success: false, message: '[passport] Unauthorized.' });
+          .json({ success: false, message: 'Unauthorized.' }); //! Unauthenticated
       }
 
       //! check Role
@@ -33,7 +33,6 @@ const isUser = function (req, res, next) {
       if (!isAdmin) {
         if (String(userDoc?._id) !== userId) {
           return res.status(403).json({
-            //! try to access -> signout
             success: false,
             message: 'Unauthenticated! Role is Not permitted.',
           });

@@ -8,10 +8,10 @@ import { toast } from 'react-toastify';
 import userService from '../services/userService';
 import authService from '../../Auth/services/authService';
 //! imp Components
-import AlertDismissibleComponent from '../../../components/Alerts/AlertDismissibleComponent';
-import BreadcrumbComponent from '../../../components/Breadcrumbs/BreadcrumbComponent';
-import UserFormComponent from '../components/Forms/UserFormComponent';
-import UserFormPasswordComponent from '../components/Forms/UserFormPasswordComponent';
+import AlertDismissibleComponent from '../../../components/Alert/AlertDismissibleComponent';
+import BreadcrumbComponent from '../../../components/Breadcrumb/BreadcrumbComponent';
+import UserFormComponent from '../components/Form/UserFormComponent';
+import UserFormPasswordComponent from '../components/Form/UserFormPasswordComponent';
 //! imp Actions
 
 const AddEditUserScreen = () => {
@@ -42,14 +42,14 @@ const AddEditUserScreen = () => {
   const isExistUser = !_.isEmpty(user);
 
   const breadcrumbItems = [
-    { key: 'breadcrumb-item-1', label: 'Home', path: '/' },
+    { key: 'breadcrumb-item-0', label: 'Home', path: '/' },
     {
-      key: 'breadcrumb-item-2',
+      key: 'breadcrumb-item-1',
       label: 'Quản lý Tài khoản',
       path: '/admin/users',
     },
     {
-      key: 'breadcrumb-item-3',
+      key: 'breadcrumb-item-2',
       label: isExistUser ? 'Cập nhật Tài khoản' : 'Thêm mới Tài khoản',
       path: isExistUser
         ? `/admin/users/${userId}/update`
@@ -85,28 +85,23 @@ const AddEditUserScreen = () => {
       setUser(userDoc?.data.user);
     } catch (error) {
       setLoading(false);
-      console.log(
-        '__Debugger__AddEditUserScreen\n__catchError__error: ',
-        error,
-        '\n'
-      );
-      // toast.error();
-      // toast.error(error.response.data.message);
-      //! Error Handling Slice
-      // if (error.error) {
-      //   setMessageError(error.error);
-      // } else {
-      //   setMessageError(error.response?.data.message || error.message);
-      // }
-      // setShowErrorAlert(true);
-      // handleHideModal();
+      setAlertOptions({
+        variant: 'danger',
+        title: 'Lỗi hệ thống',
+        message:
+          error.response?.data?.message ||
+          error.response?.message ||
+          error.message,
+      });
+      setShowAlert(true);
+      toast.error(error.response?.message || error.massage);
     }
   };
 
   const handleInfoSubmit = async (data, event, methods) => {
-    const isSameData = _.isEqual(initialValues, data);
+    const isEqualData = _.isEqual(initialValues, data);
 
-    if (isSameData) {
+    if (isEqualData) {
       return toast.error('Chưa có thông tin nào thay đổi.');
     }
 
@@ -185,7 +180,10 @@ const AddEditUserScreen = () => {
       setAlertOptions({
         variant: 'danger',
         title: 'Lỗi hệ thống',
-        message: error.response?.message || error.response?.data?.errors[0].msg,
+        message:
+          error.response?.data?.message ||
+          error.response?.message ||
+          error.message,
       });
 
       setShowAlert(true);
@@ -221,40 +219,41 @@ const AddEditUserScreen = () => {
             message: error.msg,
           });
         });
+        return;
       }
 
       setAlertOptions({
         variant: 'danger',
         title: 'Lỗi hệ thống',
-        message: error.response?.message || error.response?.data?.errors[0].msg,
+        message:
+          error.response?.data?.message ||
+          error.response?.message ||
+          error.message,
       });
 
       setShowAlert(true);
-
-      toast.error(error.response?.data.message);
+      toast.error(error.response.data?.message);
     }
   };
 
   async function handleClickUpdateRole() {
     try {
-      //! check Controller clause
       if (!isAdminController) return;
 
       const response = await userService.updateRole(userId, 'admin');
-      console.log(
-        '__Debugger__AddEditUserScreen\n__handleClickUpdateRole__response: ',
-        response,
-        '\n'
-      );
+
       await loadUser();
     } catch (error) {
       setAlertOptions({
         variant: 'danger',
         title: 'Lỗi hệ thống',
-        message: error.response?.data.message || error.response.message, //! __error__std
+        message:
+          error.response?.data?.message ||
+          error.response?.message ||
+          error.message,
       });
-
       setShowAlert(true);
+      toast.error(error.response?.message || error.massage);
     }
   }
 

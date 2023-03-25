@@ -154,7 +154,7 @@ export async function getUser(req, res, next) {
   } catch (error) {
     Logging.error('Error__ctrls__product: ' + error);
     const err = new Error(error);
-    err.httpStatusCode = 400;
+    err.statusCode = 400;
     return next(err);
   }
 }
@@ -176,7 +176,7 @@ export async function updateUserInfo(req, res, next) {
   } catch (error) {
     Logging.error('Error__ctrls__product: ' + error);
     const err = new Error(error);
-    err.httpStatusCode = 400;
+    err.statusCode = 400;
     return next(err);
   }
 }
@@ -196,7 +196,7 @@ export async function updateUserPassword(req, res, next) {
   } catch (error) {
     Logging.error('Error__ctrls__product: ' + error);
     const err = new Error(error);
-    err.httpStatusCode = 400;
+    err.statusCode = 400;
     return next(err);
   }
 }
@@ -208,9 +208,7 @@ export async function updateRole(req, res, next) {
     const user = await User.findById(userId).populate('roles').exec();
 
     const hasRole = user.roles.map((role) => role.name).includes(roleName);
-    console.log('__Debugger__user\n____hasRole: ', hasRole, '\n');
     const roleDoc = await Role.findOne({ name: roleName });
-    console.log('__Debugger__user\n____roleDoc: ', roleDoc, '\n');
 
     // const updatedUser = await User.updateOne(
     //   { _id: userId },
@@ -255,7 +253,7 @@ export async function updateRole(req, res, next) {
   } catch (error) {
     Logging.error('Error__ctrls__product: ' + error);
     const err = new Error(error);
-    err.httpStatusCode = 400;
+    err.statusCode = 400;
     return next(err);
   }
 }

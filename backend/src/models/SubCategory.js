@@ -7,7 +7,7 @@ const subCategorySchema = new mongoose.Schema(
       type: String,
       trim: true,
       minLength: [2, 'Thấp nhất 2 ký tự'],
-      maxLength: [256, 'Nhiều nhất 256 ký tự'],
+      maxLength: [32, 'Nhiều nhất 32 ký tự'],
       required: true,
     },
     slug: {

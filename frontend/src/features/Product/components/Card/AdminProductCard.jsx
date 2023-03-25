@@ -2,8 +2,8 @@ import React from 'react';
 import { Card, Button, FormCheck } from 'react-bootstrap';
 import { Link, useNavigate } from 'react-router-dom';
 //! imp comps/icons
-import TrashIcon from '../../../../components/Icons/TrashIcon';
-import EditRegularIcon from '../../../../components/Icons/EditRegularIcon';
+import TrashIcon from '../../../../components/Icon/TrashIcon';
+import EditRegularIcon from '../../../../components/Icon/EditRegularIcon';
 
 const AdminProductCard = ({
   product,

@@ -25,7 +25,7 @@ const UserRoute = ({ children }) => {
       return <Navigate to={`/users/${user._id}/update`} replace />;
     }
     //! defaults
-    return <Navigate to={`/`} replace />;
+    return <Navigate to="/auth/login" replace />;
   }
 
   return children ? children : outlet;

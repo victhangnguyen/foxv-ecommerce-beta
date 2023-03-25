@@ -4,28 +4,28 @@ import { useDispatch, useSelector } from 'react-redux';
 import { toast } from 'react-toastify';
 //! imp Hooks
 import { useItemsPerPage } from '../../../hooks/itemsPerPage';
-import { useScrollPosition } from '../../../hooks/scroll';
+import { useScrollPosition, scrollToTop } from '../../../hooks/scroll';
 //! imp Actions
 import { fetchUsersByFilters, deleteUsers } from '../UserSlice';
 //! imp Services
 import userService from '../services/userService';
 //! imp Comps
-import BreadcrumbComponent from '../../../components/Breadcrumbs/BreadcrumbComponent';
-import ConfirmationModalComponent from '../../../components/Modals/ConfirmationModalComponent';
+import BreadcrumbComponent from '../../../components/Breadcrumb/BreadcrumbComponent';
+import ConfirmationModalComponent from '../../../components/Modal/ConfirmationModalComponent';
 import PaginationComponent from '../../../components/Pagination/PaginationComponent';
 import ToolbarSearchComponent from '../../../components/Toolbars/ToolbarSearchComponent';
-import AdminUserCard from '../components/Cards/AdminUserCard';
+import AdminUserCard from '../components/Card/AdminUserCard';
 //! imp Comps/Modals
-import AlertDismissibleComponent from '../../../components/Alerts/AlertDismissibleComponent';
+import AlertDismissibleComponent from '../../../components/Alert/AlertDismissibleComponent';
 //! imp Comps/Button
 import GoToButtonComponent from '../../../components/Button/GoToButtonComponent';
 
 const ManageUserScreen = () => {
   const breadcrumbItems = [
-    { key: 'breadcrumb-item-1', label: 'Home', path: '/' },
-    { key: 'breadcrumb-item-2', label: 'Dashboard', path: '/admin' },
+    { key: 'breadcrumb-item-0', label: 'Home', path: '/' },
+    { key: 'breadcrumb-item-1', label: 'Dashboard', path: '/admin' },
     {
-      key: 'breadcrumb-item-3',
+      key: 'breadcrumb-item-2',
       label: 'Quản lý Tài khoản',
       path: '/admin/users',
       active: true,
@@ -62,7 +62,7 @@ const ManageUserScreen = () => {
   const [selectedIds, setSelectedIds] = React.useState([]);
 
   //! localState: Alert
-  const [alertType, setAlertType] = React.useState({
+  const [alertOptions, setAlertOptions] = React.useState({
     variant: 'success',
     title: '',
     message: '',
@@ -121,7 +121,7 @@ const ManageUserScreen = () => {
         });
 
         //! set Alert style
-        setAlertType({
+        setAlertOptions({
           variant: 'success',
           title: 'Xóa tài khoản thành công',
           message: `Bạn đã xóa ${
@@ -151,7 +151,7 @@ const ManageUserScreen = () => {
         });
 
         //! set Alert style
-        setAlertType({
+        setAlertOptions({
           variant: 'success',
           title: 'Reset password thành công',
           message: `Bạn đã reset password ${
@@ -205,13 +205,15 @@ const ManageUserScreen = () => {
       //! success: True
       //! clear Form
       clearForm();
-
       loadAllUsers();
+      //! gotoTop
+      scrollToTop();
+
       setShowConfirmationAlert(true);
     } catch (error) {
       //! Error Handling Slice
       setMessageError(
-        error.error || error.response?.data.message || error.message
+        error.error || error.response.data?.message || error.message
       );
       setShowConfirmationModal(false);
       setShowErrorAlert(true);
@@ -243,13 +245,13 @@ const ManageUserScreen = () => {
       </AlertDismissibleComponent>
 
       <AlertDismissibleComponent
-        variant={alertType.variant}
-        title={alertType.title}
+        variant={alertOptions.variant}
+        title={alertOptions.title}
         show={showConfirmationAlert}
         setShow={setShowConfirmationAlert}
         alwaysShown={false}
       >
-        {alertType.message}
+        {alertOptions.message}
       </AlertDismissibleComponent>
 
       <BreadcrumbComponent breadcrumbItems={breadcrumbItems} />

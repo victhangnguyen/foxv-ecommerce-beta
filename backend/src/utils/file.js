@@ -36,6 +36,7 @@ export const deleteFiles = (dir, files) => {
       return files;
     })
     .catch((error) => {
-      console.log(error);
+      console.log('__file\n__catch__error: ', error, '\n');
+      throw error;
     });
 };

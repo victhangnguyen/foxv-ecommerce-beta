@@ -1,6 +1,6 @@
 import React from 'react';
 import { Controller } from 'react-hook-form';
-import CloseIcon from '../Icons/CloseIcon';
+import CloseIcon from '../Icon/CloseIcon';
 import { Col, Form } from 'react-bootstrap';
 
 const TagControllerComponent = ({

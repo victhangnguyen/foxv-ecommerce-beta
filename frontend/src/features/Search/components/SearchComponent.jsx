@@ -3,7 +3,7 @@ import { Form, Button } from 'react-bootstrap';
 import { useDispatch, useSelector } from 'react-redux';
 
 //! imp Icons
-import SearchIcon from '../../../components/Icons/SearchIcon';
+import SearchIcon from '../../../components/Icon/SearchIcon';
 
 //! imp Actions
 import { searchQuery } from '../SearchSlice';

@@ -4,11 +4,12 @@ import { Link, useNavigate, useParams } from 'react-router-dom';
 import { toast } from 'react-toastify';
 //! imp Services
 import categoryService from '../../Category/services/categoryService';
+import subCategoryService from '../../SubCategory/services/subCategoryService';
 import productService from '../services/productService';
 //! imp Components
-import AlertDismissibleComponent from '../../../components/Alerts/AlertDismissibleComponent';
-import BreadcrumbComponent from '../../../components/Breadcrumbs/BreadcrumbComponent';
-import ProductFormComponent from '../components/Forms/ProductFormComponent';
+import AlertDismissibleComponent from '../../../components/Alert/AlertDismissibleComponent';
+import BreadcrumbComponent from '../../../components/Breadcrumb/BreadcrumbComponent';
+import ProductFormComponent from '../components/Form/ProductFormComponent';
 
 const AddEditProductScreen = () => {
   const navigate = useNavigate();
@@ -24,12 +25,15 @@ const AddEditProductScreen = () => {
   const [showAlert, setShowAlert] = React.useState(false);
   const isExistProduct = !_.isEmpty(product);
 
-
   const breadcrumbItems = [
-    { key: 'breadcrumb-item-1', label: 'Home', path: '/' },
-    { key: 'breadcrumb-item-2', label: 'Quản lý Sản phẩm', path: '/admin/products' },
+    { key: 'breadcrumb-item-0', label: 'Home', path: '/' },
     {
-      key: 'breadcrumb-item-3',
+      key: 'breadcrumb-item-1',
+      label: 'Quản lý Sản phẩm',
+      path: '/admin/products',
+    },
+    {
+      key: 'breadcrumb-item-2',
       label: isExistProduct ? 'Cập nhật Sản phẩm' : 'Thêm mới Sản phẩm',
       path: isExistProduct
         ? `/admin/products/${productId}/update`
@@ -79,7 +83,7 @@ const AddEditProductScreen = () => {
       if (categoryId) {
         setShowSub(true);
       }
-      await loadSubCategories(categoryId);
+      await loadSubCategoriesByCategoryId(categoryId);
     } catch (error) {
       setLoading(false);
       console.log(error);
@@ -90,31 +94,30 @@ const AddEditProductScreen = () => {
   const loadCategories = async () => {
     try {
       const response = await categoryService.getCategories();
-      setCategories(response);
+      setCategories(response.data.categories);
     } catch (error) {
       console.log(error);
-      toast.error(error.response?.data.message);
+      toast.error(error.response.data?.message);
     }
   };
 
-  const loadSubCategories = async (categoryId) => {
+  const loadSubCategoriesByCategoryId = async (categoryId) => {
     try {
-      const response = await categoryService.getSubCategoriesByCategoryId(
+      const response = await subCategoryService.getSubCategoriesByCategoryId(
         categoryId
       );
-      setSubCategories(response);
+      setSubCategories(response.data.subCategories);
     } catch (error) {
       console.log(error);
       toast.error(error.response.data.message);
     }
   };
 
-  const handleCategoryChange = async (e) => {
+  const triggerSelectCategoryChange = async (e) => {
     const cateogoryId = e.target.value;
-    console.log('__Debugger__handleCategoryChange: ', cateogoryId);
     try {
       if (cateogoryId) {
-        loadSubCategories(cateogoryId);
+        loadSubCategoriesByCategoryId(cateogoryId);
         setShowSub(true);
       } else {
         setShowSub(false);
@@ -126,9 +129,9 @@ const AddEditProductScreen = () => {
   };
 
   const handleSubmit = async (data, e, methods) => {
-    const isSameData = _.isEqual(initialValues, data);
+    const isEqualData = _.isEqual(initialValues, data);
 
-    if (isSameData) {
+    if (isEqualData) {
       return toast.error('Chưa có thông tin nào thay đổi.');
     }
 
@@ -190,9 +193,10 @@ const AddEditProductScreen = () => {
             message: error.msg,
           });
         });
+        return;
       }
 
-      toast.error(error.response?.data.message);
+      toast.error(error.response.data?.message);
     }
   };
 
@@ -251,7 +255,7 @@ const AddEditProductScreen = () => {
         product={product}
         categories={categories}
         subCategories={subCategories}
-        handleCategoryChange={handleCategoryChange}
+        triggerSelectCategoryChange={triggerSelectCategoryChange}
         showSub={showSub}
         onSubmit={handleSubmit}
       />

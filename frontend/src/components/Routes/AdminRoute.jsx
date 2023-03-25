@@ -11,7 +11,7 @@ const AdminRoute = ({ children }) => {
   const isAllowed = token && isAdmin;
 
   if (!isAllowed) {
-    return <Navigate to="/" replace />;
+    return <Navigate to="/auth/login" replace />;
   }
 
   return children ? children : outlet;

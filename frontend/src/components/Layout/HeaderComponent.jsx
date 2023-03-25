@@ -146,7 +146,10 @@ const HeaderComponent = () => {
                         Thêm sản phẩm
                       </NavLink>
                     ) : (
-                      <NavLink className={'nav-link'} to={'/cart'}>
+                      <NavLink
+                        className={'nav-link'}
+                        to={`/users/${userId}/cart`}
+                      >
                         Giỏ hàng
                       </NavLink>
                     )}
@@ -158,18 +161,31 @@ const HeaderComponent = () => {
                         {' '}
                         <NavLink
                           className="nav-link"
-                          to={isAdmin ? `/admin/users/${userId}/update` : `/users/${userId}/update`}
+                          to={
+                            isAdmin
+                              ? `/admin/users/${userId}/update`
+                              : `/users/${userId}/update`
+                          }
                         >
                           Profiles
                         </NavLink>
                       </NavDropdown.Item>
                       <NavDropdown.Item as="div">
-                        <NavLink
-                          className="nav-link"
-                          to={isAdmin ? '/admin' : `/users/${userId}`}
-                        >
-                          Dashboard
-                        </NavLink>
+                        {isAdmin ? (
+                          <NavLink
+                            className="nav-link"
+                            to={'/admin'}
+                          >
+                            Dashboard
+                          </NavLink>
+                        ) : (
+                          <NavLink
+                            className="nav-link"
+                            to={`/users/${userId}`}
+                          >
+                            Setting
+                          </NavLink>
+                        )}
                       </NavDropdown.Item>
                       <NavDropdown.Divider />
                       <NavDropdown.Item as="div" onClick={handleLogout}>

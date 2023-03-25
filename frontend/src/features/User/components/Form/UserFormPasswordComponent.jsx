@@ -4,12 +4,12 @@ import * as yup from 'yup';
 
 //! imp Components
 import { Button } from 'react-bootstrap';
-import FormComponent from '../../../../components/Forms/FormComponent';
-import ImageComponent from '../../../../components/Forms/ImageComponent';
-import InputComponent from '../../../../components/Forms/InputComponent';
-import SelectComponent from '../../../../components/Forms/SelectComponent';
-import SelectControllerComponent from '../../../../components/Forms/SelectControllerComponent';
-import TagControllerComponent from '../../../../components/Forms/TagControllerComponent';
+import FormComponent from '../../../../components/Form/FormComponent';
+import ImageComponent from '../../../../components/Form/ImageComponent';
+import InputComponent from '../../../../components/Form/InputComponent';
+import SelectComponent from '../../../../components/Form/SelectComponent';
+import SelectControllerComponent from '../../../../components/Form/SelectControllerComponent';
+import TagControllerComponent from '../../../../components/Form/TagControllerComponent';
 
 const UserFormComponent = ({ user, initialValues, loading, onSubmit }) => {
   const phoneNumerRegExp = /^[+]*[(]{0,1}[0-9]{1,4}[)]{0,1}[-\s\./0-9]*$/;

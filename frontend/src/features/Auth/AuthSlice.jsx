@@ -39,7 +39,7 @@ export const signup = createAsyncThunk(
       return thunkAPI.rejectWithValue({
         status: error.response.status,
         success: error.response?.data.success,
-        error: error.response?.data.message || error.message,
+        error: error.response.data?.message || error.message,
       });
     }
   }
@@ -69,7 +69,7 @@ export const signin = createAsyncThunk(
       return thunkAPI.rejectWithValue({
         status: error.response.status,
         success: error.response?.data.success,
-        error: error.response?.data.message || error.message,
+        error: error.response.data?.message || error.message,
       });
     }
   }
@@ -94,7 +94,7 @@ export const refreshToken = createAsyncThunk(
       return thunkAPI.rejectWithValue({
         status: error.response.status,
         success: error.response?.data.success,
-        error: error.response?.data.message || error.message,
+        error: error.response.data?.message || error.message,
       });
     }
   }

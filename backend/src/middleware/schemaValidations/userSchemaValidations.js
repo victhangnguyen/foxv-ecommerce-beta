@@ -3,7 +3,7 @@ import bcrypt from 'bcryptjs';
 //! imp config
 import config from '../../config/index.js';
 
-export const updateUserPassword = {
+export const updateUserPasswordSchema = {
   password: {
     trim: true,
     notEmpty: {

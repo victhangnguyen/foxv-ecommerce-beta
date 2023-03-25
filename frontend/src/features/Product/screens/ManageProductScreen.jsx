@@ -16,13 +16,13 @@ import {
 import { clearSearch } from '../../Search/SearchSlice';
 
 //! imp Components
-import BreadcrumbComponent from '../../../components/Breadcrumbs/BreadcrumbComponent';
-import DeleteConfirmationModalComponent from '../../../components/Modals/ConfirmationModalComponent';
+import BreadcrumbComponent from '../../../components/Breadcrumb/BreadcrumbComponent';
+import DeleteConfirmationModalComponent from '../../../components/Modal/ConfirmationModalComponent';
 import PaginationComponent from '../../../components/Pagination/PaginationComponent';
 import ToolbarComponent from '../../../components/Toolbars/ToolbarComponent';
-import AdminLoadingProductCard from '../components/Cards/AdminLoadingProductCard';
-import AdminProductCard from '../components/Cards/AdminProductCard';
-import AlertDismissibleComponent from '../../../components/Alerts/AlertDismissibleComponent';
+import AdminLoadingProductCard from '../components/Card/AdminLoadingProductCard';
+import AdminProductCard from '../components/Card/AdminProductCard';
+import AlertDismissibleComponent from '../../../components/Alert/AlertDismissibleComponent';
 
 const ManageProductScreen = () => {
   const itemsPerPage = useItemsPerPage(10, 15, 20, 30, 30);
@@ -41,10 +41,10 @@ const ManageProductScreen = () => {
   const [checkedProductIds, setCheckedProductIds] = React.useState([]); //! Nhung doi tuong checkAll co trong product
 
   const breadcrumbItems = [
-    { key: 'breadcrumb-item-1', label: 'Home', path: '/' },
-    { key: 'breadcrumb-item-2', label: 'Dashboard', path: '/admin' },
+    { key: 'breadcrumb-item-0', label: 'Home', path: '/' },
+    { key: 'breadcrumb-item-1', label: 'Dashboard', path: '/admin' },
     {
-      key: 'breadcrumb-item-3',
+      key: 'breadcrumb-item-2',
       label: 'Quản lý Sản phẩm',
       path: '/admin/products',
       active: true,

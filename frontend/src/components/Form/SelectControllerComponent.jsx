@@ -6,8 +6,9 @@ const SelectControllerComponent = ({
   methods,
   options,
   name,
+  optionLabel,
   label,
-  handleChange,
+  triggerSelectChange,
   className,
   ...rest
 }) => {
@@ -25,12 +26,14 @@ const SelectControllerComponent = ({
               isInvalid={methods.formState.errors[name] ? true : false}
               onChange={(e) => {
                 field.onChange(e);
-                //! TRIGGER handleChange(e, setValue)
-                handleChange(e, methods.setValue);
+                //! TRIGGER handleChange(e, methods)
+                triggerSelectChange && triggerSelectChange(e, methods);
               }}
               {...rest}
             >
-              <option value={''}>Vui lòng chọn</option>
+              <option value={''}>
+                {optionLabel ? optionLabel : 'Vui lòng chọn'}
+              </option>
               {options?.map((option, index) => (
                 <option key={option.key} value={option.value}>
                   {option.label}

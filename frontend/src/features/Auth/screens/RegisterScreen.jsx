@@ -8,7 +8,7 @@ import { toast } from 'react-toastify';
 import { signup } from '../AuthSlice';
 
 //! imp Comps
-import AlertDismissibleComponent from '../../../components/Alerts/AlertDismissibleComponent';
+import AlertDismissibleComponent from '../../../components/Alert/AlertDismissibleComponent';
 import RegisterFormComponent from '../components/RegisterFormComponent';
 
 const RegisterScreen = () => {

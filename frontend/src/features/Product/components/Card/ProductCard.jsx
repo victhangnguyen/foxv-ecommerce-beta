@@ -12,14 +12,14 @@ const ProductCard = ({ product }) => {
 
   return (
     <Card as="article" className="my-3 p-3 rounded card-product">
-      <Link to={`/product/${product._id}`}>
+      <Link to={`/products/${product._id}`}>
         <Card.Img
           src={imagesUrl + product.images[0]}
           variant="top"
         />
       </Link>
       <Card.Body>
-        <Link to={`/product/${product._id}`}>
+        <Link to={`/products/${product._id}`}>
           <Card.Title as={'div'}>{product.name}</Card.Title>
         </Link>
         <Card.Text as={'div'}>
@@ -31,7 +31,7 @@ const ProductCard = ({ product }) => {
         <Card.Text as={'h5'}>{product.price}</Card.Text>
       </Card.Body>
       <Card.Footer as={'div'} className="d-flex">
-        <Link to={`/admin/product/${product._id}`}>
+        <Link to={``}>
           <Button size="sm" variant={'primary'}>
               Mua ngay
           </Button>

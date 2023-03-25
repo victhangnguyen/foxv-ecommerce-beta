@@ -18,7 +18,7 @@ const isAdmin = function (req, res, next) {
         //! navigate login
         return res
           .status(401)
-          .json({ success: false, message: '[passport] Unauthorized.' });
+          .json({ success: false, message: 'Unauthorized.' }); //! Unauthenticated
       }
 
       //! check Role
@@ -26,8 +26,11 @@ const isAdmin = function (req, res, next) {
 
       if (!isAdmin) {
         return res
-          .status(403) //! signout
-          .json({ success: false, message: '[passport] Unauthenticated.' });
+          .status(403)
+          .json({
+            success: false,
+            message: "You don't have permission to access this page.",
+          });
       }
 
       req.user = userDoc;

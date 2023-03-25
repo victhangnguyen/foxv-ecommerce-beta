@@ -91,7 +91,7 @@ export const signup = async (req, res, next) => {
   } catch (error) {
     Logging.error('Error__ctrls__auth: ' + error);
     const err = new Error(error);
-    err.httpStatusCode = 400;
+    err.statusCode = 400;
     return next(err);
   }
 };
@@ -140,7 +140,8 @@ export const refreshToken = async (req, res, next) => {
         .json({ success: false, message: 'Refresh token is required' });
     }
 
-    authService.verifyRefreshToken(refreshToken)
+    authService
+      .verifyRefreshToken(refreshToken)
       .then((payload) => {
         const token = authService.generateAccessToken(payload.sub);
 
@@ -154,7 +155,9 @@ export const refreshToken = async (req, res, next) => {
         if (error instanceof jwt.TokenExpiredError) {
           return res.status(403).send({
             success: false,
-            message: 'Unauthorized! Refresh Token was expired!',
+            // message: 'Unauthorized! Refresh Token was expired.',
+            message:
+              'Your session has expired. Please log in again to continue using our service.',
           });
         }
 
@@ -173,8 +176,8 @@ export const forgotPassword = async (req, res, next) => {
     const user = await User.findOne({ email }).exec();
     if (!user) {
       return res
-        .status(403)
-        .json({ success: false, message: 'User does not exist' });
+        .status(400)
+        .json({ success: false, message: 'User does not exist!' });
     }
 
     const newPassword = userService.generatePassword(12);
@@ -197,8 +200,10 @@ export const forgotPassword = async (req, res, next) => {
     );
 
     await user.save();
+    res
+      .status(200)
+      .json({ success: true, message: 'Recover password successful!', info });
   } catch (error) {
-    console.log('__Debugger__auth\n__forgotPassword__error: ', error, '\n');
     next(error);
   }
 };

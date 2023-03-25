@@ -7,6 +7,7 @@ import authReducer from '../features/Auth/AuthSlice';
 import productReducer from '../features/Product/ProductSlice';
 import userReducer from '../features/User/UserSlice';
 import searchReducer from '../features/Search/SearchSlice';
+import cartReducer from '../features/Cart/CartSlice';
 
 const rootPersistConfig = {
   key: 'root',
@@ -42,7 +43,7 @@ const userPersistConfig = {
 const rootReducer = combineReducers({
   auth: persistReducer(authPersistConfig, authReducer),
   product: persistReducer(productPersistConfig, productReducer),
-  // cart: persistReducer(cartPersistConfig, cartReducer),
+  cart: persistReducer(cartPersistConfig, cartReducer),
   user: persistReducer(userPersistConfig, userReducer),
   search: searchReducer,
 });
