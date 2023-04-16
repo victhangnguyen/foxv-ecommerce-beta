@@ -4,7 +4,7 @@ import * as userController from '../controllers/user.js';
 import { validateSchema } from '../middleware/validator.js';
 import { updateUserPasswordSchema } from '../middleware/schemaValidations/index.js';
 //! imp Middleware: Passport
-import { isAdmin, isUser } from '../middleware/passport/index.js';
+import { authenticate, isAdmin, isUser } from '../middleware/passport/index.js';
 
 const router = express.Router();
 
@@ -13,7 +13,7 @@ const router = express.Router();
 //! @access   Public
 router.get('/users/:userId', userController.getUser);
 
-//! @desc     Fetch all products by Filters
+//! @desc     Fetch all users by Filters
 //! @route    GET /api/users/search/filters
 //! @access   Public
 router.get('/users/search/filters', userController.getUsersByFilters);
@@ -23,6 +23,7 @@ router.get('/users/search/filters', userController.getUsersByFilters);
 //! @access   Private: Admin
 router.delete(
   '/admin/users/delete-multiple',
+  authenticate,
   isAdmin,
   userController.deleteUsers
 );
@@ -32,6 +33,7 @@ router.delete(
 //! @access   Private: Admin
 router.put(
   '/admin/users/:userId/update-info',
+  authenticate,
   isUser,
   userController.updateUserInfo
 );
@@ -41,6 +43,7 @@ router.put(
 //! @access   Private: Admin
 router.put(
   '/admin/users/:userId/update-password',
+  authenticate,
   isUser,
   validateSchema(updateUserPasswordSchema),
   userController.updateUserPassword
@@ -51,6 +54,7 @@ router.put(
 //! @access   Private: Admin
 router.put(
   '/admin/users/password/reset-multiple',
+  authenticate,
   isAdmin,
   userController.resetPasswords
 );
@@ -60,6 +64,7 @@ router.put(
 //! @access   Private: Admin
 router.put(
   '/admin/users/:userId/update-role',
+  authenticate,
   isAdmin,
   userController.updateRole
 );

@@ -62,7 +62,6 @@ const productSchema = new mongoose.Schema(
       ref: 'User',
     },
     images: [{ type: String }],
-    shipping: { type: String, enum: ['yes', 'no'], default: 'no' },
     color: {
       type: String,
       // enum: ['black', 'brown', 'silver', 'white', 'blue'],

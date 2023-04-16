@@ -6,9 +6,10 @@ import { toast } from 'react-toastify';
 import { useItemsPerPage } from '../../../hooks/itemsPerPage';
 import { useScrollPosition, scrollToTop } from '../../../hooks/scroll';
 //! imp Actions
-import { getUsersByFilters, deleteUsers } from '../UserSlice';
+import { getUsersByFilters } from '../UserSlice';
 //! imp Services
 import userService from '../services/userService';
+import { DELETE_USERS, RESET_PASSWORDS } from '../services/actionTypes';
 //! imp Comps
 import BreadcrumbComponent from '../../../components/Breadcrumb/BreadcrumbComponent';
 import ConfirmationModalComponent from '../../../components/Modal/ConfirmationModalComponent';
@@ -21,6 +22,10 @@ import AlertDismissibleComponent from '../../../components/Alert/AlertDismissibl
 import GoToButtonComponent from '../../../components/Button/GoToButtonComponent';
 
 const ManageUserScreen = () => {
+  const dispatch = useDispatch();
+  const scrollPosition = useScrollPosition();
+  const itemsPerPage = useItemsPerPage(10, 15, 15, 20);
+
   const breadcrumbItems = [
     { key: 'breadcrumb-item-0', label: 'Home', path: '/' },
     { key: 'breadcrumb-item-1', label: 'Dashboard', path: '/admin' },
@@ -31,53 +36,43 @@ const ManageUserScreen = () => {
       active: true,
     },
   ];
-  const scrollPosition = useScrollPosition();
-  const itemsPerPage = useItemsPerPage(10, 15, 15, 20);
 
-  const dispatch = useDispatch();
-
-  // reduxState
+  // rootState
   const user = useSelector((state) => state.user);
-  const auth = useSelector((state) => state.auth);
 
-  const [typeAction, setTypeAction] = React.useState('');
+  const [actionType, setActionType] = React.useState('');
 
-  //! localState: message Error
-  const [messageError, setMessageError] = React.useState('');
-
-  //! localState: search
+  //! localState: search/pagination
   const [search, setSearch] = React.useState({ keyword: '', age: '' });
   const [sort, setSort] = React.useState('createdAt');
   const [order, setOrder] = React.useState(-1);
   const [currentPage, setCurrentPage] = React.useState(1);
 
-  //! localState: delete Modal
-  const [showConfirmationModal, setShowConfirmationModal] =
-    React.useState(false);
-  const [modalType, setModalType] = React.useState({
-    variant: 'success',
+  //! localState: selected
+  const [selectedIds, setSelectedIds] = React.useState([]);
+
+  //! localState: Modal
+  const [showModal, setShowModal] = React.useState(false);
+  const [modalOptions, setModalOptions] = React.useState({
+    variant: '',
     title: '',
     message: '',
   });
-  const [selectedIds, setSelectedIds] = React.useState([]);
-
   //! localState: Alert
+  const [showAlert, setShowAlert] = React.useState(false);
   const [alertOptions, setAlertOptions] = React.useState({
     variant: 'success',
     title: '',
     message: '',
     button: '',
   });
-  const [showConfirmationAlert, setShowConfirmationAlert] =
-    React.useState(false);
-  const [showErrorAlert, setShowErrorAlert] = React.useState(false);
 
   React.useEffect(() => {
     //! effect
-    loadAllUsers();
+    loadUsersByFilters();
   }, [currentPage, itemsPerPage]);
 
-  const loadAllUsers = () => {
+  const loadUsersByFilters = () => {
     dispatch(
       getUsersByFilters({
         search: search,
@@ -89,21 +84,19 @@ const ManageUserScreen = () => {
     );
   };
 
-  const handleShowModal = (typeAction, ids) => {
-    const selectedUsers = ids.map(
+  function handleShowModal(actionType, ids) {
+    const selectedUsers = ids?.map(
       (id) => user.entities.find((entity) => entity._id === id) //! userObject
     );
 
-    setTypeAction(typeAction);
-
-    //! ids: Array
     setSelectedIds(ids);
+    setActionType(actionType);
 
-    switch (typeAction) {
+    switch (actionType) {
       /* REMOVE USER ACCOUNT */
-      case 'deleteUsers':
+      case DELETE_USERS:
         //! set Modal style Single or Multiple
-        setModalType({
+        setModalOptions({
           variant: 'danger',
           title: `Xác nhận xóa ${
             selectedUsers.length > 1 ? 'nhiều' : ''
@@ -120,20 +113,11 @@ const ManageUserScreen = () => {
           nameButton: 'Xác nhận xóa',
         });
 
-        //! set Alert style
-        setAlertOptions({
-          variant: 'success',
-          title: 'Xóa tài khoản thành công',
-          message: `Bạn đã xóa ${
-            selectedUsers.length > 1 ? 'nhiều' : ''
-          } tài khoản thành công.`,
-        });
-
         break;
       /* RESET PASSWORD */
-      case 'resetPasswords':
+      case RESET_PASSWORDS:
         //! set Modal style Single or Multiple
-        setModalType({
+        setModalOptions({
           variant: 'warning',
           title: `Xác nhận Reset password ${
             selectedUsers.length > 1 ? 'nhiều' : ''
@@ -150,14 +134,6 @@ const ManageUserScreen = () => {
           nameButton: 'Xác nhận reset password',
         });
 
-        //! set Alert style
-        setAlertOptions({
-          variant: 'success',
-          title: 'Reset password thành công',
-          message: `Bạn đã reset password ${
-            selectedUsers.length > 1 ? 'nhiều' : ''
-          } tài khoản thành công.`,
-        });
         break;
 
       default:
@@ -166,57 +142,58 @@ const ManageUserScreen = () => {
     }
 
     //! show Modal
-    setShowConfirmationModal(true);
-  };
-
-  const clearForm = () => {
-    setSelectedIds([]);
-    setShowConfirmationModal(false);
-    setShowErrorAlert(false);
-    setShowConfirmationAlert(false);
-  };
-
-  const handleHideConfirmationModal = () => setShowConfirmationModal(false);
+    setShowModal(true);
+  }
 
   const handleSubmit = async () => {
     console.log('handleSubmit');
     try {
-      switch (typeAction) {
+      if (actionType === DELETE_USERS) {
         /* REMOVE USER ACCOUNT */
-        case 'deleteUsers':
-          const deletedUser = await dispatch(deleteUsers(selectedIds)).unwrap();
-
-          if (deletedUser.success) {
-            toast.success(`Đã xóa tài khoản!`);
-          }
-          break;
-
+        const response = await userService.deleteUsers(selectedIds);
+        const results = response.data.results;
+        //! set Alert style
+        setAlertOptions({
+          variant: 'success',
+          title: response.message,
+          message: `Bạn đã xóa ${
+            results?.length > 1 ? 'nhiều' : ''
+          } tài khoản thành công.`,
+        });
+      } else if (actionType === RESET_PASSWORDS) {
         /* RESET PASSWORD */
-        case 'resetPasswords':
-          const info = await userService.resetPasswords(selectedIds);
-          if (info) {
-            toast.success(`Đã reset password tài khoản!`);
-          }
-          break;
+        var response = await userService.resetPasswords(selectedIds);
+        var results = response.data.results;
 
-        default:
-          throw new Error('Action not found. Functionality is being improved!');
+        //! set Alert style
+        setAlertOptions({
+          variant: 'success',
+          title: 'Reset password thành công',
+          message: `Bạn đã reset password ${
+            results?.length > 1 ? 'nhiều' : ''
+          } tài khoản thành công.`,
+        });
+      } else {
+        throw new Error('Action not found. Functionality is being improved!');
       }
-      //! success: True
-      //! clear Form
-      clearForm();
-      loadAllUsers();
+
+      handleHideModal();
+      handleShowAlert();
+      loadUsersByFilters();
       //! gotoTop
       scrollToTop();
-
-      setShowConfirmationAlert(true);
     } catch (error) {
       //! Error Handling Slice
-      setMessageError(
-        error.error || error.response.data?.message || error.message
-      );
-      setShowConfirmationModal(false);
-      setShowErrorAlert(true);
+      setAlertOptions({
+        variant: 'danger',
+        title: 'Lỗi hệ thống',
+        message:
+          error.response?.data?.message ||
+          error.response?.message ||
+          error.message,
+      });
+      setShowAlert(true);
+      toast.error(error.response?.message || error.massage);
     }
   };
 
@@ -224,37 +201,34 @@ const ManageUserScreen = () => {
     e.preventDefault();
     dispatch(
       getUsersByFilters({
-        search,
         sort,
         order,
         page: 1,
         perPage: itemsPerPage,
+        search,
       })
     );
   };
 
+  function handleShowAlert() {
+    setShowAlert(true);
+  }
+
+  function handleHideModal() {
+    setShowModal(false);
+  }
+
   return (
     <>
-      <AlertDismissibleComponent
-        show={showErrorAlert}
-        setShow={setShowErrorAlert}
-        variant={'danger'}
-        alwaysShown={true}
-      >
-        {messageError}
-      </AlertDismissibleComponent>
-
+      <BreadcrumbComponent breadcrumbItems={breadcrumbItems} />
       <AlertDismissibleComponent
         variant={alertOptions.variant}
         title={alertOptions.title}
-        show={showConfirmationAlert}
-        setShow={setShowConfirmationAlert}
-        alwaysShown={false}
-      >
-        {alertOptions.message}
-      </AlertDismissibleComponent>
-
-      <BreadcrumbComponent breadcrumbItems={breadcrumbItems} />
+        message={alertOptions.message}
+        show={showAlert}
+        setShow={setShowAlert}
+        alwaysShown={true}
+      />
 
       <form className="toolbar row" onSubmit={handleSearchSubmit}>
         <div className="col-10 col-md-11">
@@ -289,12 +263,12 @@ const ManageUserScreen = () => {
         />
       </div>
       <ConfirmationModalComponent
-        showModal={showConfirmationModal}
-        variant={modalType.variant}
-        title={modalType.title}
-        nameButton={modalType.nameButton}
-        message={modalType.message}
-        handleHideModal={handleHideConfirmationModal}
+        showModal={showModal}
+        variant={modalOptions.variant}
+        title={modalOptions.title}
+        nameButton={modalOptions.nameButton}
+        message={modalOptions.message}
+        handleHideModal={handleHideModal}
         handleSubmit={handleSubmit}
       />
       <GoToButtonComponent visible={scrollPosition > 300} />

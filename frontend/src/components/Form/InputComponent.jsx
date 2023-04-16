@@ -11,9 +11,9 @@ const InputComponent = ({ methods, name, label, className, ...rest }) => {
       {label && <Form.Label>{label}</Form.Label>}
       <Col>
         <Form.Control
+          {...rest}
           {...methods.register(name)}
           isInvalid={methods.formState.errors[name] ? true : false}
-          {...rest}
           size="sm"
         />
         {methods.formState.errors[name] && (

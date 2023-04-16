@@ -1,9 +1,8 @@
 import React from 'react';
 import { Card, Button, FormCheck } from 'react-bootstrap';
 import { Link, useNavigate } from 'react-router-dom';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 //! imp comps/icons
-import TrashIcon from '../../../../components/Icon/TrashIcon';
-import EditRegularIcon from '../../../../components/Icon/EditRegularIcon';
 
 const AdminProductCard = ({
   product,
@@ -45,7 +44,7 @@ const AdminProductCard = ({
         <Link to={`/admin/product/${product._id}`}>
           <Button size="sm" variant={'warning'}>
             <span className="me-1">
-              <EditRegularIcon size={'0.75rem'} />
+              <FontAwesomeIcon icon="fa-solid fa-pen-to-square" />{' '}
             </span>
             Chỉnh sửa
           </Button>
@@ -56,7 +55,7 @@ const AdminProductCard = ({
           onClick={() => handleShowDeleteModal('single', product._id)}
         >
           <span className="me-1">
-            <TrashIcon color="white" size={'0.75rem'} />
+            <FontAwesomeIcon icon="fa-solid fa-trash" />{' '}
           </span>
           Xóa
         </Button>

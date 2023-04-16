@@ -1,20 +1,20 @@
 import React from 'react';
 import { Dropdown } from 'react-bootstrap';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+//! imp actionTypes
+import { DELETE_USERS, RESET_PASSWORDS } from '../../services/actionTypes';
 
-import { faEllipsisV } from '@fortawesome/free-solid-svg-icons';
-
-const MenuButton = ({ handleSubmit }) => {
+const MenuButton = ({ handleClickActionSubmit }) => {
   const dropdownItems = [
     {
-      key: 'action-menu-0',
+      key: 'dropdown-item-0',
       label: 'Xóa tài khoản',
-      typeAction: 'deleteUsers',
+      actionType: DELETE_USERS,
     },
     {
-      key: 'action-menu-1',
+      key: 'dropdown-item-1',
       label: 'Reset Password',
-      typeAction: 'resetPasswords',
+      actionType: RESET_PASSWORDS,
     },
   ];
 
@@ -29,7 +29,7 @@ const MenuButton = ({ handleSubmit }) => {
       }}
     >
       {children}
-      <FontAwesomeIcon icon={faEllipsisV} />
+      <FontAwesomeIcon icon="fa-solid fa-ellipsis-vertical" />
     </button>
   ));
 
@@ -37,7 +37,7 @@ const MenuButton = ({ handleSubmit }) => {
     <Dropdown.Item
       key={item.key}
       eventKey={item.key}
-      onClick={() => handleSubmit(item.typeAction)}
+      onClick={() => handleClickActionSubmit(item.actionType)}
     >
       {item.label}
     </Dropdown.Item>

@@ -1,5 +1,5 @@
 import axios from 'axios';
-import axiosInstance from '../../../services/axiosInstance';
+import axiosInstance from '../../../API/axiosInstance';
 //! imp Utils
 import * as urlHandling from '../../../utils/url';
 

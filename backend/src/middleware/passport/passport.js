@@ -27,6 +27,7 @@ const jwtStrategy = new JwtStrategy(
       if (!user) {
         return done(null, false); //! err: null, user: false
       }
+      
       done(null, user); //! err: null, user: user
     } catch (error) {
       done(error, false); //! err: error, user: false

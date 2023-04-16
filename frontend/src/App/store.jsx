@@ -1,5 +1,5 @@
 import { configureStore } from '@reduxjs/toolkit';
-import { interceptor } from '../services/axiosInstance';
+import { interceptor } from '../API/axiosInstance';
 
 import {
   FLUSH,

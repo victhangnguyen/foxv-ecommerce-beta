@@ -24,7 +24,7 @@ const FormComponent = ({
   // const watchAllFields = useWatch({ control: methods.control });
   // console.log('watchAllFields: ', watchAllFields);
 
-  const fields = children.map((child) => child?.props.name);
+  const fields = children.map((child) => child?.props?.name);
 
   //! initialize Values
   React.useEffect(() => {
@@ -59,7 +59,7 @@ const FormComponent = ({
     >
       {Array.isArray(children)
         ? children.map((child) => {
-            return child?.props.name
+            return child?.props?.name
               ? React.createElement(child.type, {
                   ...{
                     ...child.props,

@@ -17,7 +17,6 @@ const productDatas = [
       'chan-vay-but-chi-xep-eo-hnvlu026_xam_02.jpg',
       'chan-vay-but-chi-xep-eo-hnvlu026_xam_03.jpg',
     ],
-    shipping: 'yes',
     discount: 50000,
   },
   {
@@ -38,7 +37,6 @@ const productDatas = [
       'ao-thun-cutout-nguc-tay-ngan-hnath034_den_02.jpg',
       'ao-thun-cutout-nguc-tay-ngan-hnath034_den_03.jpg',
     ],
-    shipping: 'yes',
     discount: 0,
   },
   {
@@ -59,7 +57,6 @@ const productDatas = [
       'ao-thun-lech-vai-phoi-ngoc-trai-hnath033_den_02.jpg',
       'ao-thun-lech-vai-phoi-ngoc-trai-hnath033_den_03.jpg',
     ],
-    shipping: 'no',
     discount: 0,
   },
   {
@@ -80,7 +77,6 @@ const productDatas = [
       'dam-ngan-chay-vien-ruy-bang-chu-h-hndng020_trang_02.jpg',
       'dam-ngan-chay-vien-ruy-bang-chu-h-hndng020_trang_03.jpg',
     ],
-    shipping: 'no',
     discount: 100000,
   },
   {
@@ -101,7 +97,6 @@ const productDatas = [
       'ao-thun-gan-suon-nhun-vat-lech-hnath040_xanh_02.jpg',
       'ao-thun-gan-suon-nhun-vat-lech-hnath040_xanh_03.jpg',
     ],
-    shipping: 'yes',
     discount: 0,
   },
   {
@@ -122,7 +117,6 @@ const productDatas = [
       'chan-vay-lua-dap-ly-hnvlu028_hong_02.jpg',
       'chan-vay-lua-dap-ly-hnvlu028_hong_03.jpg',
     ],
-    shipping: 'yes',
     discount: 50000,
   },
   {
@@ -143,7 +137,6 @@ const productDatas = [
       'chan-vay-kieu-dap-hnvlu014_trang_02.jpg',
       'chan-vay-kieu-dap-hnvlu014_trang_03.jpg',
     ],
-    shipping: 'no',
     discount: 0,
   },
   {
@@ -164,7 +157,6 @@ const productDatas = [
       'quan-jean-wax-dui-dang-loe-hnqda011_den_02.jpg',
       'quan-jean-wax-dui-dang-loe-hnqda011_den_03.jpg',
     ],
-    shipping: 'no',
     discount: 100000,
   },
   {
@@ -185,7 +177,6 @@ const productDatas = [
       'quan-short-kieu-au-qsh006_den_02.jpg',
       'quan-short-kieu-au-qsh006_den_03.jpg',
     ],
-    shipping: 'yes',
     discount: 0,
   },
   {
@@ -206,7 +197,6 @@ const productDatas = [
       'quan-short-phoi-nep-cong-qsh00_den_02.jpg',
       'quan-short-phoi-nep-cong-qsh00_den_03.jpg',
     ],
-    shipping: 'yes',
     discount: 150000,
   },
   {
@@ -227,7 +217,6 @@ const productDatas = [
       'dam-midi-xep-eo-cai-nut-hndlu039_hong_02.jpg',
       'dam-midi-xep-eo-cai-nut-hndlu039_hong_03.jpg',
     ],
-    shipping: 'yes',
     discount: 50000,
   },
   {
@@ -248,7 +237,6 @@ const productDatas = [
       'dam-lung-co-yem-xoan-day-hndlu085_do_02.jpg',
       'dam-lung-co-yem-xoan-day-hndlu085_do_03.jpg',
     ],
-    shipping: 'no',
     discount: 0,
   },
   {
@@ -269,7 +257,6 @@ const productDatas = [
       'dam-ngan-phoi-nut-hndng022_den_02.jpg',
       'dam-ngan-phoi-nut-hndng022_den_03.jpg',
     ],
-    shipping: 'yes',
     discount: 0,
   },
   {
@@ -290,7 +277,6 @@ const productDatas = [
       'dam-lung-co-vest-hndlu034_den_02.jpg',
       'dam-lung-co-vest-hndlu034_den_03.jpg',
     ],
-    shipping: 'no',
     discount: 0,
   },
   {
@@ -311,7 +297,6 @@ const productDatas = [
       'jumpsuit-tay-lien-jum002_da_02.jpg',
       'jumpsuit-tay-lien-jum002_da_03.jpg',
     ],
-    shipping: 'no',
     discount: 50000,
   },
   {
@@ -332,7 +317,6 @@ const productDatas = [
       'vay-om-bac12002068hh_xam_02.jpg',
       'vay-om-bac12002068hh_xam_03.jpg',
     ],
-    shipping: 'no',
     discount: 100000,
   },
   {
@@ -353,7 +337,6 @@ const productDatas = [
       'quan-dai-ong-rong-nap-tui-gia-hnqda022_xam_02.jpg',
       'quan-dai-ong-rong-nap-tui-gia-hnqda022_xam_03.jpg',
     ],
-    shipping: 'no',
     discount: 50000,
   },
   {
@@ -374,7 +357,6 @@ const productDatas = [
       'vay-dam-caro_tim_02.jpg',
       'vay-dam-caro_tim_03.jpg',
     ],
-    shipping: 'no',
     discount: 50000,
   },
   {
@@ -395,7 +377,6 @@ const productDatas = [
       'quan-ngo-ra-tui-ngang-hnqsh012_xanh_02.jpg',
       'quan-ngo-ra-tui-ngang-hnqsh012_xanh_03.jpg',
     ],
-    shipping: 'yes',
     discount: 150000,
   },
   {
@@ -416,7 +397,6 @@ const productDatas = [
       'chan-vay-jean-dai-nang-dong_trang_02.jpg',
       'chan-vay-jean-dai-nang-dong_trang_03.jpg',
     ],
-    shipping: 'no',
     discount: 100000,
   },
 ];

@@ -19,8 +19,8 @@ const AddEditUserScreen = () => {
   const navigate = useNavigate();
   const { userId } = useParams();
 
-  //! reduxState
-  const auth = useSelector((state) => ({ ...state.auth }));
+  //! rootState
+  const auth = useSelector((state) => state.auth);
   const isAdminController = auth.user?.roles
     ?.map((role) => role.name)
     .includes('admin');

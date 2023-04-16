@@ -8,6 +8,7 @@ import productReducer from '../features/Product/ProductSlice';
 import userReducer from '../features/User/UserSlice';
 import searchReducer from '../features/Search/SearchSlice';
 import cartReducer from '../features/Cart/CartSlice';
+import orderReducer from '../features/Order/OrderSlice';
 
 const rootPersistConfig = {
   key: 'root',
@@ -34,6 +35,12 @@ const cartPersistConfig = {
   blacklist: ['loading', 'error', 'success'],
 };
 
+const orderPersistConfig = {
+  key: 'order',
+  storage: storage,
+  blacklist: ['loading', 'error', 'success'],
+};
+
 const userPersistConfig = {
   key: 'user',
   storage: storage,
@@ -44,6 +51,7 @@ const rootReducer = combineReducers({
   auth: persistReducer(authPersistConfig, authReducer),
   product: persistReducer(productPersistConfig, productReducer),
   cart: persistReducer(cartPersistConfig, cartReducer),
+  order: persistReducer(orderPersistConfig, orderReducer),
   user: persistReducer(userPersistConfig, userReducer),
   search: searchReducer,
 });

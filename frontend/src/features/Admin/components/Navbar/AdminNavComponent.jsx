@@ -1,63 +1,77 @@
 import React from 'react';
 import { Nav } from 'react-bootstrap';
-import { Link, NavLink } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 const AdminNavComponent = () => {
+  const location = useLocation();
+
   const adminNavItems = [
     // {
     //   key: 'admin-nav-item-0',
     //   label: 'Dashboard',
-    //   path: '/admin/dashboard',
+    //   pathname: '/admin/dashboard',
     // },
     {
       key: 'admin-nav-item-1',
+      icon: 'fa-solid fa-shirt',
       label: 'Quản lý Loại (Cat)',
-      path: '/admin/categories/create',
+      pathname: '/admin/categories/create',
     },
     {
       key: 'admin-nav-item-2',
+      icon: 'fa-solid fa-shirt',
       label: 'Quản lý Kiểu (Sub)',
-      path: '/admin/subcategories/create',
+      pathname: '/admin/subcategories/create',
     },
     {
       key: 'admin-nav-item-3',
+      icon: '<fa-solid fa-file',
       label: 'Quản lý Sản phẩm (Product)',
-      path: '/admin/products',
+      pathname: '/admin/products',
     },
     {
       key: 'admin-nav-item-4',
+      icon: 'fa-solid fa-file-circle-plus',
       label: 'Thêm sản phẩm',
-      path: '/admin/products/create',
+      pathname: '/admin/products/create',
     },
     {
       key: 'admin-nav-item-5',
+      icon: 'fa-solid fa-user',
       label: 'Quản lý Tài khoản (User)',
-      path: '/admin/users',
+      pathname: '/admin/users',
     },
     {
       key: 'admin-nav-item-6',
+      icon: '<fa-solid fa-user-plus',
       label: 'Thêm Tài khoản',
-      path: '/admin/users/create',
+      pathname: '/admin/users/create',
     },
     {
       key: 'admin-nav-item-7',
+      icon: 'fa-solid fa-cart-shopping',
       label: 'Quản lý Mua hàng (Order)',
-      path: '/admin/orders',
-    },
-    {
-      key: 'admin-nav-item-8',
-      label: 'Thay đổi mật khẩu',
-      path: '/user/password',
+      pathname: '/admin/orders',
     },
   ];
   const renderAdminNavItems = adminNavItems.map((item) => (
-    <Nav.Item key={item.key}>
-      <Link to={item.path} className="nav-link">
-        {item.label}
-      </Link>
-    </Nav.Item>
+    <Link
+      key={item.key}
+      to={item.pathname}
+      className={`nav-link ${
+        location.pathname === item.pathname ? 'active' : ''
+      }`}
+    >
+      <Nav.Item className="">
+        <span className="me-2">
+          {item.icon && <FontAwesomeIcon icon={item.icon} />}
+        </span>
+        <span>{item.label}</span>
+      </Nav.Item>
+    </Link>
   ));
-  return <Nav className="flex-column">{renderAdminNavItems}</Nav>;
+  return <Nav className="flex-column admin-nav">{renderAdminNavItems}</Nav>;
 };
 
 export default AdminNavComponent;

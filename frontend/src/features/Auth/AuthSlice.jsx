@@ -57,19 +57,13 @@ export const signin = createAsyncThunk(
 
       return thunkAPI.fulfillWithValue(response);
     } catch (error) {
-      //! 422
-      if (error.response?.status === 422) {
-        return thunkAPI.rejectWithValue({
-          status: error.response.status,
-          success: error.response?.data.success,
-          errors: error.response?.data.errors,
-        });
-      }
-      //! 400 - 500
       return thunkAPI.rejectWithValue({
-        status: error.response.status,
-        success: error.response?.data.success,
-        error: error.response.data?.message || error.message,
+        message: error.message,
+        response: {
+          data: error.response.data,
+          status: error.response.status,
+          statusText: error.response.statusText,
+        },
       });
     }
   }
@@ -146,15 +140,16 @@ const authSlice = createSlice({
       .addCase(signin.fulfilled, (state, action) => {
         state.loading = false;
         state.success = action.payload.success;
-        state.user = action.payload.data.user;
-        state.token = action.payload.data.token;
-        state.refreshToken = action.payload.data.refreshToken;
+        state.user = action.payload.data?.user; //! verify
+        state.token = action.payload.data?.token; //! verify
+        state.refreshToken = action.payload.data?.refreshToken; //! verify
       })
       .addCase(signin.rejected, (state, action) => {
-        if (action.payload?.response?.status === 422) return;
+        console.log('action.payload: ', action.payload);
+        if (action.payload.response.status === 422) return;
         state.loading = false;
-        state.success = action.payload.success;
-        state.error = action.payload.error;
+        state.success = action.payload.response.data.success;
+        state.error = action.payload.response.data.message;
         state.user = null;
         state.token = null;
         state.refreshToken = null;

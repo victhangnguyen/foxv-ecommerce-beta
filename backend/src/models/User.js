@@ -48,10 +48,6 @@ const userSchema = new mongoose.Schema(
     image: {
       type: String,
     },
-    googleId: {
-      type: String,
-      required: false,
-    },
     roles: [
       {
         type: mongoose.Schema.Types.ObjectId,

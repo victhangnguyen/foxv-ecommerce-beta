@@ -11,14 +11,14 @@ import ConfirmationModalComponent from '../../../components/Modal/ConfirmationMo
 import CategoryFormComponent from '../components/Form/CategoryFormComponent';
 
 //! components/icons
-import EditRegularIcon from '../../../components/Icon/EditRegularIcon';
-import TrashIcon from '../../../components/Icon/TrashIcon';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 //! imp Services
 import categoryService from '../services/categoryService';
 
 const CategoryCreateScreen = () => {
-  const auth = useSelector((state) => ({ ...state.auth }));
+  //! rootState
+  const auth = useSelector((state) => state.auth);
 
   const [loading, setLoading] = React.useState(false);
   const [categories, setCategories] = React.useState([]);
@@ -234,14 +234,17 @@ const CategoryCreateScreen = () => {
                       variant="danger"
                       onClick={() => handleShowModal(category)}
                     >
-                      <TrashIcon color="white" size="1.5rem" />
+                      <FontAwesomeIcon color="white" icon="fa-solid fa-trash" />
                     </Button>
                     <Link to={`/admin/categories/${category.slug}/update`}>
                       <Button
                         className="btn-sm float-end m-1"
                         variant="warning"
                       >
-                        <EditRegularIcon color="white" size="1.5rem" />
+                        <FontAwesomeIcon
+                          color="white"
+                          icon="fa-solid fa-pen-to-square"
+                        />
                       </Button>
                     </Link>
                   </div>

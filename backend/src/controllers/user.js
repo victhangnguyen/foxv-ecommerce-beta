@@ -1,11 +1,14 @@
 import mongoose from 'mongoose';
 //! imp Library
 import Logging from '../library/Logging.js';
+//! imp Utils
+import { execWithTransaction } from '../utils/transaction.js';
 
 //! imp Models
 import User from '../models/User.js';
 import Role from '../models/Role.js';
 
+//! imp Services
 import userService from '../services/userService.js';
 
 //! custom Connection
@@ -64,80 +67,73 @@ export const getUsersByFilters = async (req, res, next) => {
 export const deleteUsers = async (req, res, next) => {
   const userIds = req.query.ids;
 
-  let startedTransaction = false;
-  const session = await db.startSession();
   try {
-    await session.startTransaction();
-    startedTransaction = true;
-
-    const promises = userIds.map(async (id) =>
-      userService.deleteUser(id, session)
-    );
-
-    const results = await Promise.allSettled(promises);
-
-    const hasRejected = results.some((result) => result.status === 'rejected');
-
-    if (hasRejected) {
-      throw new Error(
-        results
-          .find((result) => result.status === 'rejected')
-          ?.reason.toString()
-          .replace('Error: ', '')
+    const results = await execWithTransaction(async (session) => {
+      const promises = userIds.map(async (id) =>
+        userService.deleteUser(id, session)
       );
-    }
 
-    await session.commitTransaction();
-    return res.status(200).json({ success: true, data: { ...results } });
+      const results = await Promise.allSettled(promises);
+
+      const hasRejected = results.some(
+        (result) => result.status === 'rejected'
+      );
+
+      if (hasRejected) {
+        throw new Error(
+          results
+            .find((result) => result.status === 'rejected')
+            ?.reason.toString()
+            .replace('Error: ', '')
+        );
+      }
+
+      return results;
+    });
+
+    return res
+      .status(200)
+      .json({
+        success: true,
+        message: 'Delele Users Successful',
+        data: { results },
+      });
   } catch (error) {
-    if (startedTransaction) {
-      await session.abortTransaction();
-    }
     Logging.error('Error__ctrls__user: ' + error);
     const err = new Error(error);
     err.statusCode = 400;
     return next(err);
-  } finally {
-    await session.endSession();
   }
 };
 
 export const resetPasswords = async (req, res, next) => {
-  let startedTransaction = false;
   const userIds = req.query.ids;
-  const session = await db.startSession();
+
   try {
-    await session.startTransaction();
-    startedTransaction = true;
-
-    const promises = userIds.map(async (id) =>
-      userService.resetPasswordAndSendEmail(id, session)
-    );
-
-    const results = await Promise.allSettled(promises);
-
-    const hasRejected = results.some((result) => result.status === 'rejected');
-
-    if (hasRejected) {
-      throw new Error(
-        results
-          .find((result) => result.status === 'rejected')
-          ?.reason.toString()
-          .replace('Error: ', '')
+    await execWithTransaction(async (session) => {
+      const promises = userIds.map(async (id) =>
+        userService.resetPasswordAndSendEmail(id, session)
       );
-    }
-    await session.commitTransaction();
-    return res.status(200).json({ success: true, data: { ...results } });
+
+      const results = await Promise.allSettled(promises);
+
+      const hasRejected = results.some(
+        (result) => result.status === 'rejected'
+      );
+
+      if (hasRejected) {
+        throw new Error(
+          results
+            .find((result) => result.status === 'rejected')
+            ?.reason.toString()
+            .replace('Error: ', '')
+        );
+      }
+
+      return res.status(200).json({ success: true, data: { ...results } });
+    });
   } catch (error) {
-    if (startedTransaction) {
-      await session.abortTransaction();
-    }
-    Logging.error('Error__ctrls__user: ' + error);
-    const err = new Error(error);
-    err.statusCode = 400;
-    return next(err);
-  } finally {
-    await session.endSession();
+    console.log('Error: ', error);
   }
 };
 

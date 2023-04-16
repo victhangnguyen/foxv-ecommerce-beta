@@ -5,6 +5,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 //! imp Actions
 import { signin } from '../AuthSlice';
+import { getCart } from '../../Cart/CartSlice';
 
 //! imp Comps
 import LoginFormComponent from '../components/LoginFormComponent';
@@ -13,45 +14,72 @@ import AlertDismissibleComponent from '../../../components/Alert/AlertDismissibl
 const LoginScreen = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  //! localState: init
+  const [loading, setLoading] = React.useState(false);
+  const [value, setvalue] = React.useState();
 
   //! localState: Alert
   const [showAlert, setShowAlert] = React.useState(false);
+  const [alertOptions, setAlertOptions] = React.useState({
+    variant: '',
+    title: '',
+    message: '',
+  });
 
-  const auth = useSelector((state) => state.auth);
+  const cart = useSelector((state) => state.cart);
+  console.log('__Debugger__LoginScreen\n__***__cart: ', cart, '\n');
 
-  React.useEffect(() => {
-    if (auth.error) {
-      setShowAlert(true);
-    }
-  }, [auth.error]);
+  // React.useEffect(() => {
+  //   if (auth.error) {
+  //     setShowAlert(true);
+  //   }
+  // }, [auth.error]);
 
-  const handleSubmit = async (data, e, methods) => {
+  const handleLoginSubmit = async (data, e, methods) => {
     const { username, password } = data;
     try {
       const response = await dispatch(signin({ username, password })).unwrap();
+      //! load Cart
+      await dispatch(getCart());
 
-      const roles = response.data.user.roles.map((role) => role.name);
-
+      const roles = response.data?.user.roles.map((role) => role.name);
       //! navigate
-      if (roles.includes('admin')) navigate('/admin/users');
-      else if (roles.includes('user')) navigate('/');
+      if (roles?.includes('admin')) {
+        navigate('/admin/users');
+      } else if (roles?.includes('user')) {
+        if (cart.cartItems?.length > 0) {
+          return navigate('/cart');
+        }
+        navigate('/');
+      }
 
       toast.success(response.message);
       // setShowAlert(true);
     } catch (error) {
-      toast.error(auth.error);
-      //! rejected
-      const UNPROCESSABLE = 422;
-      if (error.status === UNPROCESSABLE) {
-        const { errors } = error;
+      console.log('__Debugger__LoginScreen\n__handle__error: ', error, '\n');
+      setLoading(false);
+      //! Error Handling
+      if (error.response?.status === 422) {
+        const errors = error.response.data.errors;
         if (!errors.length) return;
-        errors.forEach((err) => {
-          methods.setError(err.param, {
+        errors.forEach((error) => {
+          methods.setError(error.param, {
             type: 'server',
-            message: err.msg,
+            message: error.msg,
           });
         });
+        return;
       }
+
+      setAlertOptions({
+        variant: 'danger',
+        title: 'Lỗi hệ thống',
+        message:
+          error.response?.data?.message ||
+          error.response?.message ||
+          error.message,
+      });
+
       setShowAlert(true);
     }
   };
@@ -61,9 +89,9 @@ const LoginScreen = () => {
       <AlertDismissibleComponent
         show={showAlert}
         setShow={setShowAlert}
-        variant={auth.success ? 'success' : 'danger'}
-        title={'Thông báo'}
-        message={auth.success ? '' : auth.error}
+        variant={alertOptions.variant}
+        title={alertOptions.title}
+        message={alertOptions.message}
         alwaysShown={true}
       />
       <Row className="d-flex justify-content-center align-items-center">
@@ -79,7 +107,7 @@ const LoginScreen = () => {
                 </p>
                 <p className="mb-2">Nhập Email để đăng nhập thành viên FOXV.</p>
                 <div className="mt-4">
-                  <LoginFormComponent onSubmit={handleSubmit} />
+                  <LoginFormComponent onSubmit={handleLoginSubmit} />
                 </div>
                 <div className="mb-3">
                   <p className="mb-0">

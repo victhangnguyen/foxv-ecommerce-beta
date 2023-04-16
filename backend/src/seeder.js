@@ -1,5 +1,8 @@
 import bcrypt from 'bcryptjs';
 
+//! imp Constants
+import constants from './constants/index.js';
+
 //! library
 import Logging from './library/Logging.js';
 import slugify from 'slugify';
@@ -7,6 +10,8 @@ import slugify from 'slugify';
 import config from './config/index.js';
 
 //! imp Datas
+import addressDatas from './data/addressDatas.js';
+import fullnameDatas from './data/fullnameDatas.js';
 import userDatas from './data/userDatas.js';
 import roleDatas from './data/roleDatas.js';
 import productDatas from './data/productDatas.js';

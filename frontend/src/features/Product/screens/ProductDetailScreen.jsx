@@ -2,7 +2,7 @@ import React from 'react';
 import { toast } from 'react-toastify';
 import _ from 'lodash';
 import { Button, Card, Col, Container, Row } from 'react-bootstrap';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { useParams, Link } from 'react-router-dom';
 
 //! imp Comps
@@ -13,13 +13,14 @@ import ProductImageComponent from '../components/ProductImageComponent';
 //! Services
 import productService from '../services/productService';
 //! imp Actions
-import { addToCart } from '../../Cart/CartSlice';
+import { addToCart, removeItem } from '../../Cart/CartSlice';
 
 const ProductDetail = () => {
   const dispatch = useDispatch();
   const { slug } = useParams(); //! productSlug
-  //! localState: init
+  const cart = useSelector((state) => state.cart);
 
+  //! localState: init
   const [loading, setLoading] = React.useState(false);
   const [product, setProduct] = React.useState({});
   //! localState: alert
@@ -44,7 +45,9 @@ const ProductDetail = () => {
     },
   ];
 
-  console.log('product: ', product);
+  const isAddedToCard = cart.cartItems
+    .map((item) => item.product)
+    .includes(product._id);
 
   React.useEffect(() => {
     loadProductBySlug(slug);
@@ -87,9 +90,14 @@ const ProductDetail = () => {
   };
 
   function handleClickAddToCart() {
-    // action.payload ~ { _id, title, image, price}
+    /* action.payload ~ {
+      productId: _id,
+      title, image, price
+    }
+    */
     const cartItem = {
-      _id: product._id,
+      product: product._id,
+      quantity: 1,
       slug: product.slug,
       name: product.name,
       category: product.category,
@@ -97,6 +105,10 @@ const ProductDetail = () => {
       price: product.price,
     };
     dispatch(addToCart(cartItem));
+  }
+
+  function handleClickRemoveItem() {
+    dispatch(removeItem(product._id));
   }
 
   function handleClickBuyNow(e) {
@@ -159,8 +171,16 @@ const ProductDetail = () => {
                       >
                         Mua Ngay
                       </Button>
-                      <Button variant="primary" onClick={handleClickAddToCart}>
-                        Add To Cart
+                      <Button
+                        size="sm"
+                        variant={isAddedToCard ? 'secondary' : 'danger'}
+                        onClick={
+                          isAddedToCard
+                            ? handleClickRemoveItem
+                            : handleClickAddToCart
+                        }
+                      >
+                        {isAddedToCard ? 'Hủy Thêm' : 'Thêm vào Giỏ'}
                       </Button>
                     </div>
                     <hr />
@@ -181,22 +201,36 @@ const ProductDetail = () => {
                 <Col as="aside">
                   <h5>Quyền lợi là thành viên của Foxv</h5>
                   <p>
-                    Lorem ipsum dolor sit amet consectetur adipisicing elit.
-                    Ducimus quae nobis fugiat debitis autem magnam dolor
-                    excepturi dolores harum corporis! Aperiam odio voluptatum
-                    adipisci debitis vero dolorem natus magnam inventore!
+                    1. Giảm giá khi mua hàng: Thành viên có thể được giảm giá
+                    khi mua sản phẩm.
+                  </p>
+                  <p>
+                    2. Quà tặng và ưu đãi đặc biệt: Thành viên cũng có thể được
+                    tặng quà và nhận được các ưu đãi đặc biệt…
+                  </p>
+                  <p>
+                    3. Tham gia sự kiện và chương trình khuyến mãi: Thành viên
+                    cũng có thể được mời tham gia các sự kiện và chương trình
+                    khuyến mãi độc quyền.
+                  </p>
+                  <p>
+                    4. Giao hàng nhanh và dịch vụ chăm sóc khách hàng tốt: Thành
+                    viên còn được đảm bảo nhận được sản phẩm nhanh chóng và dịch
+                    vụ chăm sóc khách hàng tốt nhất.
+                  </p>
+                  <p>
+                    5. Giảm thiểu thời gian đăng ký và thanh toán: Thành viên đã
+                    đăng ký trên trang web của bạn sẽ không cần phải nhập lại
+                    thông tin cá nhân trong quá trình thanh toán và giao dịch
+                    tiếp theo.
                   </p>
                 </Col>
               </Row>
               <hr />
               <p>
-                Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do
-                eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut
-                enim ad minim veniam, quis nostrud exercitation ullamco laboris
-                nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor
-                in reprehenderit in voluptate velit esse cillum dolore eu fugiat
-                nulla pariatur. Excepteur sint occaecat cupidatat non proident,
-                sunt in culpa qui officia deserunt mollit anim id est laborum.
+                Chúng tôi xin cảm ơn quý khách hàng đã đồng hành cùng chúng tôi
+                trong suốt thời gian vừa qua. Chúng tôi rất trân trọng sự tin
+                tưởng và hỗ trợ mà quý khách hàng đã dành cho chúng tôi.
               </p>
             </div>
           </article>

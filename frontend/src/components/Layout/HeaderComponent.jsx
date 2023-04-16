@@ -1,20 +1,26 @@
-import { NavLink, useNavigate } from 'react-router-dom';
 import React from 'react';
-import { toast } from 'react-toastify';
+import { NavLink, useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
+import { toast } from 'react-toastify';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
-import Container from 'react-bootstrap/Container';
-import Image from 'react-bootstrap/Image';
-import Nav from 'react-bootstrap/Nav';
-import Navbar from 'react-bootstrap/Navbar';
-import NavDropdown from 'react-bootstrap/NavDropdown';
-import Offcanvas from 'react-bootstrap/Offcanvas';
+//! imp Comps
+import {
+  Container,
+  Image,
+  Nav,
+  Navbar,
+  NavDropdown,
+  Offcanvas,
+} from 'react-bootstrap';
+
 //! imp Services
 import categoryService from '../../features/Category/services/categoryService';
 import subCategoryService from '../../features/SubCategory/services/subCategoryService';
 
 //! imp Actions
 import { signout } from '../../features/Auth/AuthSlice';
+import { postCart } from '../../features/Cart/CartSlice';
 
 const HeaderComponent = () => {
   const dispatch = useDispatch();
@@ -22,16 +28,30 @@ const HeaderComponent = () => {
 
   //! reduxState
   const auth = useSelector((state) => state.auth);
+  const cart = useSelector((state) => state.cart);
+
+  //! varibale form auth
   const userId = auth?.user?._id;
   const roles = auth.user?.roles?.map((role) => role.name);
   const isAuthenticated = roles?.includes('user');
   const isAdmin = roles?.includes('admin');
+  //! variable from cart
+  //! total items Type
+  const itemsCount = cart.cartItems?.length;
+  const badgeProps = {};
+
+  if (itemsCount) {
+    badgeProps.count = itemsCount;
+  }
 
   //! localState: selected
   const [categories, setCategories] = React.useState([]);
   const [subCategories, setSubCategories] = React.useState([]);
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
+    //! save Cart
+    await dispatch(postCart());
+    //! logout
     dispatch(signout());
     navigate('/auth/login');
     toast.success(`${auth.user.lastName} has successfully signed out!`);
@@ -52,7 +72,7 @@ const HeaderComponent = () => {
     const response = await categoryService.getCategoriesByFilters(
       filterOptions
     );
-    setCategories(response.data.categories);
+    setCategories(response.data?.categories); //! vrf ?.cate..
   };
 
   const loadSubCategories = async () => {
@@ -62,8 +82,10 @@ const HeaderComponent = () => {
       page: 1,
       perPage: 10,
     };
-    const response = await subCategoryService.getSubCategoriesByFilters(filterOptions);
-    setSubCategories(response.data.subCategories);
+    const response = await subCategoryService.getSubCategoriesByFilters(
+      filterOptions
+    );
+    setSubCategories(response.data?.subCategories); //! vrf ?.sub...
   };
 
   const renderCategoryHeader = categories?.map((category) => (
@@ -156,20 +178,24 @@ const HeaderComponent = () => {
                 //! Nav
               }
               <Nav className="justify-content-end flex-grow-1 pe-3">
+                {isAdmin ? (
+                  <NavLink className="nav-link" to={'/admin/products'}>
+                    Quản lý Sản phẩm
+                  </NavLink>
+                ) : (
+                  <NavLink className={'nav-link'} to={`/cart`}>
+                    <i className="orders-badge" {...badgeProps}>
+                      {/* <CartIcon size="1.5rem" /> */}
+                      <FontAwesomeIcon
+                        color="black"
+                        size="lg"
+                        icon="fa-solid fa-bag-shopping"
+                      />
+                    </i>
+                  </NavLink>
+                )}
                 {isAuthenticated ? (
                   <>
-                    {isAdmin ? (
-                      <NavLink className="nav-link" to={'/admin/products'}>
-                        Quản lý Sản phẩm
-                      </NavLink>
-                    ) : (
-                      <NavLink
-                        className={'nav-link'}
-                        to={`/users/${userId}/cart`}
-                      >
-                        Giỏ hàng
-                      </NavLink>
-                    )}
                     <NavDropdown
                       title={auth.user?.firstName}
                       id={`offcanvasNavbarDropdown-expand-lg`}

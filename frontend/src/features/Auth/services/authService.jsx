@@ -1,4 +1,4 @@
-import axiosInstance from '../../../services/axiosInstance';
+import axiosInstance from '../../../API/axiosInstance';
 
 const authService = {
   signup: (data) => {

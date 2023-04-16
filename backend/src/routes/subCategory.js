@@ -7,7 +7,7 @@ import {
   updateSubCategorySchema,
 } from '../middleware/schemaValidations/index.js';
 //! imp Middleware: Passport
-import { isAdmin, isUser } from '../middleware/passport/index.js';
+import { authenticate, isAdmin } from '../middleware/passport/index.js';
 
 const router = express.Router();
 //! @desc     Fetch a SubCategory by slug
@@ -45,6 +45,7 @@ router.get(
 router.post(
   '/admin/subcategories/create',
   validateSchema(createSubCategorySchema),
+  authenticate,
   isAdmin,
   subCategoryController.createSubCategory
 );
@@ -55,6 +56,7 @@ router.post(
 router.put(
   '/admin/subcategories/slug/:slug/update-info',
   validateSchema(updateSubCategorySchema),
+  authenticate,
   isAdmin,
   subCategoryController.updateSubCategoryBySlug
 );
@@ -64,6 +66,7 @@ router.put(
 //! @access   Private: Admin
 router.delete(
   '/admin/subcategories/slug/:slug/delete',
+  authenticate,
   isAdmin,
   subCategoryController.deleteSubCategoryBySlug
 );

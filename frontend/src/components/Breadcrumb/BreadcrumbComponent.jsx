@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom';
 function BreadcrumbComponent({ breadcrumbItems }) {
-  const renderBreadcrumbItem = breadcrumbItems.map((item) => (
+  const renderBreadcrumbItems = breadcrumbItems.map((item) => (
     <li
       key={item.key}
       className={`breadcrumb-item ${item.active ? 'active' : ''}`}
@@ -10,7 +10,7 @@ function BreadcrumbComponent({ breadcrumbItems }) {
   ));
   return (
     <nav aria-label="breadcrumb">
-      <ol className="breadcrumb">{renderBreadcrumbItem}</ol>
+      <ol className="breadcrumb">{renderBreadcrumbItems}</ol>
     </nav>
   );
 }

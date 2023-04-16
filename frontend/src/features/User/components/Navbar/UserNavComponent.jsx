@@ -5,7 +5,7 @@ import { useDispatch, useSelector } from 'react-redux';
 
 const AdminNavComponent = () => {
   const dispatch = useDispatch();
-  const auth = useSelector((state) => ({ ...state.auth }));
+  const auth = useSelector((state) => state.auth);
   const userId = auth.user?._id;
 
   const adminNavItems = [

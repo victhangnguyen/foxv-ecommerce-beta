@@ -5,11 +5,7 @@ import * as yup from 'yup';
 //! imp Components
 import { Button } from 'react-bootstrap';
 import FormComponent from '../../../../components/Form/FormComponent';
-import ImageComponent from '../../../../components/Form/ImageComponent';
 import InputComponent from '../../../../components/Form/InputComponent';
-import SelectComponent from '../../../../components/Form/SelectComponent';
-import SelectControllerComponent from '../../../../components/Form/SelectControllerComponent';
-import TagControllerComponent from '../../../../components/Form/TagControllerComponent';
 
 const UserFormComponent = ({ user, initialValues, loading, onSubmit }) => {
   const phoneNumerRegExp = /^[+]*[(]{0,1}[0-9]{1,4}[)]{0,1}[-\s\./0-9]*$/;
@@ -48,37 +44,7 @@ const UserFormComponent = ({ user, initialValues, loading, onSubmit }) => {
       .max(32, 'Nhiều nhất 32 ký tự.')
       .matches(phoneNumerRegExp, 'Số điện thoại không hợp lệ')
       .required('Yêu cầu nhập số điện thoại'),
-    // password: yup
-    //   .string()
-    //   .min(8, 'Ít nhất 8 ký tự.')
-    //   .max(64, 'Nhiều nhất 64 ký tự.')
-    //   .required('Yêu cầu nhập Mật khẩu'),
-    // confirmPassword: yup
-    //   .string()
-    //   .oneOf([yup.ref('password'), null], 'Mật khẩu nhập lại không chính xác')
-    //   .required('Yêu cầu nhập Xác nhận mật khẩu'),
   });
-
-  // const categoryOptions = categories?.map((category) => ({
-  //   key: category._id,
-  //   value: category._id,
-  //   label: category.name,
-  // }));
-
-  // const subCategoryOptions = subCategories?.map((sub) => ({
-  //   key: sub._id,
-  //   value: sub._id,
-  //   label: sub.name,
-  // }));
-
-  // const shippingOptions = [
-  //   { key: 0, value: 'no', label: 'No' },
-  //   { key: 1, value: 'yes', label: 'Yes' },
-  // ];
-
-  // const colorOptions = [{ key: 0, value: 'black', label: 'Black' }];
-
-  // const brandOptions = [{ key: 0, value: 'dior', label: 'Dior' }];
 
   return (
     <div className="screen-body mb-4 p-3">

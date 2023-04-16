@@ -23,7 +23,9 @@ import CollectionScreen from '../features/Collection/screens/CollectionScreen';
 //! imp Comps/Private: User
 import UserDashboardScreen from '../features/User/screens/UserDashboardScreen';
 import CartScreen from '../features/Cart/screens/CartScreen';
+import AddEditOrderScreen from '../features/Order/screens/AddEditOrderScreen';
 import AddEditUserScreen from '../features/User/screens/AddEditUserScreen';
+import CheckoutPaymentScreen from '../features/Payment/screens/CheckoutPaymentScreen';
 //! imp Comps/Private: Admin
 import AdminDashboardScreen from '../features/Admin/screens/AdminDashboardScreen';
 import AddEditProductScreen from '../features/Product/screens/AddEditProductScreen';
@@ -37,30 +39,43 @@ import UserRoute from '../components/Routes/UserRoute';
 
 const router = createBrowserRouter([
   {
-    path: '/',
+    path: '',
     element: <RootComponent />,
     errorElement: <ErrorScreen />,
     children: [
       //! Public Routes
       { index: true, element: <HomeScreen /> },
-      { path: '/products/:slug', element: <ProductDetailScreen /> },
-      { path: '/promotion', element: <PromotionScreen /> },
-      { path: '/shop', element: <ShopScreens /> },
-      { path: '/auth/register', element: <RegisterScreen /> },
-      { path: '/auth/login', element: <LoginScreen /> },
-      { path: '/auth/forgot-password', element: <ForgotPasswordScreen /> },
-      { path: '/collections/:slug', element: <CollectionScreen /> }, //! catSlug
-      { path: '/collections/sub/:slug', element: <SubCollectionScreen /> }, //! subSlug
-      //! Private Routes: User
+      { path: 'products/:slug', element: <ProductDetailScreen /> },
+      { path: 'promotion', element: <PromotionScreen /> },
+      { path: 'shop', element: <ShopScreens /> },
+      { path: 'auth/register', element: <RegisterScreen /> },
+      { path: 'auth/login', element: <LoginScreen /> },
+      { path: 'auth/forgot-password', element: <ForgotPasswordScreen /> },
+      { path: 'collections/:slug', element: <CollectionScreen /> }, //! catSlug
+      { path: 'collections/sub/:slug', element: <SubCollectionScreen /> }, //! subSlug
+      { path: 'cart', element: <CartScreen /> },
+      //! Required User
       {
-        path: 'users/:userId',
+        path: '',
         element: <UserRoute />,
+        children: [],
+      },
+      //! Private User
+      {
+        path: '',
+        element: <UserRoute privateProtect={true} />,
         children: [
-          { path: 'cart', element: <CartScreen /> },
           {
-            path: '',
+            path: 'users/:userId',
             element: <UserDashboardScreen />,
             children: [{ path: 'update', element: <AddEditUserScreen /> }],
+          },
+          {
+            path: 'users/:userId',
+            children: [
+              { path: 'checkout', element: <CheckoutPaymentScreen /> },
+              { path: 'orders/:orderId', element: <AddEditOrderScreen /> },
+            ],
           },
         ],
       },
@@ -75,21 +90,36 @@ const router = createBrowserRouter([
             path: 'admin',
             element: <AdminDashboardScreen />,
             children: [
-              //! Product Management
+              //! User Management
               { path: 'users', element: <ManageUserScreen /> }, //! users management
               { path: 'users/create', element: <AddEditUserScreen /> },
               { path: 'users/:userId/update', element: <AddEditUserScreen /> },
+              //! Product Management
               { path: 'products', element: <ManageProductScreen /> }, //! products management
               { path: 'products/create', element: <AddEditProductScreen /> },
               {
                 path: 'products/:productId/update',
                 element: <AddEditProductScreen />,
               },
-              { path: 'categories/create', element: <CategoryCreateScreen/> },
-              { path: 'categories/:slug/update', element: <CategoryUpdateScreen/> },
-              { path: 'subcategories/create', element: <SubCategoryCreateScreen/> },
-              { path: 'subcategories/:slug/update', element: <SubCategoryUpdateScreen/> },
+              //! Order Management
               { path: 'orders', element: <ManageOrderScreen /> },
+              {
+                path: 'orders/:orderId/update',
+                element: <AddEditOrderScreen />,
+              },
+              { path: 'categories/create', element: <CategoryCreateScreen /> },
+              {
+                path: 'categories/:slug/update',
+                element: <CategoryUpdateScreen />,
+              },
+              {
+                path: 'subcategories/create',
+                element: <SubCategoryCreateScreen />,
+              },
+              {
+                path: 'subcategories/:slug/update',
+                element: <SubCategoryUpdateScreen />,
+              },
             ],
           },
         ],

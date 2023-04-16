@@ -8,7 +8,7 @@ import MenuButton from '../Button/MenuButton';
 const AdminUserCard = ({ entity, handleShowModal }) => {
   const REACT_APP_SERVER = 'http://127.0.0.1';
   const REACT_APP_PORT = 5000;
-  const isAdmin = entity?.roles.map((role) => role.name).includes('admin');
+  const isAdmin = entity.roles?.map((role) => role.name).includes('admin');
 
   return (
     <Card as="article" className="my-3 p-3 rounded card-admin-user">
@@ -19,7 +19,7 @@ const AdminUserCard = ({ entity, handleShowModal }) => {
           </Link>
 
           <MenuButton
-            handleSubmit={(typeAction) =>
+            handleClickActionSubmit={(typeAction) =>
               handleShowModal(typeAction, [entity._id])
             }
           />

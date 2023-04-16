@@ -1,7 +1,14 @@
 import React from 'react';
 import { Row, Col, Form } from 'react-bootstrap';
 
-const SelectComponent = ({ methods, options, name, label, className,...rest }) => {
+const SelectComponent = ({
+  methods,
+  options,
+  name,
+  label,
+  className,
+  ...rest
+}) => {
   return (
     <Form.Group as={Row} className={className} controlId={`ipt-${name}`}>
       {label && <Form.Label>{label}</Form.Label>}

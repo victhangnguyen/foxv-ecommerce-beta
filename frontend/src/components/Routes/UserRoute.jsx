@@ -1,7 +1,7 @@
 import { useSelector } from 'react-redux';
 import { Navigate, useOutlet, useParams, useLocation } from 'react-router-dom';
 
-const UserRoute = ({ children }) => {
+const UserRoute = ({ children, privateProtect }) => {
   const outlet = useOutlet();
   const location = useLocation();
 
@@ -11,21 +11,27 @@ const UserRoute = ({ children }) => {
   const { userId } = useParams();
 
   //! Authen
-  const { user, token } = useSelector((state) => ({ ...state.auth }));
-  const isAuth = userId === user?._id;
+  const { user, token } = useSelector((state) => state.auth);
+  const isAuth = !!token;
 
   //! Author
   const roles = user?.roles.map((role) => role.name);
   const isUser = roles?.includes('user');
 
-  const isAllowed = token && isAuth && isUser;
+  let isAllowed = false;
+
+  if (privateProtect) {
+    isAllowed = isAuth && isUser && userId === user._id;
+  } else {
+    isAllowed = isAuth && isUser;
+  }
 
   if (!isAllowed) {
     if (dest === 'update') {
       return <Navigate to={`/users/${user._id}/update`} replace />;
     }
     //! defaults
-    return <Navigate to="/auth/login" replace />;
+    return <Navigate to="/" replace />;
   }
 
   return children ? children : outlet;
