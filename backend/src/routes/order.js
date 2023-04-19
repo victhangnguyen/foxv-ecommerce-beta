@@ -2,7 +2,9 @@ import express from 'express';
 //! imp Controllers
 import * as orderController from '../controllers/order.js';
 //! imp Middlewares
-import { authenticate } from '../middleware/passport/index.js';
+import { authenticate, isUser, isAdmin } from '../middleware/passport/index.js';
+import { validateSchema } from '../middleware/validator.js';
+import { updateOrderSchema } from '../middleware/schemaValidations/index.js';
 
 const router = express.Router();
 
@@ -23,6 +25,37 @@ router.post(
   '/orders/checkout',
   authenticate,
   orderController.createOrderByUserId
+);
+
+//! @desc     Delete One Order
+//! @route    DEL /api/admin/orders/delete-one'
+//! @access   Private: Admin
+router.delete(
+  '/admin/orders/delete-one',
+  authenticate,
+  isAdmin,
+  orderController.deleteOrder
+);
+
+//! @desc     Delete Many Orders
+//! @route    DEL /api/admin/orders/delete-multiple'
+//! @access   Private: Admin
+router.delete(
+  '/admin/orders/delete-multiple',
+  authenticate,
+  isAdmin,
+  orderController.deleteOrders
+);
+
+//! @desc     Update One Order
+//! @route    PUT /api/orders/:orderId/update
+//! @access   Private: Admin
+router.put(
+  '/admin/orders/:orderId/update',
+  authenticate,
+  isAdmin,
+  validateSchema(updateOrderSchema),
+  orderController.updateOrder
 );
 
 export default router;

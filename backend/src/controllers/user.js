@@ -34,6 +34,7 @@ export const getUsersByFilters = async (req, res, next) => {
 
     const result = await User.aggregate([
       { $match: match },
+      { $sort: { [sort]: +order, _id: 1 } },
       {
         //! populate
         $lookup: {
@@ -43,7 +44,6 @@ export const getUsersByFilters = async (req, res, next) => {
           as: 'roles',
         },
       },
-      { $sort: { [sort]: +order } },
       {
         $facet: {
           users: [{ $skip: skip }, { $limit: +perPage }],
@@ -91,13 +91,11 @@ export const deleteUsers = async (req, res, next) => {
       return results;
     });
 
-    return res
-      .status(200)
-      .json({
-        success: true,
-        message: 'Delele Users Successful',
-        data: { results },
-      });
+    return res.status(200).json({
+      success: true,
+      message: 'Delele Users Successful',
+      data: { results },
+    });
   } catch (error) {
     Logging.error('Error__ctrls__user: ' + error);
     const err = new Error(error);

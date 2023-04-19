@@ -6,7 +6,7 @@ export const getOrderById = createAsyncThunk(
   'order/getOrderById',
   async (orderId, thunkAPI) => {
     try {
-      const response = await API.getOrderById(orderId);
+      const response = await API.order.getOrderById(orderId);
       return thunkAPI.fulfillWithValue(response);
     } catch (error) {
       return thunkAPI.rejectWithValue({
@@ -25,7 +25,7 @@ export const createOrder = createAsyncThunk(
   'order/createOrder',
   async ({ name, address, items, orderPayAmount, bankCode }, thunkAPI) => {
     try {
-      const response = await API.checkoutOrder({
+      const response = await API.order.checkoutOrder({
         name,
         address,
         items,
@@ -51,12 +51,76 @@ export const getOrdersByFilters = createAsyncThunk(
   'order/getOrdersByFilters',
   async ({ sort, order, page, perPage, search }, thunkAPI) => {
     try {
-      const response = await API.getOrdersByFilters({
+      const response = await API.order.getOrdersByFilters({
         sort,
         order,
         page,
         perPage,
         search,
+      });
+      return thunkAPI.fulfillWithValue(response);
+    } catch (error) {
+      return thunkAPI.rejectWithValue({
+        message: error.message,
+        response: {
+          data: error.response.data,
+          status: error.response.status,
+          statusText: error.response.statusText,
+        },
+      });
+    }
+  }
+);
+
+export const deleteOrder = createAsyncThunk(
+  'order/deleteOrder',
+  async (orderId, thunkAPI) => {
+    try {
+      const response = await API.order.deleteOrder(orderId);
+      return thunkAPI.fulfillWithValue(response);
+    } catch (error) {
+      return thunkAPI.rejectWithValue({
+        message: error.message,
+        response: {
+          data: error.response.data,
+          status: error.response.status,
+          statusText: error.response.statusText,
+        },
+      });
+    }
+  }
+);
+
+export const deleteOrders = createAsyncThunk(
+  'order/deleteOrders',
+  async (orderIds, thunkAPI) => {
+    try {
+      const response = await API.order.deleteOrders(orderIds);
+      return thunkAPI.fulfillWithValue(response);
+    } catch (error) {
+      return thunkAPI.rejectWithValue({
+        message: error.message,
+        response: {
+          data: error.response.data,
+          status: error.response.status,
+          statusText: error.response.statusText,
+        },
+      });
+    }
+  }
+);
+
+export const updateOrder = createAsyncThunk(
+  'order/updateOrderById',
+  async ({ orderId, orderData }, thunkAPI) => {
+    const { address, bankTranNo, name, status, transactionNo } = orderData;
+    try {
+      const response = await API.order.updateOrderById(orderId, {
+        address,
+        bankTranNo,
+        name,
+        status,
+        transactionNo,
       });
       return thunkAPI.fulfillWithValue(response);
     } catch (error) {
@@ -110,11 +174,6 @@ const OrderSlice = createSlice({
         state.loading = true;
       })
       .addCase(getOrdersByFilters.fulfilled, (state, action) => {
-        console.log(
-          '__Debugger__OrderSlice\n__getOrderByFilters__action.payload: ',
-          action.payload,
-          '\n'
-        );
         state.loading = false;
         state.orders = action.payload.orders;
         state.ordersCount = action.payload.ordersCount;
@@ -132,6 +191,41 @@ const OrderSlice = createSlice({
         state.order = action.payload.data.order;
       })
       .addCase(getOrderById.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload.message;
+      });
+    builder
+      .addCase(deleteOrder.pending, (state, action) => {
+        state.loading = true;
+      })
+      .addCase(deleteOrder.fulfilled, (state, action) => {
+        state.loading = false;
+        state.ordersCount -= 1;
+      })
+      .addCase(deleteOrder.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload.message;
+      });
+    builder
+      .addCase(deleteOrders.pending, (state, action) => {
+        state.loading = true;
+      })
+      .addCase(deleteOrders.fulfilled, (state, action) => {
+        state.loading = false;
+        state.ordersCount -= action.payload.data.deletedOrdersCount;
+      })
+      .addCase(deleteOrders.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload.message;
+      });
+    builder
+      .addCase(updateOrder.pending, (state, action) => {
+        state.loading = true;
+      })
+      .addCase(updateOrder.fulfilled, (state, action) => {
+        state.loading = false;
+      })
+      .addCase(updateOrder.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload.message;
       });

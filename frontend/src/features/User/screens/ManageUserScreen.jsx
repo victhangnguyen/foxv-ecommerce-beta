@@ -84,13 +84,13 @@ const ManageUserScreen = () => {
     );
   };
 
-  function handleShowModal(actionType, ids) {
+  function handleOpenModal(actionType, ids) {
+    setSelectedIds(ids);
+    setActionType(actionType);
+
     const selectedUsers = ids?.map(
       (id) => user.entities.find((entity) => entity._id === id) //! userObject
     );
-
-    setSelectedIds(ids);
-    setActionType(actionType);
 
     switch (actionType) {
       /* REMOVE USER ACCOUNT */
@@ -142,7 +142,7 @@ const ManageUserScreen = () => {
     }
 
     //! show Modal
-    setShowModal(true);
+    handleShowModal();
   }
 
   const handleSubmit = async () => {
@@ -214,6 +214,14 @@ const ManageUserScreen = () => {
     setShowAlert(true);
   }
 
+  function handleHideAlert() {
+    setShowAlert(false);
+  }
+
+  function handleShowModal() {
+    setShowModal(true);
+  }
+
   function handleHideModal() {
     setShowModal(false);
   }
@@ -222,11 +230,11 @@ const ManageUserScreen = () => {
     <>
       <BreadcrumbComponent breadcrumbItems={breadcrumbItems} />
       <AlertDismissibleComponent
+        handleHideAlert={handleHideAlert}
+        show={showAlert}
         variant={alertOptions.variant}
         title={alertOptions.title}
         message={alertOptions.message}
-        show={showAlert}
-        setShow={setShowAlert}
         alwaysShown={true}
       />
 
@@ -248,7 +256,7 @@ const ManageUserScreen = () => {
               <Col key={entity._id} xs={6} sm={4} md={4} lg={3}>
                 <AdminUserCard
                   entity={entity}
-                  handleShowModal={handleShowModal}
+                  handleOpenModal={handleOpenModal}
                 />
               </Col>
             );

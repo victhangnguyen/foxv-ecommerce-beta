@@ -1,4 +1,6 @@
 import React from 'react';
+import _, { constant } from 'lodash';
+import { toast } from 'react-toastify';
 import { Row, Col } from 'react-bootstrap';
 import { useDispatch, useSelector } from 'react-redux';
 //! imp Comps
@@ -8,15 +10,17 @@ import PaginationComponent from '../../../components/Pagination/PaginationCompon
 import ConfirmationModalComponent from '../../../components/Modal/ConfirmationModalComponent';
 import GoToButtonComponent from '../../../components/Button/GoToButtonComponent';
 import ControlledtabsComponent from '../../../components/Form/ControlledTabsComponent';
+import ToolbarComponent from '../components/ToolbarComponent';
 //! imp Comps:tabs
 import OrderTabComponent from '../components/OrderTabComponent';
 //! imp Hooks
 import { useItemsPerPage } from '../../../hooks/itemsPerPage';
-import { useScrollPosition } from '../../../hooks/scroll';
+import { useScrollPosition, scrollToTop } from '../../../hooks/scroll';
 //! imps Actions
-import { getOrdersByFilters } from '../OrderSlice';
+import { getOrdersByFilters, deleteOrder, deleteOrders } from '../OrderSlice';
 //! imps Constants
 import constants from '../../../constants';
+import API from '../../../API';
 
 const ManageOrderScreen = () => {
   const dispatch = useDispatch();
@@ -30,6 +34,8 @@ const ManageOrderScreen = () => {
     keyword: '',
     status: '',
   }); //! search orderId, status, name, address...
+  const [keyword, setKeyword] = React.useState('');
+  console.log('__Debugger__ManageOrderScreen\n__***__keyword: ', keyword, '\n');
 
   const [sort, setSort] = React.useState('createdAt');
   const [order, setOrder] = React.useState(-1);
@@ -38,6 +44,10 @@ const ManageOrderScreen = () => {
   //! localState: Select Ids
   const [isCheckAll, setIsCheckAll] = React.useState(false);
   const [selectedIds, setSelectedIds] = React.useState([]);
+  const [selectedId, setSelectedId] = React.useState('');
+
+  //! localState: actionType
+  const [actionType, setActionType] = React.useState('');
 
   //! localState: Modal
   const [showModal, setShowModal] = React.useState(false);
@@ -66,7 +76,10 @@ const ManageOrderScreen = () => {
   //! un-check All if selectedIds equal to 0
   React.useEffect(() => {
     if (selectedIds.length !== 0) return;
-    resetCheckAll();
+
+    if (isCheckAll) {
+      handleCheckAllChange();
+    }
   }, [selectedIds]);
 
   function loadOrdersByFilters() {
@@ -81,30 +94,135 @@ const ManageOrderScreen = () => {
     );
   }
 
-  function handleConfirmationSubmit() {
-    //! localFunction
+  function handleOpenModal(actionType, ids) {
+    //! clear Form
+    handleHideAlert();
+
+    setActionType(actionType);
+
+    let selectedOrders;
+    if (_.isArray(ids)) {
+      //! multiple Ids
+      setSelectedIds(ids);
+      selectedOrders = ids?.map((id) =>
+        orderSelector.orders.find((order) => order._id === id)
+      );
+    } else {
+      //! single Id
+      //! bổ sung: fix lại multiple selectedIds sau khi xóa id single Ids
+      setSelectedId(ids);
+      selectedOrders = [
+        orderSelector.orders.find((order) => order._id === ids),
+      ];
+    }
+
+    switch (actionType) {
+      /* DELETE ONE ORDER */
+      case constants.order.actionTypes.DELETE_ORDER:
+        setModalOptions({
+          variant: 'warning',
+          title: `Xác nhận xóa hóa đơn`,
+          message: `Bạn có muốn xóa hóa đơn này không? [Người nhận: ${selectedOrders[0]?.name}, Tình trạng: ${selectedOrders[0]?.status}]`,
+          nameButton: 'Xác nhận xóa',
+        });
+
+        break;
+      /* DELETE_ORDERS */
+      case constants.order.actionTypes.DELETE_ORDERS:
+        setModalOptions({
+          variant: 'warning',
+          title: `Xác nhận xóa nhiều hóa đơn`,
+          message: `Bạn có muốn xóa những hóa đơn này không? [Người nhận: ${selectedOrders[0]?.name}, Tình trạng: ${selectedOrders[0]?.status}, ...]`,
+          nameButton: 'Xác nhận xóa nhiều',
+        });
+
+        break;
+
+      default:
+        setAlertOptions({
+          variant: 'danger',
+          title: `Hệ thống đang phát triển chức năng`,
+          message: `Chức năng này đang được phát triển hoặc nâng cấp. Xin vui lòng xử dụng chức năng này sau!`,
+        });
+
+        handleShowAlert();
+        return;
+    }
+
+    //! Show Confirmation Modal
+    handleShowModal();
+  }
+
+  async function handleConfirmationSubmit() {
+    console.log('handleSubmit');
+    try {
+      //! single Ids
+      if (actionType === constants.order.actionTypes.DELETE_ORDER) {
+        /* REMOVE USER ACCOUNT */
+        const response = await dispatch(deleteOrder(selectedId)).unwrap();
+
+        setAlertOptions({
+          variant: response.success ? 'success' : 'danger',
+          title: `Xóa hóa đơn thành công`,
+          message: response.message,
+        });
+
+        checkSelectedIds();
+      } else if (actionType === constants.order.actionTypes.DELETE_ORDERS) {
+        /* RESET PASSWORD */
+        const response = await dispatch(deleteOrders(selectedIds)).unwrap();
+        setAlertOptions({
+          variant: response.success ? 'success' : 'danger',
+          title: `Xóa nhiều hóa đơn thành công`,
+          message: response.message,
+        });
+
+        resetCheckAll();
+      }
+
+      handleHideModal();
+      handleShowAlert();
+      //! re-load
+      loadOrdersByFilters();
+      // checkSelectedIds();
+
+      //! gotoTop
+      scrollToTop();
+    } catch (error) {
+      handleHideModal();
+
+      setAlertOptions({
+        variant: 'danger',
+        title: 'Lỗi hệ thống',
+        message:
+          error.response?.data?.message ||
+          error.response?.message ||
+          error.message,
+      });
+      setShowAlert(true);
+      toast.error(error.response?.message || error.massage);
+    }
   }
 
   function handleHideAlert() {
-    showAlert(false);
+    setShowAlert(false);
   }
 
   function handleShowAlert() {
-    showAlert(true);
+    setShowAlert(true);
   }
 
   function handleHideModal() {
-    showModal(false);
+    setShowModal(false);
   }
 
   function handleShowModal() {
-    showModal(true);
+    setShowModal(true);
   }
 
   function handleCheckChange(e) {
     const { id, checked } = e.target;
-    console.log('id: ', id);
-    console.log('checked: ', checked);
+
     if (!checked) {
       setSelectedIds((prevState) =>
         prevState.filter((orderId) => orderId !== id)
@@ -127,16 +245,6 @@ const ManageOrderScreen = () => {
     }
   }
 
-  const selectedIdsCountRef = React.useRef(0);
-  console.log(
-    '%c__Debugger__ManageOrderScreen\n__***__selectedIds__',
-    'color: chartreuse;',
-    (selectedIdsCountRef.current += 1),
-    ':',
-    selectedIds,
-    '\n'
-  );
-
   function triggerSelectChange(eventKey) {
     if (eventKey === constants.order.tabs.ALL_ORDERS) {
       setSearch((prevState) => ({ ...prevState, keyword: '', status: '' }));
@@ -154,9 +262,14 @@ const ManageOrderScreen = () => {
 
   function resetCheckAll() {
     //! reset CheckAll
-    if (isCheckAll) {
-      handleCheckAllChange();
-    }
+    setSelectedId('');
+    setSelectedIds([]);
+    setIsCheckAll(false);
+  }
+
+  function checkSelectedIds() {
+    if (selectedIds.length === 0) return;
+    setSelectedIds((prevState) => prevState.filter((id) => id !== selectedId));
   }
 
   const tabItems = [
@@ -170,6 +283,9 @@ const ManageOrderScreen = () => {
           selectedIds={selectedIds}
           setSearch={setSearch}
           isCheckAll={isCheckAll}
+          keyword={keyword}
+          setKeyword={setKeyword}
+          handleOpenModal={handleOpenModal}
           handleCheckChange={handleCheckChange}
           handleCheckAllChange={handleCheckAllChange}
         />
@@ -185,6 +301,9 @@ const ManageOrderScreen = () => {
           selectedIds={selectedIds}
           setSearch={setSearch}
           isCheckAll={isCheckAll}
+          keyword={keyword}
+          setKeyword={setKeyword}
+          handleOpenModal={handleOpenModal}
           handleCheckChange={handleCheckChange}
           handleCheckAllChange={handleCheckAllChange}
         />
@@ -200,6 +319,9 @@ const ManageOrderScreen = () => {
           selectedIds={selectedIds}
           setSearch={setSearch}
           isCheckAll={isCheckAll}
+          keyword={keyword}
+          setKeyword={setKeyword}
+          handleOpenModal={handleOpenModal}
           handleCheckChange={handleCheckChange}
           handleCheckAllChange={handleCheckAllChange}
         />
@@ -215,6 +337,9 @@ const ManageOrderScreen = () => {
           selectedIds={selectedIds}
           setSearch={setSearch}
           isCheckAll={isCheckAll}
+          keyword={keyword}
+          setKeyword={setKeyword}
+          handleOpenModal={handleOpenModal}
           handleCheckChange={handleCheckChange}
           handleCheckAllChange={handleCheckAllChange}
         />
@@ -230,6 +355,9 @@ const ManageOrderScreen = () => {
           selectedIds={selectedIds}
           setSearch={setSearch}
           isCheckAll={isCheckAll}
+          keyword={keyword}
+          setKeyword={setKeyword}
+          handleOpenModal={handleOpenModal}
           handleCheckChange={handleCheckChange}
           handleCheckAllChange={handleCheckAllChange}
         />
@@ -252,11 +380,11 @@ const ManageOrderScreen = () => {
     <>
       <BreadcrumbComponent breadcrumbItems={breadcrumbItems} />
       <AlertDismissibleComponent
+        show={showAlert}
+        handleHideAlert={handleHideAlert}
         variant={alertOptions.variant}
         title={alertOptions.title}
         message={alertOptions.message}
-        show={showAlert}
-        setShow={setShowAlert}
         alwaysShown={true}
       />
       <div className="col-10 col-md-11">
@@ -295,15 +423,3 @@ const ManageOrderScreen = () => {
 };
 
 export default ManageOrderScreen;
-// {orderSelector.orders?.length > 0 &&
-//   orderSelector.orders?.map((order) => {
-//     return (
-//       <Col key={order._id} xs={12}>
-//         <p>{order._id}</p>
-//         {/* <AdminUserCard
-//           entity={entity}
-//           handleShowModal={handleShowModal}
-//         /> */}
-//       </Col>
-//     );
-//   })}

@@ -5,7 +5,7 @@ import { Card, Button } from 'react-bootstrap';
 //! imp Comps
 import MenuButton from '../Button/MenuButton';
 
-const AdminUserCard = ({ entity, handleShowModal }) => {
+const AdminUserCard = ({ entity, handleOpenModal }) => {
   const REACT_APP_SERVER = 'http://127.0.0.1';
   const REACT_APP_PORT = 5000;
   const isAdmin = entity.roles?.map((role) => role.name).includes('admin');
@@ -19,8 +19,8 @@ const AdminUserCard = ({ entity, handleShowModal }) => {
           </Link>
 
           <MenuButton
-            handleClickActionSubmit={(typeAction) =>
-              handleShowModal(typeAction, [entity._id])
+            handleClickActionTypeSubmit={(actionType) =>
+              handleOpenModal(actionType, [entity._id])
             }
           />
         </div>

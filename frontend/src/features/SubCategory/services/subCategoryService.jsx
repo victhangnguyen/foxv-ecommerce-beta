@@ -18,7 +18,7 @@ const subCategoryService = {
   getSubCategoriesByFilters: (filterOptions) => {
     // const { keyword, sort, order, page, perPage } = filterOptions
     const url = `/subcategories/search/filters`;
-    const urlQueryParams = urlHandling.queryParam(url, filterOptions);
+    const urlQueryParams = urlHandling.serializeQueryParams(url, filterOptions);
     return axiosInstance.get(urlQueryParams);
   },
   createSubCategory: (subCategory) => {

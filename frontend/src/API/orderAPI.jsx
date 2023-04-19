@@ -31,7 +31,7 @@ export function getOrderById(orderId) {
 
 export function getOrdersByFilters({ sort, order, page, perPage, search }) {
   const url = `/orders/search/filters`;
-  const urlQueryParams = urlHandling.queryParam(url, {
+  const urlQueryParams = urlHandling.serializeQueryParams(url, {
     sort,
     order,
     page,
@@ -39,4 +39,36 @@ export function getOrdersByFilters({ sort, order, page, perPage, search }) {
     ...search,
   });
   return axiosInstance.get(urlQueryParams);
+}
+
+//! Private: Admin
+export function deleteOrder(orderId) {
+  const url = `/admin/orders/delete-one?orderId=${orderId}`;
+  return axiosInstance.delete(url);
+}
+
+//! Private: Admin
+export function deleteOrders(orderIds) {
+  const url = `/admin/orders/delete-multiple`;
+  const urlQueryParams = urlHandling.serializeQueryArray(
+    url,
+    orderIds,
+    'orderIds'
+  );
+  return axiosInstance.delete(urlQueryParams);
+}
+
+//! Private: Admin
+export function updateOrderById(
+  orderId,
+  { address, bankTranNo, name, status, transactionNo }
+) {
+  const url = `/admin/orders/${orderId}/update`;
+  return axiosInstance.put(url, {
+    address,
+    bankTranNo,
+    name,
+    status,
+    transactionNo,
+  });
 }

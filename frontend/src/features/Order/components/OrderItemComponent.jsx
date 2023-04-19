@@ -5,17 +5,17 @@ import MenuButtonComponent from '../../../components/Button/MenuButtonComponent'
 //! imp Constants
 import constants from '../../../constants';
 
-const OrderItemComponent = ({ order, selectedIds, handleCheckChange }) => {
+const OrderItemComponent = ({
+  order,
+  selectedIds,
+  handleCheckChange,
+  handleOpenModal,
+}) => {
   const menuItems = [
     {
-      key: 'dropdown-item-0',
+      key: 'menu-item-0',
       label: 'Xóa hóa đơn',
-      actionType: constants.order.menuButtons.DELETE_ORDERS,
-    },
-    {
-      key: 'dropdown-item-1',
-      label: 'Reset Password',
-      actionType: 'RESET_PASSWORDS',
+      actionType: constants.order.actionTypes.DELETE_ORDER,
     },
   ];
 
@@ -59,7 +59,12 @@ const OrderItemComponent = ({ order, selectedIds, handleCheckChange }) => {
           //! status
         }
         <td className="py-1 px-3 tab__menu">
-          <MenuButtonComponent menuItems={menuItems} />
+          <MenuButtonComponent
+            menuItems={menuItems}
+            handleClickActionTypeSubmit={(actionType) =>
+              handleOpenModal(actionType, order._id)
+            }
+          />
         </td>
       </tr>
       <tr id="spacing-row">

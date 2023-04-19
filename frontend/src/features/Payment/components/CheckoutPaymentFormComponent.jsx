@@ -28,7 +28,7 @@ const CheckoutPaymentFormComponent = ({
     address: yup
       .string()
       .min(2, 'Ít nhất 8 ký tự.')
-      .max(32, 'Nhiều nhất 256 ký tự.')
+      .max(256, 'Nhiều nhất 256 ký tự.')
       .required('Vui lòng nhập Địa chỉ của bạn.'),
     // email: yup
     //   .string()

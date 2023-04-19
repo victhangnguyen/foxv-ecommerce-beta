@@ -3,7 +3,7 @@ import { Alert, Button } from 'react-bootstrap';
 
 const AlertDismissibleComponent = ({
   show,
-  setShow,
+  handleHideAlert,
   children,
   title,
   labelButton,
@@ -16,7 +16,7 @@ const AlertDismissibleComponent = ({
   React.useEffect(() => {
     if (!alwaysShown) {
       const timer = setTimeout(() => {
-        setShow(false);
+        handleHideAlert();
       }, 5000);
       return () => clearTimeout(timer);
     }
@@ -35,7 +35,7 @@ const AlertDismissibleComponent = ({
         <div>{children ? children : message}</div>
         <hr />
         <div className="d-flex justify-content-end">
-          <Button onClick={() => setShow(false)} variant={`outline-${variant}`}>
+          <Button onClick={handleHideAlert} variant={`outline-${variant}`}>
             {labelButton
               ? labelButton
               : alwaysShown

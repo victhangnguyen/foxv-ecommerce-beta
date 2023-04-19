@@ -18,7 +18,7 @@ const productService = {
   },
   getProductList: (params) => {
     const url = `/products`;
-    const urlQueryParams = urlHandling.queryParam(url, params);
+    const urlQueryParams = urlHandling.serializeQueryParams(url, params);
     return axiosInstance.get(urlQueryParams);
   },
   createProduct: (product) => {
@@ -44,7 +44,7 @@ const productService = {
     return axiosInstance.delete(url);
   },
   removeProducts: (productIds) => {
-    const idPairs = urlHandling.queryIds(productIds);
+    const idPairs = urlHandling.serializeQueryArray(productIds);
     const url = `/products?${idPairs}`;
     return axiosInstance.delete(url);
   },

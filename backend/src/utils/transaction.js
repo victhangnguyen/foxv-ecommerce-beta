@@ -1,12 +1,12 @@
 import mongoose from 'mongoose';
 //! imp Libraries
 import Logging from '../library/Logging.js';
-export async function execWithTransaction(callbackFn) {
+export async function execWithTransaction(sessionCallbackFn) {
   //! session: callback
   const session = await mongoose.startSession();
   session.startTransaction(); //! error will be throwed by Promise.rejected
   try {
-    const result = await callbackFn(session); //! callback with emmit session
+    const result = await sessionCallbackFn(session); //! callback with emmit session
 
     //! Commit the database's changes
     await session.commitTransaction();

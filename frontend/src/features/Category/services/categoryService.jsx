@@ -10,7 +10,7 @@ const categoryService = {
   getCategoriesByFilters: (filterOptions) => {
     // const { keyword, sort, order, page, perPage } = filterOptions
     const url = `/categories/search/filters`;
-    const urlQueryParams = urlHandling.queryParam(url, filterOptions);
+    const urlQueryParams = urlHandling.serializeQueryParams(url, filterOptions);
     return axiosInstance.get(urlQueryParams);
   },
   getCategories: () => {
@@ -25,7 +25,7 @@ const categoryService = {
   updateCategoryBySlug: (slug, category) => {
     const { name } = category;
     const url = `/admin/categories/slug/${slug}/update-info`;
-    const urlQueryParams = urlHandling.queryParam(url, { name });
+    const urlQueryParams = urlHandling.serializeQueryParams(url, { name });
     return axiosInstance.put(urlQueryParams);
   },
   deleteCategoryBySlug: (slug) => {

@@ -2,7 +2,7 @@ import React from 'react';
 import { Dropdown } from 'react-bootstrap';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
-const MenuButtonComponent = ({ handleClickActionSubmit, menuItems }) => {
+const MenuButtonComponent = ({ handleClickActionTypeSubmit, menuItems }) => {
   const CustomToggle = React.forwardRef(({ children, onClick }, ref) => (
     <button
       className="btn btn-EllipsisV"
@@ -22,7 +22,7 @@ const MenuButtonComponent = ({ handleClickActionSubmit, menuItems }) => {
     <Dropdown.Item
       key={item.key}
       eventKey={item.key}
-      onClick={() => handleClickActionSubmit(item.actionType)}
+      onClick={() => handleClickActionTypeSubmit(item.actionType)}
     >
       {item.label}
     </Dropdown.Item>

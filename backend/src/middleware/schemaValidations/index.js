@@ -12,3 +12,4 @@ export {
   createSubCategorySchema,
   updateSubCategorySchema,
 } from './subCategorySchemaValidations.js';
+export { updateOrderSchema } from './orderSchemaValidations.js';

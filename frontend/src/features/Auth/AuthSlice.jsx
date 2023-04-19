@@ -78,11 +78,6 @@ export const refreshToken = createAsyncThunk(
       const response = await authService.refreshToken({
         refreshToken,
       });
-      console.log(
-        '__Debugger__AuthSlice\n__refreshToken__response: ',
-        response,
-        '\n'
-      );
       return thunkAPI.fulfillWithValue(response);
     } catch (error) {
       return thunkAPI.rejectWithValue({
@@ -169,6 +164,7 @@ const authSlice = createSlice({
       .addCase(refreshToken.rejected, (state, action) => {
         console.log('refreshToken.rejected action.payload: ', action.payload);
         state.loading = false;
+        state.token = null;
         state.success = action.payload?.success;
         state.error = action.payload?.error;
       });

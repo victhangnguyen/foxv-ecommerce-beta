@@ -1,10 +1,8 @@
-import { checkoutOrder, getOrderById, getOrdersByFilters } from './orderAPI';
+import * as orderAPI from './orderAPI';
 
 const API = {
   //! order
-  checkoutOrder,
-  getOrderById,
-  getOrdersByFilters,
+  order: orderAPI,
 };
 
 export default API;

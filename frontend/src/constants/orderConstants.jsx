@@ -14,7 +14,8 @@ const orderConstants = {
     PAID: 'paid',
     COMPLETED: 'completed',
   },
-  menuButtons: {
+  actionTypes: {
+    DELETE_ORDER: 'DELETE_ORDER',
     DELETE_ORDERS: 'DELETE_ORDERS',
   },
 };

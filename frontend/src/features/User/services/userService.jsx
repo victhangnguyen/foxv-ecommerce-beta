@@ -10,20 +10,20 @@ const userService = {
   },
   getUsersByFilters: (params) => {
     const url = `/users/search/filters`;
-    const urlQueryParams = urlHandling.queryParam(url, params);
+    const urlQueryParams = urlHandling.serializeQueryParams(url, params);
     return axiosInstance.get(urlQueryParams);
   },
   //! Private: Admin
   deleteUsers: (userIds) => {
-    const idPairs = urlHandling.queryIds(userIds);
-    const url = `/admin/users/delete-multiple?${idPairs}`;
-    return axiosInstance.delete(url);
+    const url = `/admin/users/delete-multiple`;
+    const urlQueryParams = urlHandling.serializeQueryArray(url, userIds);
+    return axiosInstance.delete(urlQueryParams);
   },
   //! Private: Admin
   resetPasswords: (userIds) => {
-    const idPairs = urlHandling.queryIds(userIds);
-    const url = `/admin/users/password/reset-multiple?${idPairs}`;
-    return axiosInstance.put(url);
+    const url = `/admin/users/password/reset-multiple`;
+    const urlQueryParams = urlHandling.serializeQueryArray(url, userIds);
+    return axiosInstance.put(urlQueryParams);
   },
   //! Private: Admin
   updateUserInfo: (userId, dataFields) => {
@@ -49,7 +49,7 @@ const userService = {
   //! Private: Admin
   updateRole: (userId, role) => {
     const url = `/admin/users/${userId}/update-role`;
-    const urlQueryParams = urlHandling.queryParam(url, { role });
+    const urlQueryParams = urlHandling.serializeQueryParams(url, { role });
     return axiosInstance.put(urlQueryParams);
   },
 };

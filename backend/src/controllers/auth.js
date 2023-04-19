@@ -109,6 +109,7 @@ export const signin = async (req, res, next) => {
 
     const token = authService.generateAccessToken(user._id);
     const refreshToken = await authService.generateRefreshToken(user._id);
+    console.log('__Debugger__auth\n__signin__refreshToken: ', refreshToken, '\n');
 
     return res.status(201).json({
       success: true,

@@ -1,5 +1,6 @@
-import _ from 'lodash';
 import React from 'react';
+import _ from 'lodash';
+import { toast } from 'react-toastify';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate, useParams } from 'react-router-dom';
 //! imp Utils
@@ -14,7 +15,7 @@ import OrderFormComponent from '../components/OrderFormComponent';
 
 //! imp Actions
 import { emptyCart } from '../../Cart/CartSlice';
-import { emptyNewOrder, getOrderById } from '../OrderSlice';
+import { emptyNewOrder, getOrderById, updateOrder } from '../OrderSlice';
 
 //! imp API
 import API from '../../../API';
@@ -46,7 +47,7 @@ const AddEditOrderScreen = ({ entity }) => {
     async function hanldeNewOrder() {
       try {
         //! update newOrder
-        const response = await API.getOrderById(order.newOrder?._id);
+        const response = await API.order.getOrderById(order.newOrder?._id);
         switch (response.data.order.status) {
           case constants.order.status.CANCELED:
             // emptyNewOrder
@@ -60,6 +61,9 @@ const AddEditOrderScreen = ({ entity }) => {
             break;
 
           default:
+            //! resetForm
+            // dispatch(emptyCart());
+            // dispatch(emptyNewOrder());
             break;
         }
       } catch (error) {
@@ -72,34 +76,93 @@ const AddEditOrderScreen = ({ entity }) => {
 
   async function loadOrderById(orderId) {
     try {
-      await dispatch(getOrderById(orderId));
+      const response = await dispatch(getOrderById(orderId));
     } catch (error) {
       console.log('Error: ', error);
     }
   }
 
+  async function handleUpdateSubmit(data, e, methods) {
+    const isEqualData = _.isEqual(initialValues, data);
+
+    if (isEqualData) {
+      return toast.error('Chưa có thông tin nào thay đổi.');
+    }
+
+    try {
+      const response = await dispatch(
+        updateOrder({ orderId, orderData: data })
+      ).unwrap();
+      if (response.success) {
+        //! reload Order
+        await loadOrderById(orderId);
+
+        console.log('response: ', response);
+
+        setAlertOptions({
+          variant: 'success',
+          title: 'Thay đổi thông tin thành công!',
+          message: `Bạn đã thay đổi thông tin đơn hàng thành công.`,
+        });
+
+        handleShowAlert();
+      }
+    } catch (error) {
+      //! Error Handling 422
+      if (error.response?.status === 422) {
+        const errors = error.response.data.errors;
+        if (!errors.length) return;
+        errors.forEach((error) => {
+          methods.setError(error.param, {
+            type: 'server',
+            message: error.msg,
+          });
+        });
+
+        return;
+      }
+
+      //! Error Handling Other
+      setAlertOptions({
+        variant: 'danger',
+        title: 'Lỗi hệ thống',
+        message:
+          error.response?.data?.message ||
+          error.response?.message ||
+          error.message,
+      });
+      setShowAlert(true);
+      toast.error(error.response?.message || error.massage);
+    }
+  }
+
+  function handleShowAlert() {
+    setShowAlert(true);
+  }
+
+  function handleHideAlert() {
+    setShowAlert(false);
+  }
+
   const initialValues = {
+    orderId: order.order?._id,
+    userId: order.order?.user,
     name: order.order?.name,
     address: order.order?.address,
-    orderId: order.order?._id,
     orderDate: order.order?.orderDate,
     status: order.order?.status,
     transactionNo: order.order?.transactionNo,
     bankTranNo: order.order?.bankTranNo,
   };
 
-  function handleCheckoutOrderSubmit() {
-    //! localFunction
-  }
-
   return (
-    <div className="container d-flex">
+    <div className="container">
       <AlertDismissibleComponent
         variant={alertOptions.variant}
         title={alertOptions.title}
         message={alertOptions.message}
         show={showAlert}
-        setShow={setShowAlert}
+        handleHideAlert={handleHideAlert}
         alwaysShown={true}
       />
 
@@ -128,7 +191,10 @@ const AddEditOrderScreen = ({ entity }) => {
           </div>
         </div>
         <div className="col-md-6 col-lg-6 col-xl-7 offset-md-1">
-          <OrderFormComponent initialValues={initialValues} />
+          <OrderFormComponent
+            initialValues={initialValues}
+            onSubmit={handleUpdateSubmit}
+          />
         </div>
       </div>
     </div>
@@ -136,20 +202,3 @@ const AddEditOrderScreen = ({ entity }) => {
 };
 
 export default AddEditOrderScreen;
-
-/*
-  https://sandbox.vnpayment.vn/paymentv2/vpcpay.html?
-  vnp_Amount=1806000
-  vnp_Command=pay
-  vnp_CreateDate=20210801153333
-  vnp_CurrCode=VND
-  vnp_IpAddr=127.0.0.1
-  vnp_Locale=vn
-  vnp_OrderInfo=Thanh+toan+don+hang+%3A5
-  vnp_OrderType=other
-  vnp_ReturnUrl=https%3A%2F%2Fdomainmerchant.vn%2FReturnUrl
-  vnp_TmnCode=DEMOV210
-  vnp_TxnRef=5
-  vnp_Version=2.1.0
-  vnp_SecureHash=3e0d61a0c0534b2e36680b3f7277743e8784cc4e1d68fa7d276e79c23be7d6318d338b477910a27992f5057bb1582bd44bd82ae8009ffaf6d141219218625c42
-*/

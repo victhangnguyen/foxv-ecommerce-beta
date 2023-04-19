@@ -21,6 +21,7 @@ import subCategoryService from '../../features/SubCategory/services/subCategoryS
 //! imp Actions
 import { signout } from '../../features/Auth/AuthSlice';
 import { postCart } from '../../features/Cart/CartSlice';
+import { emptyNewOrder } from '../../features/Order/OrderSlice';
 
 const HeaderComponent = () => {
   const dispatch = useDispatch();
@@ -48,11 +49,15 @@ const HeaderComponent = () => {
   const [categories, setCategories] = React.useState([]);
   const [subCategories, setSubCategories] = React.useState([]);
 
-  const handleLogout = async () => {
-    //! save Cart
-    await dispatch(postCart());
+  const handleLogout = () => {
     //! logout
     dispatch(signout());
+
+    //! save Cart
+    dispatch(postCart());
+    //! empty Order
+    dispatch(emptyNewOrder());
+
     navigate('/auth/login');
     toast.success(`${auth.user.lastName} has successfully signed out!`);
   };

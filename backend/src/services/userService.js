@@ -53,6 +53,10 @@ async function resetPasswordAndSendEmail(userId, session) {
 async function deleteUser(userId, session) {
   const user = await User.findById(userId).populate('roles').session(session);
 
+  if (!user) {
+    throw new Error('User does not exist!'); //! Forbidden
+  }
+
   const roles = user.roles.map((role) => role.name);
 
   const isAdmin = roles.includes('admin');
@@ -61,10 +65,6 @@ async function deleteUser(userId, session) {
     throw Error('You are not authorized to delete Admin roles.'); //! Forbidden
   }
   const deletedUser = await user.remove({ session });
-
-  if (!user) {
-    throw new Error('User does not exist!'); //! Forbidden
-  }
 
   return deletedUser;
 }

@@ -4,15 +4,15 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 //! imp actionTypes
 import { DELETE_USERS, RESET_PASSWORDS } from '../../services/actionTypes';
 
-const MenuButton = ({ handleClickActionSubmit }) => {
-  const dropdownItems = [
+const MenuButton = ({ handleClickActionTypeSubmit }) => {
+  const menuItems = [
     {
-      key: 'dropdown-item-0',
+      key: 'menu-item-0',
       label: 'Xóa tài khoản',
       actionType: DELETE_USERS,
     },
     {
-      key: 'dropdown-item-1',
+      key: 'menu-item-1',
       label: 'Reset Password',
       actionType: RESET_PASSWORDS,
     },
@@ -33,11 +33,11 @@ const MenuButton = ({ handleClickActionSubmit }) => {
     </button>
   ));
 
-  const renderDropdownItems = dropdownItems.map((item) => (
+  const renderDropdownItems = menuItems.map((item) => (
     <Dropdown.Item
       key={item.key}
       eventKey={item.key}
-      onClick={() => handleClickActionSubmit(item.actionType)}
+      onClick={() => handleClickActionTypeSubmit(item.actionType)}
     >
       {item.label}
     </Dropdown.Item>
