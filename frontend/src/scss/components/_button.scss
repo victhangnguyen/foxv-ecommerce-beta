@@ -1,0 +1,34 @@
+//! button btn-EllipsisV
+.btn-EllipsisV {
+  width: 2rem;
+  height: 2rem;
+}
+
+//! Back-To-Top Butotn
+.back-to-top-btn {
+  z-index: 250;
+  position: fixed;
+  right: 25px;
+  bottom: 25px;
+  border-radius: 25%;
+  height: 50px;
+  width: 50px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  transition: opacity 0.2s;
+  pointer-events: none;
+  opacity: 0;
+  background-color: $color-foxv-10;
+  border: none;
+  cursor: pointer;
+}
+
+.back-to-top-btn--visible {
+  pointer-events: all;
+  opacity: 1;
+}
+
+.back-to-top-btn svg {
+  font-size: 23px;
+}

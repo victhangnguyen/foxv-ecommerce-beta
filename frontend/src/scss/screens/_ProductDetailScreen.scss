@@ -1,0 +1,45 @@
+.gallery-wrap {
+  .img-product-main-wrap {
+    margin-bottom: 10px;
+    border-radius: 0.37rem;
+    overflow: hidden;
+    background-color: #fff;
+  }
+
+  .thumbs-wrap {
+    text-align: center;
+    margin-bottom: 20px;
+    .item-thumb {
+      width: 60px;
+      height: 60px;
+      border: 1px solid #ddd;
+      border-radius: 6px;
+      margin: 3px;
+      display: inline-block;
+      overflow: hidden;
+      img {
+        max-width: 100%;
+        max-height: 100%;
+        -o-object-fit: cover;
+        object-fit: cover;
+        border-radius: 4px;
+        cursor: zoom-in;
+      }
+      img:hover {
+        -webkit-filter: brightness(1.1);
+        filter: brightness(1.1);
+        cursor: zoom-in;
+      }
+    }
+  }
+}
+
+.card {
+  .card-id {
+    text-transform: uppercase;
+  }
+  .card-price {
+    font-weight: 600;
+    color: #212529;
+  }
+}

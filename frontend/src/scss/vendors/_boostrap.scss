@@ -1,0 +1,35 @@
+@import '../abstracts/variables';
+
+.navbar {
+  padding: $bs-navbar-padding-y $bs-navbar-padding-x;
+  border-bottom: 2px solid $bs-dark;
+  background-color: $bs-light !important;
+
+  .navbar-brand {
+    & img {
+      padding: $bs-navbar-brand-padding-y $bs-navbar-brand-padding-x;
+      width: 7.5rem;
+    }
+  }
+  .navbar-nav {
+    .nav-link {
+      padding: $bs-nav-link-padding-y $bs-nav-link-padding-x;
+    }
+  }
+}
+
+.breadcrumb {
+  .breadcrumb-item {
+    //! Link
+    a {
+      text-decoration: none;
+      color: $color-secondary;
+    }
+
+    &.active {
+      a {
+        font-weight: bold;
+      }
+    }
+  }
+}
