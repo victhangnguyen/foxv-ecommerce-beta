@@ -5,6 +5,7 @@ const isAdmin = async function (req, res, next) {
   try {
     //! check Role
     const roles = req.user.roles.map((role) => role.name);
+    console.log('__Debugger__isAdmin\n__isAdmin__roles: ', roles, '\n');
     const isAdmin = roles.includes('admin');
 
     if (!isAdmin) {

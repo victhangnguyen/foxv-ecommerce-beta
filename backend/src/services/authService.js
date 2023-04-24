@@ -68,6 +68,7 @@ async function findOrGenerateRefreshToken(userId) {
 }
 
 async function verifyRefreshToken(refreshToken) {
+  console.log('__Debugger__authService\n__verifyRefreshToken__refreshToken: ', refreshToken, '\n');
   try {
     return jwt.verify(
       refreshToken,

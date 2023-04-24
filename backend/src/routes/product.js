@@ -12,11 +12,6 @@ import { authenticate, isAdmin } from '../middleware/passport/index.js';
 
 const router = express.Router();
 
-//! @desc     Fetch Count of All Products
-//! @route    GET /api/products/total
-//! @access   Public
-router.get('/products/total', productController.productsCount);
-
 //! @desc     Fetch all products with Pagination
 //! @route    GET /api/products
 //! @access   Public

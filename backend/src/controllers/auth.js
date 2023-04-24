@@ -109,7 +109,11 @@ export const signin = async (req, res, next) => {
 
     const token = authService.generateAccessToken(user._id);
     const refreshToken = await authService.generateRefreshToken(user._id);
-    console.log('__Debugger__auth\n__signin__refreshToken: ', refreshToken, '\n');
+    console.log(
+      '__Debugger__auth\n__signin__refreshToken: ',
+      refreshToken,
+      '\n'
+    );
 
     return res.status(201).json({
       success: true,
@@ -132,6 +136,11 @@ export const signin = async (req, res, next) => {
 
 export const refreshToken = async (req, res, next) => {
   const { refreshToken } = req.body;
+  console.log(
+    '__Debugger__auth\n__refreshToken__refreshToken: ',
+    refreshToken,
+    '\n'
+  );
 
   try {
     // If refresh token is missing
@@ -148,13 +157,13 @@ export const refreshToken = async (req, res, next) => {
 
         return res.status(201).json({
           success: true,
-          message: 'refresh AccessToken successful',
+          message: 'Refresh AccessToken successful',
           data: { token },
         });
       })
       .catch((error) => {
         if (error instanceof jwt.TokenExpiredError) {
-          return res.status(403).send({
+          return res.status(403).json({
             success: false,
             // message: 'Unauthorized! Refresh Token was expired.',
             message:
@@ -163,8 +172,8 @@ export const refreshToken = async (req, res, next) => {
         }
 
         return res
-          .sendStatus(401)
-          .send({ success: false, message: 'Unauthorized!' });
+          .status(401)
+          .json({ success: false, message: 'Unauthorized!' });
       });
   } catch (error) {
     next(error);

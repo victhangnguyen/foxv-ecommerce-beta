@@ -2,7 +2,7 @@ import React from 'react';
 import { Form } from 'react-bootstrap';
 
 const ToolCategoryComponent = ({ label, categories, handleCategoryChange }) => {
-  const renderCategories = categories.map((category) => (
+  const renderCategories = categories?.map((category) => (
     <option key={category._id} value={category._id}>{category.name}</option>
   ));
 

@@ -7,7 +7,7 @@ import SelectControllerComponent from '../../../../components/Form/SelectControl
 import InputComponent from '../../../../components/Form/InputComponent';
 
 const validationSchema = yup.object({
-  categoryId: yup.string().required('Xin vui lòng chọn Kiểu sản phẩm.'),
+  parent: yup.string().required('Xin vui lòng chọn Kiểu sản phẩm.'),
   name: yup
     .string()
     .min(2, 'Ít nhất 2 ký tự.')
@@ -16,7 +16,7 @@ const validationSchema = yup.object({
 });
 
 const SubCategoryFormComponent = ({
-  entitySlug,
+  subCategoryId,
   categories,
   loading,
   handleSubmit,
@@ -39,7 +39,7 @@ const SubCategoryFormComponent = ({
       }
       <SelectControllerComponent
         triggerSelectChange={triggerSelectChange}
-        name={'categoryId'}
+        name={'parent'}
         label={'Loại sản phẩm (CategoryId)'}
         optionLabel={'Vui lòng chọn Kiểu sản phẩm'}
         options={categoryOptions}
@@ -56,7 +56,7 @@ const SubCategoryFormComponent = ({
       {
         //! sub: slug
       }
-      {entitySlug && (
+      {subCategoryId && (
         <InputComponent
           disabled={true}
           name={'slug'}
@@ -69,7 +69,7 @@ const SubCategoryFormComponent = ({
       }
       <div>
         <Button variant="primary" type="submit">
-          {loading ? 'Loading...' : entitySlug ? 'Cập nhật' : 'Tạo Kiểu ngay'}
+          {loading ? 'Loading...' : subCategoryId ? 'Cập nhật' : 'Tạo Kiểu ngay'}
         </Button>
       </div>
     </FormComponent>

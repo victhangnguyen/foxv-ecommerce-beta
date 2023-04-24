@@ -109,7 +109,7 @@ const router = createBrowserRouter([
               },
               { path: 'categories/create', element: <CategoryCreateScreen /> },
               {
-                path: 'categories/:slug/update',
+                path: 'categories/:categoryId/update',
                 element: <CategoryUpdateScreen />,
               },
               {
@@ -117,7 +117,7 @@ const router = createBrowserRouter([
                 element: <SubCategoryCreateScreen />,
               },
               {
-                path: 'subcategories/:slug/update',
+                path: 'subcategories/:subCategoryId/update',
                 element: <SubCategoryUpdateScreen />,
               },
             ],

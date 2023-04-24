@@ -1,11 +1,42 @@
+import mongoose from 'mongoose';
 //! imp Library
 import Logging from '../library/Logging.js';
 //! imp Utils
 import generateSlug from '../utils/generateSlug.js';
+import { execWithTransaction } from '../utils/transaction.js';
 
 //! imp Models
 import Category from '../models/Category.js';
 import Product from '../models/Product.js';
+
+//! imp Services
+import categoryService from '../services/categoryService.js';
+
+export async function getCategoryById(req, res, next) {
+  const categoryId = req.params.categoryId;
+
+  try {
+    if (!mongoose.Types.ObjectId.isValid(categoryId)) {
+      throw new Error('Category does not exist!');
+    }
+    const category = await Category.findById(categoryId).exec();
+
+    if (!category) {
+      throw new Error('Category does not exist!');
+    }
+
+    res.status(200).json({
+      success: true,
+      message: 'Fetch a Category by Id successful!',
+      data: { category },
+    });
+  } catch (error) {
+    Logging.error('Error__ctrls__category: ' + error);
+    const err = new Error(error);
+    err.statusCode = 400;
+    return next(err);
+  }
+}
 
 export async function getCategoryBySlug(req, res, next) {
   const slug = req.params.slug;
@@ -34,6 +65,7 @@ export async function getCategoryBySlug(req, res, next) {
 export async function getCategories(req, res, next) {
   try {
     const categories = await Category.find({}).sort({ createdAt: -1 }).exec();
+
     res.status(200).json({
       success: true,
       message: 'Fetch all of Categories successful!',
@@ -108,7 +140,6 @@ export async function createCategory(req, res, next) {
   const { name } = req.body;
   try {
     const slug = await generateSlug(name, 'Category');
-    console.log('__Debugger__category\n__createCategory__slug: ', slug, '\n');
 
     const newCategory = await new Category({
       name,
@@ -116,6 +147,42 @@ export async function createCategory(req, res, next) {
     }).save();
 
     res.status(201).json({ success: true, data: { category: newCategory } });
+  } catch (error) {
+    Logging.error('Error__ctrls__category: ' + error);
+    const err = new Error(error);
+    err.statusCode = 400;
+    return next(err);
+  }
+}
+
+export async function updateCategoryById(req, res, next) {
+  const categoryId = req.params.categoryId;
+
+  const { name } = req.query;
+  try {
+    const categoryData = { name };
+
+    const updatedCategory = await execWithTransaction(async (session) => {
+      const result = await categoryService.updateCategoryById(
+        categoryId,
+        categoryData,
+        session
+      );
+
+      return result;
+    });
+
+    console.log(
+      '__Debugger__category\n__updateCategoryById__updatedCategory: ',
+      updatedCategory,
+      '\n'
+    );
+
+    res.status(200).json({
+      success: true,
+      message: 'Update an Category successful!',
+      data: { updatedCategory },
+    });
   } catch (error) {
     Logging.error('Error__ctrls__category: ' + error);
     const err = new Error(error);
@@ -136,6 +203,7 @@ export async function updateCategoryBySlug(req, res, next) {
         new: true,
       }
     );
+
     res.status(200).json({
       success: true,
       message: 'Update Category successful!',
@@ -148,6 +216,32 @@ export async function updateCategoryBySlug(req, res, next) {
     return next(err);
   }
 }
+
+export const deleteCategoryById = async (req, res, next) => {
+  const categoryId = req.query.categoryId;
+
+  try {
+    const deletedCategory = await execWithTransaction(async (session) => {
+      const result = await categoryService.deleteCategoryById(
+        categoryId,
+        session
+      );
+
+      return result;
+    });
+
+    res.status(200).json({
+      success: true,
+      message: 'Delete a Category successful!',
+      data: { deletedCategory: deletedCategory },
+    });
+  } catch (error) {
+    Logging.error('Error__ctrls__category: ' + error);
+    const err = new Error(error);
+    err.statusCode = 400;
+    return next(err);
+  }
+};
 
 export const deleteCategoryBySlug = async (req, res, next) => {
   const { slug } = req.params;

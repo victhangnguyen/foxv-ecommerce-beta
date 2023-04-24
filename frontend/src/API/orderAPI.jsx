@@ -43,7 +43,7 @@ export function getOrdersByFilters({ sort, order, page, perPage, search }) {
 
 //! Private: Admin
 export function deleteOrder(orderId) {
-  const url = `/admin/orders/delete-one?orderId=${orderId}`;
+  const url = `/admin/orders/delete-single?orderId=${orderId}`;
   return axiosInstance.delete(url);
 }
 

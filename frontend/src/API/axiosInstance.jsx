@@ -83,9 +83,8 @@ export const interceptor = (store) => {
             // return a request with config
             return axiosInstance(originalConfig);
           } catch (error) {
-            //! sign out
             // If Promise.reject(err) -> throw this error to handleSubmit
-            Promise.reject(error.error);
+            Promise.reject(error.message);
           }
         }
       }

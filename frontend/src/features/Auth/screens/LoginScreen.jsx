@@ -14,9 +14,6 @@ import AlertDismissibleComponent from '../../../components/Alert/AlertDismissibl
 const LoginScreen = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  //! localState: init
-  const [loading, setLoading] = React.useState(false);
-  const [value, setvalue] = React.useState();
 
   //! localState: Alert
   const [showAlert, setShowAlert] = React.useState(false);
@@ -27,18 +24,12 @@ const LoginScreen = () => {
   });
 
   const cart = useSelector((state) => state.cart);
-  console.log('__Debugger__LoginScreen\n__***__cart: ', cart, '\n');
-
-  // React.useEffect(() => {
-  //   if (auth.error) {
-  //     setShowAlert(true);
-  //   }
-  // }, [auth.error]);
 
   const handleLoginSubmit = async (data, e, methods) => {
     const { username, password } = data;
     try {
       const response = await dispatch(signin({ username, password })).unwrap();
+
       //! load Cart
       await dispatch(getCart());
 
@@ -54,10 +45,7 @@ const LoginScreen = () => {
       }
 
       toast.success(response.message);
-      // setShowAlert(true);
     } catch (error) {
-      console.log('__Debugger__LoginScreen\n__handle__error: ', error, '\n');
-      setLoading(false);
       //! Error Handling
       if (error.response?.status === 422) {
         const errors = error.response.data.errors;
@@ -68,6 +56,7 @@ const LoginScreen = () => {
             message: error.msg,
           });
         });
+
         return;
       }
 
@@ -80,15 +69,23 @@ const LoginScreen = () => {
           error.message,
       });
 
-      setShowAlert(true);
+      handleShowAlert();
     }
   };
+
+  function handleShowAlert() {
+    setShowAlert(true);
+  }
+
+  function handleHideAlert() {
+    setShowAlert(false);
+  }
 
   return (
     <>
       <AlertDismissibleComponent
         show={showAlert}
-        setShow={setShowAlert}
+        handleHideAlert={handleHideAlert}
         variant={alertOptions.variant}
         title={alertOptions.title}
         message={alertOptions.message}

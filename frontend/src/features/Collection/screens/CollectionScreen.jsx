@@ -49,7 +49,7 @@ const CollectionScreen = () => {
   const loadCategoryBySlug = async (slug) => {
     try {
       setLoading(true);
-      const response = await categoryService.getCateogryBySlug(slug);
+      const response = await categoryService.getCategoryBySlug(slug);
       setLoading(false);
       setCategory(response.data.category);
       setProducts(response.data.products);

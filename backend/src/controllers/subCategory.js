@@ -1,3 +1,4 @@
+import mongoose from 'mongoose';
 //! imp Library
 import Logging from '../library/Logging.js';
 
@@ -7,14 +8,35 @@ import Product from '../models/Product.js';
 
 //! imp Utils
 import generateSlug from '../utils/generateSlug.js';
+import { execWithTransaction } from '../utils/transaction.js';
 
-export async function getSubCategory(req, res, next) {
+//! imp Services
+import subCategoryService from '../services/subCategoryService.js';
+
+export async function getSubCategoryById(req, res, next) {
+  const subCategoryId = req.params.subCategoryId;
+
   try {
-  } catch (err) {
-    Logging.error('Error__ctrls__subCategory: ' + err);
-    const error = new Error(err);
-    error.httpStatusCode = 400;
-    return next(error);
+    if (!mongoose.Types.ObjectId.isValid(subCategoryId)) {
+      throw new Error('SubCategory does not exist!');
+    }
+
+    const subCategory = await SubCategory.findById(subCategoryId).exec();
+
+    if (!subCategory) {
+      throw new Error('SubCategory does not exist!');
+    }
+
+    res.status(200).json({
+      success: true,
+      message: 'Fetch a SubCategory by Id successful!',
+      data: { subCategory },
+    });
+  } catch (error) {
+    Logging.error('Error__ctrls__subCategory: ' + error);
+    const err = new Error(error);
+    err.statusCode = 400;
+    return next(err);
   }
 }
 
@@ -35,7 +57,7 @@ export async function getSubCategoryBySlug(req, res, next) {
       data: { subCategory, products },
     });
   } catch (error) {
-    Logging.error('Error__ctrls__category: ' + error);
+    Logging.error('Error__ctrls__subCategory: ' + error);
     const err = new Error(error);
     err.statusCode = 400;
     return next(err);
@@ -52,7 +74,7 @@ export async function getSubCategoriesByCategoryId(req, res, next) {
       data: { subCategories },
     });
   } catch (error) {
-    Logging.error('Error__ctrls__category: ' + error);
+    Logging.error('Error__ctrls__subCategory: ' + error);
     const err = new Error(error);
     err.statusCode = 400;
     return next(err);
@@ -70,7 +92,7 @@ export async function getSubCategories(req, res, next) {
       data: { subCategories },
     });
   } catch (error) {
-    Logging.error('Error__ctrls__category: ' + error);
+    Logging.error('Error__ctrls__subCategory: ' + error);
     const err = new Error(error);
     err.statusCode = 400;
     return next(err);
@@ -148,7 +170,41 @@ export async function createSubCategory(req, res, next) {
       data: { subCategory: newSubCategory },
     });
   } catch (error) {
-    Logging.error('Error__ctrls__category: ' + error);
+    Logging.error('Error__ctrls__subCategory: ' + error);
+    const err = new Error(error);
+    err.statusCode = 400;
+    return next(err);
+  }
+}
+
+export async function updateSubCategoryById(req, res, next) {
+  const subCategoryId = req.params.subCategoryId;
+  const subCategoryData = {
+    name: req.body.name,
+    parent: req.body.parent,
+  };
+  try {
+    if (!mongoose.Types.ObjectId.isValid(subCategoryId)) {
+      throw new Error('SubCategory does not exist!');
+    }
+
+    const updatedSubCategory = await execWithTransaction(async (session) => {
+      const result = await subCategoryService.updateSubCategoryById(
+        subCategoryId,
+        subCategoryData,
+        session
+      );
+
+      return result;
+    });
+
+    res.status(200).json({
+      success: true,
+      message: 'Update a SubCategory successful!',
+      data: { updatedSubCategory },
+    });
+  } catch (error) {
+    Logging.error('Error__ctrls__subCategory: ' + error);
     const err = new Error(error);
     err.statusCode = 400;
     return next(err);
@@ -173,7 +229,31 @@ export async function updateSubCategoryBySlug(req, res, next) {
       data: { subCategory: updatedSubCategory },
     });
   } catch (error) {
-    Logging.error('Error__ctrls__category: ' + error);
+    Logging.error('Error__ctrls__subCategory: ' + error);
+    const err = new Error(error);
+    err.statusCode = 400;
+    return next(err);
+  }
+}
+
+export async function deleteSubCategoryById(req, res, next) {
+  const subCategoryId = req.query.subCategoryId;
+  try {
+    const deletedSubCategory = await execWithTransaction(async (session) => {
+      const result = await subCategoryService.deleteSubCategoryById(
+        subCategoryId
+      );
+
+      return result;
+    });
+
+    res.status(200).json({
+      success: true,
+      message: 'Delete a SubCategory successful!',
+      data: { deletedSubCategory },
+    });
+  } catch (error) {
+    Logging.error('Error__ctrls__subCategory: ' + error);
     const err = new Error(error);
     err.statusCode = 400;
     return next(err);
@@ -192,7 +272,7 @@ export async function deleteSubCategoryBySlug(req, res, next) {
       data: { subCategory: deletedSubCategory },
     });
   } catch (error) {
-    Logging.error('Error__ctrls__category: ' + error);
+    Logging.error('Error__ctrls__subCategory: ' + error);
     const err = new Error(error);
     err.statusCode = 400;
     return next(err);

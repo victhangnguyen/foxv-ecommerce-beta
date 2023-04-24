@@ -28,10 +28,10 @@ router.post(
 );
 
 //! @desc     Delete One Order
-//! @route    DEL /api/admin/orders/delete-one'
+//! @route    DEL /api/admin/orders/delete-single'
 //! @access   Private: Admin
 router.delete(
-  '/admin/orders/delete-one',
+  '/admin/orders/delete-single',
   authenticate,
   isAdmin,
   orderController.deleteOrder

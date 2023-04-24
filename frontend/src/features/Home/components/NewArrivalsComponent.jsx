@@ -1,54 +1,48 @@
 import React from 'react';
 import { Col, Row } from 'react-bootstrap';
+//! imp Hookds
+import { useItemsPerPage } from '../../../hooks/itemsPerPage';
 
 //! imp Components
 import PaginationComponent from '../../../components/Pagination/PaginationComponent';
 import LoadingProductCard from '../../Product/components/Card/LoadingProductCard';
 import ProductCard from '../../Product/components/Card/ProductCard';
 
-//! imp API
-import productService from '../../../features/Product/services/productService';
-
-const PRODUCT_PERPAGE = 4;
+//! imp APIs
+import API from '../../../API';
 
 const NewArrivalsComponent = ({ title }) => {
-  // const [productsPerPage, setProductsPerPage] = React.useState(4);
-  const [currentPage, setCurrentPage] = React.useState(1);
-  const [productsCount, setProductsCount] = React.useState(0);
+  const itemsPerPage = useItemsPerPage(4, 4, 6, 8, 8);
 
-  const [products, setProducts] = React.useState([]);
+  //! localState:
   const [loading, setLoading] = React.useState(false);
 
-  React.useEffect(() => {
+  const [currentPage, setCurrentPage] = React.useState(1);
+  const [products, setProducts] = React.useState([]);
+  const [productsCount, setProductsCount] = React.useState(0);
+
+  React.useLayoutEffect(() => {
     loadAllProducts();
-  }, [currentPage]);
+  }, [currentPage, itemsPerPage]);
 
-  //! effect DidMount
-  React.useEffect(() => {
-    productService.getProductsCount().then((res) => setProductsCount(res));
-  }, []);
+  async function loadAllProducts() {
+    const response = await API.product.getProductList({
+      sort: 'createdAt',
+      order: 'desc',
+      page: currentPage,
+      perPage: itemsPerPage,
+    });
 
-  const loadAllProducts = () => {
-    setLoading(true);
-    productService
-      .getProductList({
-        sort: 'createdAt',
-        order: 'desc',
-        page: currentPage,
-        perPage: PRODUCT_PERPAGE,
-      })
-      .then((res) => {
-        setProducts(res);
-        setLoading(false);
-      });
-  };
+    setProducts(response.data.products);
+    setProductsCount(response.data.productsCount);
+  }
 
   return (
     <div className="container">
       <h4 className="jumbotron">{title}</h4>
 
       {loading === true ? (
-        <LoadingProductCard count={PRODUCT_PERPAGE} />
+        <LoadingProductCard count={itemsPerPage} />
       ) : (
         <>
           <Row>
@@ -72,10 +66,11 @@ const NewArrivalsComponent = ({ title }) => {
       }
       <div className="d-flex justify-content-center">
         <PaginationComponent
-          itemsCount={productsCount}
-          itemsPerPage={PRODUCT_PERPAGE}
           currentPage={currentPage}
+          itemsCount={productsCount}
+          itemsPerPage={itemsPerPage}
           setCurrentPage={setCurrentPage}
+          alwaysShown={false}
         />
       </div>
     </div>

@@ -28,7 +28,7 @@ const userService = {
   //! Private: Admin
   updateUserInfo: (userId, dataFields) => {
     const { firstName, lastName, username, email, phoneNumber } = dataFields;
-    const url = `/admin/users/${userId}/update-info`;
+    const url = `/admin/users/${userId}/update`;
     return axiosInstance.put(url, {
       firstName,
       lastName,

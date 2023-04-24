@@ -2,11 +2,11 @@ import _ from 'lodash';
 import React from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { toast } from 'react-toastify';
-//! imp Services
-import categoryService from '../../Category/services/categoryService';
-import subCategoryService from '../../SubCategory/services/subCategoryService';
-import productService from '../services/productService';
-//! imp Components
+
+//! imp API
+import API from '../../../API';
+
+//! imp Comps
 import AlertDismissibleComponent from '../../../components/Alert/AlertDismissibleComponent';
 import BreadcrumbComponent from '../../../components/Breadcrumb/BreadcrumbComponent';
 import ProductFormComponent from '../components/Form/ProductFormComponent';
@@ -73,7 +73,7 @@ const AddEditProductScreen = () => {
   const loadProduct = async () => {
     try {
       setLoading(true);
-      const productDoc = await productService.getProduct(productId);
+      const productDoc = await API.product.getProduct(productId);
       setLoading(false);
       setProduct(productDoc);
       const categoryId = productDoc.category._id;
@@ -91,7 +91,7 @@ const AddEditProductScreen = () => {
 
   const loadCategories = async () => {
     try {
-      const response = await categoryService.getCategories();
+      const response = await API.category.getCategories();
       setCategories(response.data.categories);
     } catch (error) {
       console.log(error);
@@ -101,7 +101,7 @@ const AddEditProductScreen = () => {
 
   const loadSubCategoriesByCategoryId = async (categoryId) => {
     try {
-      const response = await subCategoryService.getSubCategoriesByCategoryId(
+      const response = await API.subCategory.getSubCategoriesByCategoryId(
         categoryId
       );
       setSubCategories(response.data.subCategories);
@@ -152,7 +152,7 @@ const AddEditProductScreen = () => {
 
       if (productId) {
         //! Mode: Edit Product
-        const updatedProduct = await productService.updateProduct(
+        const updatedProduct = await API.product.updateProduct(
           productId,
           product
         );
@@ -162,7 +162,7 @@ const AddEditProductScreen = () => {
         navigate('/admin/products');
       } else {
         //! Mode: Create Product
-        const newProduct = await productService.createProduct(product);
+        const newProduct = await API.product.createProduct(product);
         //! Error Handling
 
         // if (response.statusCode > 300) {

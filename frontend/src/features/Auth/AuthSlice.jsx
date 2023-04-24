@@ -1,6 +1,8 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 //! imp Services
 import authService from './services/authService';
+//! API
+import API from '../../API';
 
 export const signup = createAsyncThunk(
   'auth/signup',
@@ -15,7 +17,7 @@ export const signup = createAsyncThunk(
         password,
         confirmPassword,
       } = data;
-      const response = await authService.signup({
+      const response = await API.auth.signup({
         firstName,
         lastName,
         username,
@@ -24,22 +26,16 @@ export const signup = createAsyncThunk(
         password,
         confirmPassword,
       });
-      return response;
+
+      return thunkAPI.fulfillWithValue(response);
     } catch (error) {
-      console.log('__Debugger__AuthSlice\n__signiup__error: ', error, '\n');
-      //! 422
-      if (error.response?.status === 422) {
-        return thunkAPI.rejectWithValue({
-          status: error.response.status,
-          success: error.response?.data.success,
-          errors: error.response?.data.errors,
-        });
-      }
-      //! 400 - 500
       return thunkAPI.rejectWithValue({
-        status: error.response.status,
-        success: error.response?.data.success,
-        error: error.response.data?.message || error.message,
+        message: error.message,
+        response: {
+          data: error.response.data,
+          status: error.response.status,
+          statusText: error.response.statusText,
+        },
       });
     }
   }
@@ -50,7 +46,7 @@ export const signin = createAsyncThunk(
   async (data, thunkAPI) => {
     const { username, password } = data;
     try {
-      const response = await authService.signin({
+      const response = await API.auth.signin({
         username,
         password,
       });
@@ -75,15 +71,17 @@ export const refreshToken = createAsyncThunk(
     try {
       const { refreshToken } = data;
 
-      const response = await authService.refreshToken({
-        refreshToken,
-      });
+      const response = await API.auth.refreshToken(refreshToken);
+
       return thunkAPI.fulfillWithValue(response);
     } catch (error) {
       return thunkAPI.rejectWithValue({
-        status: error.response.status,
-        success: error.response?.data.success,
-        error: error.response.data?.message || error.message,
+        message: error.message,
+        response: {
+          data: error.response.data,
+          status: error.response.status,
+          statusText: error.response.statusText,
+        },
       });
     }
   }
@@ -152,8 +150,7 @@ const authSlice = createSlice({
     builder
       .addCase(refreshToken.pending, (state, action) => {
         state.loading = true;
-        // state.success = initialState.success;
-        // state.error = initialState.error;
+        state.error = initialState.error;
       })
       .addCase(refreshToken.fulfilled, (state, action) => {
         console.log('refreshToken.fulfilled action.payload: ', action.payload);

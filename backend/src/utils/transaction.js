@@ -13,7 +13,7 @@ export async function execWithTransaction(sessionCallbackFn) {
     return result;
   } catch (error) {
     await session.abortTransaction();
-    Logging.error('Transaction Error: ' + error);
+    Logging.error('Error__transaction: ' + error);
     //! Re-throw error to outside
     throw error;
   } finally {

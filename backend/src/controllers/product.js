@@ -64,19 +64,6 @@ export const getProducts = async (req, res, next) => {
   }
 };
 
-export const productsCount = async (req, res, next) => {
-  try {
-    const total = await Product.find({}).estimatedDocumentCount().exec();
-    console.log('__Debugger__ctrls/product/productsCount__total: ', total);
-    res.status(200).json(total);
-  } catch (error) {
-    Logging.error('Error__ctrls__product: ' + error);
-    const err = new Error(error);
-    err.statusCode = 400;
-    return next(err);
-  }
-};
-
 //! All of Products with skip and limit
 export const getProductList = async (req, res, next) => {
   let { sort, order, page, perPage } = req.query;
@@ -95,7 +82,15 @@ export const getProductList = async (req, res, next) => {
       .limit(perPage)
       .exec();
 
-    res.status(200).json(products);
+    const productsCount = await Product.find({})
+      .estimatedDocumentCount()
+      .exec();
+
+    return res.status(200).json({
+      success: true,
+      message: 'Get Product List sucessful!',
+      data: { products, productsCount },
+    });
   } catch (error) {
     Logging.error('Error__ctrls__product: ' + error);
     const err = new Error(error);

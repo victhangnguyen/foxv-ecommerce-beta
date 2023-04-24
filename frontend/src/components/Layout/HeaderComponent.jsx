@@ -15,8 +15,7 @@ import {
 } from 'react-bootstrap';
 
 //! imp Services
-import categoryService from '../../features/Category/services/categoryService';
-import subCategoryService from '../../features/SubCategory/services/subCategoryService';
+import API from '../../API';
 
 //! imp Actions
 import { signout } from '../../features/Auth/AuthSlice';
@@ -49,18 +48,23 @@ const HeaderComponent = () => {
   const [categories, setCategories] = React.useState([]);
   const [subCategories, setSubCategories] = React.useState([]);
 
-  const handleLogout = () => {
-    //! logout
-    dispatch(signout());
+  async function handleLogout() {
+    try {
+      //! save Cart to database
+      await dispatch(postCart()).unwrap(); //! not authenticated
 
-    //! save Cart
-    dispatch(postCart());
-    //! empty Order
-    dispatch(emptyNewOrder());
+      //! logout
+      dispatch(signout());
 
-    navigate('/auth/login');
-    toast.success(`${auth.user.lastName} has successfully signed out!`);
-  };
+      //! empty Order
+      dispatch(emptyNewOrder());
+
+      navigate('/auth/login');
+      toast.success(`${auth.user.lastName} has successfully signed out!`);
+    } catch (error) {
+      console.log('Error: ', error);
+    }
+  }
 
   React.useEffect(() => {
     loadCategories();
@@ -74,9 +78,8 @@ const HeaderComponent = () => {
       page: 1,
       perPage: 10,
     };
-    const response = await categoryService.getCategoriesByFilters(
-      filterOptions
-    );
+    const response = await API.category.getCategoriesByFilters(filterOptions);
+
     setCategories(response.data?.categories); //! vrf ?.cate..
   };
 
@@ -87,7 +90,7 @@ const HeaderComponent = () => {
       page: 1,
       perPage: 10,
     };
-    const response = await subCategoryService.getSubCategoriesByFilters(
+    const response = await API.subCategory.getSubCategoriesByFilters(
       filterOptions
     );
     setSubCategories(response.data?.subCategories); //! vrf ?.sub...

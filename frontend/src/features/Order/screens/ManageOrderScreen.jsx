@@ -1,5 +1,5 @@
 import React from 'react';
-import _, { constant } from 'lodash';
+import _ from 'lodash';
 import { toast } from 'react-toastify';
 import { Row, Col } from 'react-bootstrap';
 import { useDispatch, useSelector } from 'react-redux';
@@ -20,6 +20,7 @@ import { useScrollPosition, scrollToTop } from '../../../hooks/scroll';
 import { getOrdersByFilters, deleteOrder, deleteOrders } from '../OrderSlice';
 //! imps Constants
 import constants from '../../../constants';
+//! imp APIs
 import API from '../../../API';
 
 const ManageOrderScreen = () => {
@@ -190,7 +191,8 @@ const ManageOrderScreen = () => {
       scrollToTop();
     } catch (error) {
       handleHideModal();
-
+      handleShowAlert();
+      
       setAlertOptions({
         variant: 'danger',
         title: 'Lỗi hệ thống',
@@ -199,7 +201,7 @@ const ManageOrderScreen = () => {
           error.response?.message ||
           error.message,
       });
-      setShowAlert(true);
+
       toast.error(error.response?.message || error.massage);
     }
   }

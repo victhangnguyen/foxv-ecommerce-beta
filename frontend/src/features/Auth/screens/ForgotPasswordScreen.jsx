@@ -24,7 +24,6 @@ const ForgotPasswordScreen = () => {
 
     try {
       const response = await authService.forgotPassword({ email });
-      console.log('response: ', response);
 
       setAlertOptions({
         variant: 'success',

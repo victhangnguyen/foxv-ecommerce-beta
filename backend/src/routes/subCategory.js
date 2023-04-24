@@ -10,8 +10,17 @@ import {
 import { authenticate, isAdmin } from '../middleware/passport/index.js';
 
 const router = express.Router();
+
+//! @desc     Fetch a SubCategory by Id
+//! @route    GET /api/subcategories/:subCategoryId
+//! @access   Private/Public
+router.get(
+  '/subcategories/:subCategoryId',
+  subCategoryController.getSubCategoryById
+);
+
 //! @desc     Fetch a SubCategory by slug
-//! @route    GET /api/categories/:slug
+//! @route    GET /api/subcategories/slug/:slug
 //! @access   Private/Public
 router.get(
   '/subcategories/slug/:slug',
@@ -50,15 +59,36 @@ router.post(
   subCategoryController.createSubCategory
 );
 
-//! @desc     Update Info a SubCategory
-//! @route    PUT /api/admin/subcategories/slug/:slug/update-info
+//! @desc     Update a SubCategory by Id
+//! @route    PUT /api/admin/subcategories/slug/:slug/update
 //! @access   Private: Admin
 router.put(
-  '/admin/subcategories/slug/:slug/update-info',
+  '/admin/subcategories/:subCategoryId/update',
+  validateSchema(updateSubCategorySchema),
+  authenticate,
+  isAdmin,
+  subCategoryController.updateSubCategoryById
+);
+
+//! @desc     Update  a SubCategory by Slug
+//! @route    PUT /api/admin/subcategories/slug/:slug/update
+//! @access   Private: Admin
+router.put(
+  '/admin/subcategories/slug/:slug/update',
   validateSchema(updateSubCategorySchema),
   authenticate,
   isAdmin,
   subCategoryController.updateSubCategoryBySlug
+);
+
+//! @desc     Delete a SubCategory by Id
+//! @route    DEL /api/admin/subcategories/delete-single
+//! @access   Private: Admin
+router.delete(
+  '/admin/subcategories/delete-single',
+  authenticate,
+  isAdmin,
+  subCategoryController.deleteSubCategoryById
 );
 
 //! @desc     Delete a SubCategory by Slug

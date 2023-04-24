@@ -1,7 +1,10 @@
 import React from 'react';
-import { useSelector } from 'react-redux';
+import _ from 'lodash';
 import { Link } from 'react-router-dom';
 import { toast } from 'react-toastify';
+
+//! imp API
+import API from '../../../API';
 
 //! components
 import { Button, Card, Col, Row } from 'react-bootstrap';
@@ -9,27 +12,53 @@ import AlertDismissibleComponent from '../../../components/Alert/AlertDismissibl
 import BreadcrumbComponent from '../../../components/Breadcrumb/BreadcrumbComponent';
 import ConfirmationModalComponent from '../../../components/Modal/ConfirmationModalComponent';
 import SubCategoryFormComponent from '../components/Form/SubCategoryFormComponent';
+import GoToButtonComponent from '../../../components/Button/GoToButtonComponent';
 
 //! components/icons
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+
+//! imp Constants
+import constants from '../../../constants';
+
+//! imp Hooks
+import { useDispatch, useSelector } from 'react-redux';
+import { scrollToTop, useScrollPosition } from '../../../hooks/scroll';
 
 //! imp Services
 import categoryService from '../../Category/services/categoryService';
 import subCategoryService from '../services/subCategoryService';
 
-const SubCategoryCreateScreen = () => {
-  const auth = useSelector((state) => state.auth);
+//! imp Actions
+import {
+  getSubCategories,
+  getSubCategoriesByCategoryId,
+} from '../SubCategorySlice';
 
+const SubCategoryCreateScreen = () => {
+  const dispatch = useDispatch();
+  const scrollPosition = useScrollPosition();
+  //! rootState
+  const auth = useSelector((state) => state.auth);
+  const { subCategories } = useSelector((state) => state.subCategory);
+
+  //! localState: init
   const [loading, setLoading] = React.useState(false);
-  const [categories, setCategories] = React.useState([]);
-  const [subCategories, setSubCategories] = React.useState([]);
 
   //! search/filter
   const [keyword, setKeyword] = React.useState('');
 
-  //! localState: seleteced
-  const [selectedSlug, setSelectedSlug] = React.useState('');
-  const [selectedCategoryId, setSelectedCategoryId] = React.useState('');
+  //! localState: Select Ids
+  const [isCheckAll, setIsCheckAll] = React.useState(false);
+  const [selectedIds, setSelectedIds] = React.useState([]);
+  const [selectedId, setSelectedId] = React.useState('');
+
+  //! localState: Category Select
+  const [categories, setCategories] = React.useState([]);
+  const [selectedCategoryId, setSelectedCategoryId] = React.useState();
+  // const [loading, setLoading] = React.useState(false);
+
+  //! localState: actionType
+  const [actionType, setActionType] = React.useState('');
 
   //! localState Alert
   const [showAlert, setShowAlert] = React.useState(false);
@@ -48,17 +77,6 @@ const SubCategoryCreateScreen = () => {
     nameButton: null,
   });
 
-  const breadcrumbItems = [
-    { key: 'breadcrumb-item-0', label: 'Home', path: '/' },
-    { key: 'breadcrumb-item-1', label: 'Dashboard', path: '/admin' },
-    {
-      key: 'breadcrumb-item-2',
-      label: 'Thêm Kiểu sản phẩm',
-      path: '/admin/subcategories/create',
-      active: true,
-    },
-  ];
-
   React.useEffect(() => {
     auth.error && toast.error(auth.error);
   }, [auth.error]);
@@ -71,7 +89,7 @@ const SubCategoryCreateScreen = () => {
   const loadCategories = async () => {
     try {
       setLoading(true);
-      const response = await categoryService.getCategories();
+      const response = await API.category.getCategories();
       setLoading(false);
       setCategories(response.data.categories);
     } catch (error) {
@@ -92,11 +110,12 @@ const SubCategoryCreateScreen = () => {
   const loadSubCategories = async () => {
     try {
       setLoading(true);
-      const response = await subCategoryService.getSubCategories();
+      await dispatch(getSubCategories()).unwrap();
       setLoading(false);
-      setSubCategories(response.data.subCategories);
     } catch (error) {
       setLoading(false);
+      handleShowAlert();
+
       setAlertOptions({
         variant: 'danger',
         title: 'Lỗi hệ thống',
@@ -105,22 +124,18 @@ const SubCategoryCreateScreen = () => {
           error.response?.message ||
           error.message,
       });
-
-      setShowAlert(true);
-      toast.error(error.response?.message || error.massage);
     }
   };
 
   const loadSubCategoriesByCategoryId = async (categoryId) => {
     try {
       setLoading(true);
-      const response = await subCategoryService.getSubCategoriesByCategoryId(
-        categoryId
-      );
+      await dispatch(getSubCategoriesByCategoryId(categoryId)).unwrap();
       setLoading(false);
-      setSubCategories(response.data.subCategories);
     } catch (error) {
       setLoading(false);
+      handleShowAlert();
+
       setAlertOptions({
         variant: 'danger',
         title: 'Lỗi hệ thống',
@@ -129,21 +144,16 @@ const SubCategoryCreateScreen = () => {
           error.response?.message ||
           error.message,
       });
-
-      setShowAlert(true);
-      toast.error(error.response?.message || error.massage);
     }
   };
 
   const handleCreateSubCategorySubmit = async (data, e, methods) => {
     const { categoryId, name } = data;
     try {
-      setLoading(true);
       const response = await subCategoryService.createSubCategory({
         categoryId,
         name,
       });
-      setLoading(false);
       //! clear Form
       methods.reset();
       //! re-load Data
@@ -156,7 +166,6 @@ const SubCategoryCreateScreen = () => {
       });
       setShowAlert(true);
     } catch (error) {
-      setLoading(false);
       //! Error Handling
       if (error.response?.status === 422) {
         const errors = error.response.data.errors;
@@ -191,64 +200,83 @@ const SubCategoryCreateScreen = () => {
     setKeyword(e.target?.value?.toLowerCase());
   };
 
-  const handleShowModal = (category) => {
-    setSelectedSlug(category.slug);
-    setShowModal(true);
-    setModalOptions({
-      variant: 'warning',
-      title: 'Xác nhận xóa Kiểu sản phẩm (SubCategory)',
-      message: `Bạn có muốn xóa Kiểu sản phẩm với tên [${category.name}] không?`,
-      nameButton: 'Xác nhận',
-    });
-  };
+  const handleOpenModal = (actionType, ids) => {
+    //! clear Form
+    handleHideAlert();
 
-  const handleHideModal = () => {
-    setShowModal(false);
-  };
+    setActionType(actionType);
 
-  const triggerSelectChange = async (e) => {
-    const categoryId = e.target.value;
-    setSelectedCategoryId(categoryId);
-    try {
-      if (categoryId) {
-        //! loadSubsByCategoryId
-        loadSubCategoriesByCategoryId(categoryId);
-      } else {
-        //! All
-        const response = await subCategoryService.getSubCategories();
-        setSubCategories(response.data.subCategories);
-      }
-    } catch (error) {
-      console.log('Error: ', error);
-    }
-  };
-
-  const handleModalSubmit = async () => {
-    try {
-      setLoading(true);
-      const response = await subCategoryService.deleteSubCategoryBySlug(
-        selectedSlug
+    let selectedSubCategories;
+    if (_.isArray(ids)) {
+      //! multiple Ids
+      setSelectedIds(ids);
+      selectedSubCategories = ids?.map((id) =>
+        subCategories.find((sub) => sub._id === id)
       );
-      //! re-load All or base on Category Id
+    } else {
+      //! single Id
+      //! bổ sung: fix lại multiple selectedIds sau khi xóa id single Ids
+      setSelectedId(ids);
+      selectedSubCategories = [subCategories.find((sub) => sub._id === ids)];
+    }
+
+    switch (actionType) {
+      /* DELETE ONE CATEOGRY */
+      case constants.subCategory.actionTypes.DELETE_SUBCATEGORY:
+        setModalOptions({
+          variant: 'warning',
+          title: `Xác nhận xóa Category`,
+          message: `Bạn có muốn xóa Kiểu sản phẩm này không? [Tên Kiểu: ${selectedSubCategories[0]?.name}, Slug: ${selectedSubCategories[0]?.slug}]`,
+          nameButton: 'Xác nhận xóa',
+        });
+
+        break;
+
+      default:
+        setAlertOptions({
+          variant: 'danger',
+          title: `Hệ thống đang phát triển chức năng`,
+          message: `Chức năng này đang được phát triển hoặc nâng cấp. Xin vui lòng xử dụng chức năng này sau!`,
+        });
+
+        handleShowAlert();
+        return;
+    }
+    //! Show Confirmation Modal
+    handleShowModal();
+  };
+
+  const handleConfirmationSubmit = async () => {
+    try {
+      if (actionType === constants.subCategory.actionTypes.DELETE_SUBCATEGORY) {
+        /* REMOVE USER ACCOUNT */
+        setLoading(true);
+        const response = await API.subCategory.deleteSubCategoryById(
+          selectedId
+        );
+        setLoading(false);
+
+        setAlertOptions({
+          variant: response.success ? 'success' : 'danger',
+          title: `Xóa Kiểu sản phẩm thành công`,
+          message: `Bạn đã xóa Kiểuoại sản phẩm với tên [${response.data.deletedSubCategory.name}] thành công.`,
+        });
+      }
+
+      //! re-load subCategories (all / by categoryId)
       if (selectedCategoryId) {
         loadSubCategoriesByCategoryId(selectedCategoryId);
       } else {
         loadSubCategories();
       }
 
-      setLoading(false);
       handleHideModal();
-      setAlertOptions({
-        variant: 'success',
-        title: 'Xóa Kiểu sản phẩm (SubCategory)',
-        message: `Bạn đã xóa Kiểu sản phẩm với tên [${response.data.subCategory.name}] thành công.`,
-      });
-
-      setShowAlert(true);
-      toast.success(response.message); //! server response
+      handleShowAlert();
     } catch (error) {
       setLoading(false);
       handleHideModal();
+      handleShowAlert();
+
       setAlertOptions({
         variant: 'danger',
         title: 'Lỗi hệ thống',
@@ -257,21 +285,56 @@ const SubCategoryCreateScreen = () => {
           error.response?.message ||
           error.message,
       });
-
-      setShowAlert(true);
-      toast.error(error.response?.message || error.massage);
     }
   };
+
+  const triggerSelectChange = (e) => {
+    setSelectedCategoryId(e.target.value);
+    const categoryId = e.target.value;
+
+    if (categoryId) {
+      loadSubCategoriesByCategoryId(categoryId);
+    } else {
+      loadSubCategories();
+    }
+  };
+
+  function handleShowAlert() {
+    setShowAlert(true);
+  }
+
+  function handleHideAlert() {
+    setShowAlert(false);
+  }
+
+  function handleShowModal() {
+    setShowModal(true);
+  }
+
+  function handleHideModal() {
+    setShowModal(false);
+  }
+
+  const breadcrumbItems = [
+    { key: 'breadcrumb-item-0', label: 'Home', path: '/' },
+    { key: 'breadcrumb-item-1', label: 'Dashboard', path: '/admin' },
+    {
+      key: 'breadcrumb-item-2',
+      label: 'Thêm Kiểu sản phẩm',
+      path: '/admin/subcategories/create',
+      active: true,
+    },
+  ];
 
   return (
     <>
       <BreadcrumbComponent breadcrumbItems={breadcrumbItems} />
       <AlertDismissibleComponent
+        show={showAlert}
+        handleHideAlert={handleHideAlert}
         variant={alertOptions.variant}
         title={alertOptions.title}
         message={alertOptions.message}
-        show={showAlert}
-        setShow={setShowAlert}
         alwaysShown={true}
       />
 
@@ -308,11 +371,16 @@ const SubCategoryCreateScreen = () => {
                     <Button
                       className="btn-sm float-end m-1"
                       variant="danger"
-                      onClick={() => handleShowModal(sub)}
+                      onClick={() =>
+                        handleOpenModal(
+                          constants.subCategory.actionTypes.DELETE_SUBCATEGORY,
+                          sub._id
+                        )
+                      }
                     >
                       <FontAwesomeIcon color="white" icon="fa-solid fa-trash" />
                     </Button>
-                    <Link to={`/admin/subcategories/${sub.slug}/update`}>
+                    <Link to={`/admin/subcategories/${sub._id}/update`}>
                       <Button
                         className="btn-sm float-end m-1"
                         variant="warning"
@@ -332,13 +400,14 @@ const SubCategoryCreateScreen = () => {
       </Row>
       <ConfirmationModalComponent
         showModal={showModal}
-        handleHideModal={handleHideModal}
         variant={modalOptions.variant}
         title={modalOptions.title}
-        message={modalOptions.message}
-        handleSubmit={handleModalSubmit}
         nameButton={modalOptions.nameButton}
+        message={modalOptions.message}
+        handleHideModal={handleHideModal}
+        handleSubmit={handleConfirmationSubmit}
       />
+      <GoToButtonComponent visible={scrollPosition > 300} />
     </>
   );
 };

@@ -4,7 +4,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { toast } from 'react-toastify';
 
 //! imp Services
-import categoryService from '../../features/Category/services/categoryService';
+import API from '../../API';
 
 //! imp Actions
 import { getProductsByFilters } from '../../features/Product/ProductSlice';
@@ -41,11 +41,11 @@ const ToolbarComponent = ({
 
   const loadCategories = async () => {
     try {
-      const response = await categoryService.getCategories();
-      setCategories(response);
+      const response = await API.category.getCategories();
+      setCategories(response.data.categories);
     } catch (error) {
       console.log(error);
-      toast.error(error.response.data?.message);
+      toast.error(error.response?.data?.message);
     }
   };
 

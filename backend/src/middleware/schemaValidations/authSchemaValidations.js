@@ -105,31 +105,8 @@ export const signupSchema = {
     },
     errorMessage: 'Invalid phone number',
   },
-  // password: {
-  //   notEmpty: {
-  //     errorMessage: 'Password must not be empty',
-  //   },
-  //   in: ['body'],
-  //   isLength: {
-  //     options: { min: 8, max: 64 },
-  //     errorMessage: 'Password must be between 8 and 64 characters long',
-  //   },
-  // },
-  // confirmPassword: {
-  //   notEmpty: {
-  //     errorMessage: 'Confirm Password must not be empty',
-  //   },
-  //   custom: {
-  //     options: (value, { req, location, path }) => {
-  //       if (value !== req.body.password) {
-  //         throw new Error('Passwords do not match');
-  //       } else {
-  //         return true;
-  //       }
-  //     },
-  //   },
-  // },
 };
+
 export const signinSchema = {
   username: {
     trim: true,

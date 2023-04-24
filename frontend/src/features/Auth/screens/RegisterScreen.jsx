@@ -1,8 +1,10 @@
 import React from 'react';
 import { Card, Col, Row } from 'react-bootstrap';
-import { useDispatch, useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
 import { toast } from 'react-toastify';
+//! Hooks
+import { useDispatch, useSelector } from 'react-redux';
+import { scrollToTop } from '../../../hooks/scroll';
 
 //! imp Actions
 import { signup } from '../AuthSlice';
@@ -17,11 +19,15 @@ const RegisterScreen = () => {
 
   const [newUser, setNewUser] = React.useState({});
 
-  //! localState Alert
+  //! localState: Alert
   const [showAlert, setShowAlert] = React.useState(false);
+  const [alertOptions, setAlertOptions] = React.useState({
+    variant: '',
+    title: '',
+    message: '',
+  });
 
-  const handleSubmit = async (data, e, methods) => {
-    console.log('handleSubmnit-data: ', data);
+  const handleSignupSubmit = async (data, e, methods) => {
     const {
       firstName,
       lastName,
@@ -43,52 +49,65 @@ const RegisterScreen = () => {
           confirmPassword, //! send to check Password must be match
         })
       ).unwrap();
-      //! fulfilled
-      setNewUser(response.data.user);
-      toast.success(response.message);
-      setShowAlert(true);
-    } catch (error) {
-      toast.error(auth.message);
 
-      //! rejected
-      const UNPROCESSABLE = 422;
-      if (error.status === UNPROCESSABLE) {
-        const { errors } = error;
+      if (response.success) {
+        scrollToTop();
+        setAlertOptions({
+          variant: 'success',
+          title: 'Đăng ký tài khoản thành công',
+          message: `Bạn đã đăng ký thành công tài khoản [${response.data.user.email}].`,
+        });
+
+        setNewUser(response.data.user);
+        toast.success(response.message);
+        setShowAlert(true);
+      }
+    } catch (error) {
+      //! Error Handling
+      if (error.response?.status === 422) {
+        const errors = error.response.data.errors;
         if (!errors.length) return;
-        errors.forEach((err) => {
-          methods.setError(err.param, {
+        errors.forEach((error) => {
+          methods.setError(error.param, {
             type: 'server',
-            message: err.msg,
+            message: error.msg,
           });
         });
+
+        return;
       }
+
+      setAlertOptions({
+        variant: 'danger',
+        title: 'Lỗi hệ thống',
+        message:
+          error.response?.data?.message ||
+          error.response?.message ||
+          error.message,
+      });
+
+      handleShowAlert();
     }
   };
+
+  function handleShowAlert() {
+    setShowAlert(true);
+  }
+
+  function handleHideAlert() {
+    setShowAlert(false);
+  }
 
   return (
     <>
       <AlertDismissibleComponent
-        variant={auth.success ? 'success' : 'danger'}
-        title={auth.success ? 'Đăng ký thành công' : 'Đăng ký thất bại'}
         show={showAlert}
-        setShow={setShowAlert}
+        handleHideAlert={handleHideAlert}
+        variant={alertOptions.variant}
+        title={alertOptions.title}
+        message={alertOptions.message}
         alwaysShown={true}
-      >
-        {auth.success ? (
-          <div>
-            <p>
-              Bạn đã đăng ký thành công tài khoản:{' '}
-              <strong>{newUser.username}</strong>.
-            </p>
-            <p>
-              Truy cập email: <strong>{newUser.email}</strong> để xác nhận
-              password.
-            </p>
-          </div>
-        ) : (
-          'Bạn đã đăng ký tài khoản thất bại.'
-        )}
-      </AlertDismissibleComponent>
+      />
 
       <Row className="mb-4 d-flex justify-content-center align-items-center">
         <Col xs={12} sm={8} md={8} lg={6} xl={4}>
@@ -107,7 +126,7 @@ const RegisterScreen = () => {
                   //! RegisterFormComponent
                 }
                 <div className="my-4">
-                  <RegisterFormComponent onSubmit={handleSubmit} />
+                  <RegisterFormComponent onSubmit={handleSignupSubmit} />
                 </div>
                 <div className="mt-3">
                   <p className="mb-0  text-center">
