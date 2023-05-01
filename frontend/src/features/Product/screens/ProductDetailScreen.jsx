@@ -12,6 +12,7 @@ import ProductImageComponent from '../components/ProductImageComponent';
 
 //! Services
 import productService from '../services/productService';
+import API from '../../../API';
 //! imp Actions
 import { addToCart, removeItem } from '../../Cart/CartSlice';
 
@@ -25,25 +26,11 @@ const ProductDetail = () => {
   const [product, setProduct] = React.useState({});
   //! localState: alert
   const [showAlert, setShowAlert] = React.useState(false);
-  const [alertOptions, setAlertOptions] = React.useState({
+  const [alertOpts, setAlertOpts] = React.useState({
     variant: '',
     title: '',
     message: '',
   });
-  const breadcrumbItems = [
-    { key: 'breadcrumb-item-0', label: 'Home', path: '/' },
-    {
-      key: 'breadcrumb-item-1',
-      label: product.category?.name,
-      path: `/collections/${product.category?.slug}`,
-    },
-    {
-      key: 'breadcrumb-item-2',
-      label: product.name,
-      path: `/products/${product.slug}`,
-      active: true,
-    },
-  ];
 
   const isAddedToCard = cart.cartItems
     .map((item) => item.product)
@@ -56,12 +43,12 @@ const ProductDetail = () => {
   const loadProductBySlug = async (slug) => {
     setLoading(true);
     try {
-      const response = await productService.getProductBySlug(slug);
+      const response = await API.product.getProductBySlug(slug);
       setLoading(false);
       setProduct(response.data.product);
     } catch (error) {
       setLoading(false);
-      setAlertOptions({
+      setAlertOpts({
         variant: 'danger',
         title: 'Lỗi hệ thống',
         message:
@@ -115,14 +102,30 @@ const ProductDetail = () => {
     console.log('__Debugger__ProductDetailScreen\n__handleClickBuyNow', '\n');
   }
 
+    const breadcrumbItems = [
+    { key: 'breadcrumb-item-0', label: 'Home', path: '/' },
+    {
+      key: 'breadcrumb-item-1',
+      label: product.category?.name,
+      path: `/collections/${product.category?.slug}`,
+    },
+    {
+      key: 'breadcrumb-item-2',
+      label: product.name,
+      path: `/products/${product.slug}`,
+      active: true,
+    },
+  ];
+
+
   return (
     <Container>
       <AlertDismissibleComponent
         show={showAlert}
         setShow={setShowAlert}
-        variant={alertOptions.variant}
-        title={alertOptions.title}
-        message={alertOptions.message}
+        variant={alertOpts.variant}
+        title={alertOpts.title}
+        message={alertOpts.message}
         alwaysShown={true}
       />
       {!_.isEmpty(product) && (

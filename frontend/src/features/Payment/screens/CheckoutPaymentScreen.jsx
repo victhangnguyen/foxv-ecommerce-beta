@@ -12,7 +12,7 @@ import CheckoutPaymentFormComponent from '../components/CheckoutPaymentFormCompo
 import API from '../../../API';
 
 //! imp Actions
-import { createOrder } from '../../Order/OrderSlice';
+import { checkoutOrder } from '../../Order/OrderSlice';
 
 const CheckoutPaymentScreen = ({ entity }) => {
   const dispatch = useDispatch();
@@ -22,7 +22,7 @@ const CheckoutPaymentScreen = ({ entity }) => {
 
   //! localState: alert
   const [showAlert, setShowAlert] = React.useState(false);
-  const [alertOptions, setAlertOptions] = React.useState({
+  const [alertOpts, setAlertOpts] = React.useState({
     variant: '',
     title: '',
     message: '',
@@ -55,7 +55,7 @@ const CheckoutPaymentScreen = ({ entity }) => {
       //! check emptyCart
       if (_.isEmpty(cart.cartItems)) {
         //! show Alert Error
-        setAlertOptions({
+        setAlertOpts({
           variant: 'warning',
           title: 'Giỏ hàng chưa có sản phẩm',
           message:
@@ -68,7 +68,7 @@ const CheckoutPaymentScreen = ({ entity }) => {
 
       // if (!isAuthenticated) {
       //   //! show Alert Error
-      //   setAlertOptions({
+      //   setAlertOpts({
       //     variant: 'danger',
       //     title: 'Truy cập không hợp lệ',
       //     message:
@@ -83,7 +83,7 @@ const CheckoutPaymentScreen = ({ entity }) => {
       //! process checkout the Order
       //! save the Cart and get (create) Order
       const response = await dispatch(
-        createOrder(cart.cartItems, total)
+        checkoutOrder(cart.cartItems, total)
       ).unwrap();
 
       const order = response?.data?.order;
@@ -94,7 +94,7 @@ const CheckoutPaymentScreen = ({ entity }) => {
       return navigate(`/orders/${order._id}`);
     } catch (error) {
       // handleHideModal();
-      setAlertOptions({
+      setAlertOpts({
         variant: 'danger',
         title: 'Lỗi hệ thống',
         message:
@@ -119,7 +119,7 @@ const CheckoutPaymentScreen = ({ entity }) => {
   async function handleCheckoutOrderSubmit(data, e, methods) {
     const { name, address, bankCode } = data;
     dispatch(
-      createOrder({
+      checkoutOrder({
         name,
         address,
         bankCode,
@@ -132,9 +132,9 @@ const CheckoutPaymentScreen = ({ entity }) => {
   return (
     <div className="container d-flex">
       <AlertDismissibleComponent
-        variant={alertOptions.variant}
-        title={alertOptions.title}
-        message={alertOptions.message}
+        variant={alertOpts.variant}
+        title={alertOpts.title}
+        message={alertOpts.message}
         show={showAlert}
         setShow={setShowAlert}
         alwaysShown={true}

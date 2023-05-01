@@ -3,7 +3,7 @@ import { Col, Form, Row } from 'react-bootstrap';
 
 const ImageComponent = ({ methods, name, label, className, ...rest }) => {
   const [imageMain, setImageMain] = React.useState(null);
-  const [images, setImages] = React.useState();
+  const [images, setImages] = React.useState([]);
 
   const REACT_APP_SERVER = 'http://127.0.0.1';
   const REACT_APP_PORT = 5000;
@@ -15,7 +15,7 @@ const ImageComponent = ({ methods, name, label, className, ...rest }) => {
     //! if Array (response from Backend)
     if (Array.isArray(imageFiles)) {
       //! rhf.State === Array
-      setImages(imageFiles);
+      setImages(imageFiles); 
       setImageMain(imageFiles[0]);
       return;
     }
@@ -56,6 +56,8 @@ const ImageComponent = ({ methods, name, label, className, ...rest }) => {
         });
     }
     return () => {
+      if (!imageFiles.length) return;
+
       isCancel = true;
       fileReaders.forEach((fileReader) => {
         if (fileReader.readyState === 1) {
@@ -78,7 +80,7 @@ const ImageComponent = ({ methods, name, label, className, ...rest }) => {
         onClick={() => handleImage(index)}
       >
         <img
-          src={image.includes('data:image/') ? image : imagesUrl + image}
+          src={image?.includes('data:image/') ? image : imagesUrl + image}
           alt=""
         />
       </div>
@@ -105,7 +107,9 @@ const ImageComponent = ({ methods, name, label, className, ...rest }) => {
             />
           )}
         </div>
-        <div className="form-image__image-slides">{renderSlices}</div>
+        {images && (
+          <div className="form-image__image-slides">{renderSlices}</div>
+        )}
       </div>
       <Col>
         <Form.Control

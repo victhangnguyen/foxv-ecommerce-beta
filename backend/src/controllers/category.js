@@ -172,12 +172,6 @@ export async function updateCategoryById(req, res, next) {
       return result;
     });
 
-    console.log(
-      '__Debugger__category\n__updateCategoryById__updatedCategory: ',
-      updatedCategory,
-      '\n'
-    );
-
     res.status(200).json({
       success: true,
       message: 'Update an Category successful!',

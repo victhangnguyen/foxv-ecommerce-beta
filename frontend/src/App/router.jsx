@@ -32,6 +32,7 @@ import AddEditProductScreen from '../features/Product/screens/AddEditProductScre
 import ManageProductScreen from '../features/Product/screens/ManageProductScreen';
 import ManageUserScreen from '../features/User/screens/ManageUserScreen';
 import ManageOrderScreen from '../features/Order/screens/ManageOrderScreen';
+import OrderCreateScreen from '../features/Order/screens/OrderCreateScreen';
 
 //! imp Routes
 import AdminRoute from '../components/Routes/AdminRoute';
@@ -90,28 +91,31 @@ const router = createBrowserRouter([
             path: 'admin',
             element: <AdminDashboardScreen />,
             children: [
-              //! User Management
+              //! /admin/users
               { path: 'users', element: <ManageUserScreen /> }, //! users management
               { path: 'users/create', element: <AddEditUserScreen /> },
               { path: 'users/:userId/update', element: <AddEditUserScreen /> },
-              //! Product Management
+              //! /admin/products
               { path: 'products', element: <ManageProductScreen /> }, //! products management
               { path: 'products/create', element: <AddEditProductScreen /> },
               {
                 path: 'products/:productId/update',
                 element: <AddEditProductScreen />,
               },
-              //! Order Management
+              //! /admin/orders
               { path: 'orders', element: <ManageOrderScreen /> },
+              { path: 'orders/create', element: <OrderCreateScreen /> },
               {
                 path: 'orders/:orderId/update',
                 element: <AddEditOrderScreen />,
               },
+              //! /admin/categories
               { path: 'categories/create', element: <CategoryCreateScreen /> },
               {
                 path: 'categories/:categoryId/update',
                 element: <CategoryUpdateScreen />,
               },
+              //! /admin/subcategories
               {
                 path: 'subcategories/create',
                 element: <SubCategoryCreateScreen />,

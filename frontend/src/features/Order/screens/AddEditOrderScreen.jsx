@@ -5,18 +5,14 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate, useParams } from 'react-router-dom';
 //! imp Utils
 import { parseIntlNumber } from '../../../utils/parse';
-
 //! imp Constants
 import constants from '../../../constants';
-
 //! imp Comps
 import AlertDismissibleComponent from '../../../components/Alert/AlertDismissibleComponent';
 import OrderFormComponent from '../components/OrderFormComponent';
-
 //! imp Actions
 import { emptyCart } from '../../Cart/CartSlice';
 import { emptyNewOrder, getOrderById, updateOrder } from '../OrderSlice';
-
 //! imp API
 import API from '../../../API';
 
@@ -30,7 +26,7 @@ const AddEditOrderScreen = ({ entity }) => {
 
   //! localState: alert
   const [showAlert, setShowAlert] = React.useState(false);
-  const [alertOptions, setAlertOptions] = React.useState({
+  const [alertOpts, setAlertOpts] = React.useState({
     variant: '',
     title: '',
     message: '',
@@ -94,24 +90,13 @@ const AddEditOrderScreen = ({ entity }) => {
         updateOrder({ orderId, orderData: data })
       ).unwrap();
       if (response.success) {
-        //! reload Order
-        await loadOrderById(orderId);
-
-        console.log('response: ', response);
-
-        setAlertOptions({
-          variant: 'success',
-          title: 'Thay đổi thông tin thành công!',
-          message: `Bạn đã thay đổi thông tin đơn hàng thành công.`,
-        });
-
-        handleShowAlert();
+        navigate('/admin/orders', { replace: true });
       }
     } catch (error) {
       //! Error Handling 422
       if (error.response?.status === 422) {
         const errors = error.response.data.errors;
-        if (!errors.length) return;
+        if (!errors?.length) return;
         errors.forEach((error) => {
           methods.setError(error.param, {
             type: 'server',
@@ -123,7 +108,7 @@ const AddEditOrderScreen = ({ entity }) => {
       }
 
       //! Error Handling Other
-      setAlertOptions({
+      setAlertOpts({
         variant: 'danger',
         title: 'Lỗi hệ thống',
         message:
@@ -158,9 +143,9 @@ const AddEditOrderScreen = ({ entity }) => {
   return (
     <div className="container">
       <AlertDismissibleComponent
-        variant={alertOptions.variant}
-        title={alertOptions.title}
-        message={alertOptions.message}
+        variant={alertOpts.variant}
+        title={alertOpts.title}
+        message={alertOpts.message}
         show={showAlert}
         handleHideAlert={handleHideAlert}
         alwaysShown={true}

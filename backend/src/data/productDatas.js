@@ -255,7 +255,8 @@ const productDatas = [
       'dam-ngan-phoi-nut-hndng022_den_00.jpg',
       'dam-ngan-phoi-nut-hndng022_den_01.jpg',
       'dam-ngan-phoi-nut-hndng022_den_02.jpg',
-      'dam-ngan-phoi-nut-hndng022_den_03.jpg',
+      // 'dam-ngan-phoi-nut-hndng022_den_03.jpg',
+      'dam-lung-co-yem-xoan-day-hndlu085_do_03.jpg',
     ],
     discount: 0,
   },
@@ -315,7 +316,7 @@ const productDatas = [
       'vay-om-bac12002068hh_xam_00.jpg',
       'vay-om-bac12002068hh_xam_01.jpg',
       'vay-om-bac12002068hh_xam_02.jpg',
-      'vay-om-bac12002068hh_xam_03.jpg',
+      'vay-om-bac12002068hh_xam__03.jpg', //! make an fake error: dont exist
     ],
     discount: 100000,
   },

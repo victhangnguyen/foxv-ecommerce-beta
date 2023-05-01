@@ -12,7 +12,12 @@ import SelectControllerComponent from '../../../components/Form/SelectController
 //! imp Constants
 import constants from '../../../constants';
 
-const OrderFormComponent = ({ initialValues, loading, onSubmit }) => {
+const OrderFormComponent = ({
+  initialValues,
+  loading,
+  onSubmit,
+  handleClickCancel,
+}) => {
   const phoneNumerRegExp = /^[+]*[(]{0,1}[0-9]{1,4}[)]{0,1}[-\s\./0-9]*$/;
   const unicodeLetters = /^[A-Za-z\u00C0-\u024F\u1E00-\u1EFF ]+$/;
 
@@ -79,30 +84,34 @@ const OrderFormComponent = ({ initialValues, loading, onSubmit }) => {
         {
           //! orderId
         }
-        <InputComponent
-          readOnly
-          disabled
-          name="orderId"
-          label={'Mã đơn hàng'}
-        />
+        {!isAdminController && (
+          <InputComponent
+            readOnly={isAdminController ? false : true}
+            disabled={isAdminController ? false : true}
+            name="orderId"
+            label={'Mã đơn hàng'}
+          />
+        )}
         {
           //! userId
         }
         <InputComponent
-          readOnly
-          disabled
+          readOnly={isAdminController ? false : true}
+          disabled={isAdminController ? false : true}
           name="userId"
-          label={'Mã khách hàng'}
+          label={isAdminController ? 'Mã người mua hộ' : 'Mã khách hàng'}
         />
         {
           //! orderDate
         }
-        <InputComponent
-          readOnly
-          disabled
-          name="orderDate"
-          label={'Ngày lập đơn hàng'}
-        />
+        {!isAdminController && (
+          <InputComponent
+            readOnly
+            disabled
+            name="orderDate"
+            label={'Ngày lập đơn hàng'}
+          />
+        )}
         {
           //! name
         }
@@ -126,8 +135,10 @@ const OrderFormComponent = ({ initialValues, loading, onSubmit }) => {
           //! status
         }
         <SelectControllerComponent
+          className={'mb-4'}
           options={statusOptions}
           readOnly={isAdminController ? false : true}
+          disabled={isAdminController ? false : true}
           name="status"
           label={'Tình trạng đơn hàng'}
         />
@@ -136,6 +147,7 @@ const OrderFormComponent = ({ initialValues, loading, onSubmit }) => {
         }
         <InputComponent
           readOnly={isAdminController ? false : true}
+          disabled={isAdminController ? false : true}
           name="transactionNo"
           label={'Mã giao dịch'}
         />
@@ -144,6 +156,7 @@ const OrderFormComponent = ({ initialValues, loading, onSubmit }) => {
         }
         <InputComponent
           readOnly={isAdminController ? false : true}
+          disabled={isAdminController ? false : true}
           name="bankTranNo"
           label={'Mã giao dịch ngân hàng'}
         />
@@ -153,7 +166,18 @@ const OrderFormComponent = ({ initialValues, loading, onSubmit }) => {
         {isAdminController && (
           <div className="d-flex justify-content-center">
             <Button className="btn-submit" variant="primary" type="submit">
-              {loading ? 'Loading...' : 'Cập nhật đơn hàng'}
+              {loading
+                ? 'Loading...'
+                : isAdminController
+                ? 'Tạo đơn hàng mới'
+                : 'Cập nhật đơn hàng'}
+            </Button>
+            <Button
+              className="btn ms-4"
+              variant="secondary"
+              onClick={handleClickCancel}
+            >
+              Hủy
             </Button>
           </div>
         )}

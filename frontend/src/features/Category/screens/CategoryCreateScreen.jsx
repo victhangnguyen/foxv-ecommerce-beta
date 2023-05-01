@@ -50,7 +50,7 @@ const CategoryCreateScreen = () => {
 
   //! localState Alert
   const [showAlert, setShowAlert] = React.useState(false);
-  const [alertOptions, setAlertOptions] = React.useState({
+  const [alertOpts, setAlertOpts] = React.useState({
     variant: '',
     title: '',
     message: '',
@@ -58,7 +58,7 @@ const CategoryCreateScreen = () => {
 
   //! localState Modal
   const [showModal, setShowModal] = React.useState(false);
-  const [modalOptions, setModalOptions] = React.useState({
+  const [modalOpts, setModalOpts] = React.useState({
     variant: '',
     title: '',
     message: '',
@@ -80,7 +80,7 @@ const CategoryCreateScreen = () => {
       setLoading(false);
     } catch (error) {
       setLoading(false);
-      setAlertOptions({
+      setAlertOpts({
         variant: 'danger',
         title: 'Lỗi hệ thống',
         message:
@@ -104,7 +104,7 @@ const CategoryCreateScreen = () => {
       //! re-load Data
       loadCategories();
       //! show Alert
-      setAlertOptions({
+      setAlertOpts({
         variant: 'success',
         title: 'Tạo Loại sản phẩm (Category)',
         message: `Bạn đã tạo Loại sản phẩm với tên [${response.data.category.name}] thành công!`,
@@ -115,7 +115,7 @@ const CategoryCreateScreen = () => {
       //! Error Handling
       if (error.response?.status === 422) {
         const errors = error.response.data.errors;
-        if (!errors.length) return;
+        if (!errors?.length) return;
         errors.forEach((error) => {
           if (error.param === 'subCategories') {
             if (!data.category) return;
@@ -128,7 +128,7 @@ const CategoryCreateScreen = () => {
         return;
       }
 
-      setAlertOptions({
+      setAlertOpts({
         variant: 'danger',
         title: 'Lỗi hệ thống',
         message:
@@ -174,7 +174,7 @@ const CategoryCreateScreen = () => {
     switch (actionType) {
       /* DELETE ONE CATEOGRY */
       case constants.category.actionTypes.DELETE_CATEGORY:
-        setModalOptions({
+        setModalOpts({
           variant: 'warning',
           title: `Xác nhận xóa Category`,
           message: `Bạn có muốn xóa Loại sản phẩm này không? [Tên Loại: ${selectedCategories[0]?.name}, Slug: ${selectedCategories[0]?.slug}]`,
@@ -184,7 +184,7 @@ const CategoryCreateScreen = () => {
         break;
 
       default:
-        setAlertOptions({
+        setAlertOpts({
           variant: 'danger',
           title: `Hệ thống đang phát triển chức năng`,
           message: `Chức năng này đang được phát triển hoặc nâng cấp. Xin vui lòng xử dụng chức năng này sau!`,
@@ -206,7 +206,7 @@ const CategoryCreateScreen = () => {
       loadCategories();
       handleHideModal();
       handleShowAlert();
-      setAlertOptions({
+      setAlertOpts({
         variant: 'success',
         title: 'Xóa Loại sản phẩm (Category)',
         message: `Bạn đã xóa Loại sản phẩm với tên [${response.data?.deletedCategory.name}] thành công.`,
@@ -216,7 +216,7 @@ const CategoryCreateScreen = () => {
       handleHideModal();
       handleShowAlert();
 
-      setAlertOptions({
+      setAlertOpts({
         variant: 'danger',
         title: 'Lỗi hệ thống',
         message:
@@ -260,9 +260,9 @@ const CategoryCreateScreen = () => {
       <AlertDismissibleComponent
         show={showAlert}
         handleHideAlert={handleHideAlert}
-        variant={alertOptions.variant}
-        title={alertOptions.title}
-        message={alertOptions.message}
+        variant={alertOpts.variant}
+        title={alertOpts.title}
+        message={alertOpts.message}
         alwaysShown={true}
       />
 
@@ -331,10 +331,10 @@ const CategoryCreateScreen = () => {
       </Row>
       <ConfirmationModalComponent
         showModal={showModal}
-        variant={modalOptions.variant}
-        title={modalOptions.title}
-        nameButton={modalOptions.nameButton}
-        message={modalOptions.message}
+        variant={modalOpts.variant}
+        title={modalOpts.title}
+        nameButton={modalOpts.nameButton}
+        message={modalOpts.message}
         handleHideModal={handleHideModal}
         handleSubmit={handleConfirmationSubmit}
       />

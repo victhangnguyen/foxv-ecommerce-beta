@@ -21,7 +21,7 @@ const RegisterScreen = () => {
 
   //! localState: Alert
   const [showAlert, setShowAlert] = React.useState(false);
-  const [alertOptions, setAlertOptions] = React.useState({
+  const [alertOpts, setAlertOpts] = React.useState({
     variant: '',
     title: '',
     message: '',
@@ -52,7 +52,7 @@ const RegisterScreen = () => {
 
       if (response.success) {
         scrollToTop();
-        setAlertOptions({
+        setAlertOpts({
           variant: 'success',
           title: 'Đăng ký tài khoản thành công',
           message: `Bạn đã đăng ký thành công tài khoản [${response.data.user.email}].`,
@@ -66,7 +66,7 @@ const RegisterScreen = () => {
       //! Error Handling
       if (error.response?.status === 422) {
         const errors = error.response.data.errors;
-        if (!errors.length) return;
+        if (!errors?.length) return;
         errors.forEach((error) => {
           methods.setError(error.param, {
             type: 'server',
@@ -77,7 +77,7 @@ const RegisterScreen = () => {
         return;
       }
 
-      setAlertOptions({
+      setAlertOpts({
         variant: 'danger',
         title: 'Lỗi hệ thống',
         message:
@@ -103,9 +103,9 @@ const RegisterScreen = () => {
       <AlertDismissibleComponent
         show={showAlert}
         handleHideAlert={handleHideAlert}
-        variant={alertOptions.variant}
-        title={alertOptions.title}
-        message={alertOptions.message}
+        variant={alertOpts.variant}
+        title={alertOpts.title}
+        message={alertOpts.message}
         alwaysShown={true}
       />
 

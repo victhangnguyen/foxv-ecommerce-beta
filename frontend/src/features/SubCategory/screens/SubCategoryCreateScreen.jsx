@@ -62,7 +62,7 @@ const SubCategoryCreateScreen = () => {
 
   //! localState Alert
   const [showAlert, setShowAlert] = React.useState(false);
-  const [alertOptions, setAlertOptions] = React.useState({
+  const [alertOpts, setAlertOpts] = React.useState({
     variant: '',
     title: '',
     message: '',
@@ -70,7 +70,7 @@ const SubCategoryCreateScreen = () => {
 
   //! localState Modal
   const [showModal, setShowModal] = React.useState(false);
-  const [modalOptions, setModalOptions] = React.useState({
+  const [modalOpts, setModalOpts] = React.useState({
     variant: '',
     title: '',
     message: '',
@@ -94,7 +94,7 @@ const SubCategoryCreateScreen = () => {
       setCategories(response.data.categories);
     } catch (error) {
       setLoading(false);
-      setAlertOptions({
+      setAlertOpts({
         variant: 'danger',
         title: 'Lỗi hệ thống',
         message:
@@ -116,7 +116,7 @@ const SubCategoryCreateScreen = () => {
       setLoading(false);
       handleShowAlert();
 
-      setAlertOptions({
+      setAlertOpts({
         variant: 'danger',
         title: 'Lỗi hệ thống',
         message:
@@ -136,7 +136,7 @@ const SubCategoryCreateScreen = () => {
       setLoading(false);
       handleShowAlert();
 
-      setAlertOptions({
+      setAlertOpts({
         variant: 'danger',
         title: 'Lỗi hệ thống',
         message:
@@ -159,7 +159,7 @@ const SubCategoryCreateScreen = () => {
       //! re-load Data
       loadSubCategoriesByCategoryId(categoryId);
       //! show Alert
-      setAlertOptions({
+      setAlertOpts({
         variant: 'success',
         title: 'Tạo Kiểu sản phẩm (SubCategory)',
         message: `Bạn đã tạo Kiểu sản phẩm với tên [${response.data.subCategory.name}] thành công!`,
@@ -169,7 +169,7 @@ const SubCategoryCreateScreen = () => {
       //! Error Handling
       if (error.response?.status === 422) {
         const errors = error.response.data.errors;
-        if (!errors.length) return;
+        if (!errors?.length) return;
         errors.forEach((error) => {
           methods.setError(error.param, {
             type: 'server',
@@ -179,7 +179,7 @@ const SubCategoryCreateScreen = () => {
         return;
       }
 
-      setAlertOptions({
+      setAlertOpts({
         variant: 'danger',
         title: 'Lỗi hệ thống',
         message:
@@ -223,7 +223,7 @@ const SubCategoryCreateScreen = () => {
     switch (actionType) {
       /* DELETE ONE CATEOGRY */
       case constants.subCategory.actionTypes.DELETE_SUBCATEGORY:
-        setModalOptions({
+        setModalOpts({
           variant: 'warning',
           title: `Xác nhận xóa Category`,
           message: `Bạn có muốn xóa Kiểu sản phẩm này không? [Tên Kiểu: ${selectedSubCategories[0]?.name}, Slug: ${selectedSubCategories[0]?.slug}]`,
@@ -233,7 +233,7 @@ const SubCategoryCreateScreen = () => {
         break;
 
       default:
-        setAlertOptions({
+        setAlertOpts({
           variant: 'danger',
           title: `Hệ thống đang phát triển chức năng`,
           message: `Chức năng này đang được phát triển hoặc nâng cấp. Xin vui lòng xử dụng chức năng này sau!`,
@@ -256,7 +256,7 @@ const SubCategoryCreateScreen = () => {
         );
         setLoading(false);
 
-        setAlertOptions({
+        setAlertOpts({
           variant: response.success ? 'success' : 'danger',
           title: `Xóa Kiểu sản phẩm thành công`,
           message: `Bạn đã xóa Kiểuoại sản phẩm với tên [${response.data.deletedSubCategory.name}] thành công.`,
@@ -277,7 +277,7 @@ const SubCategoryCreateScreen = () => {
       handleHideModal();
       handleShowAlert();
 
-      setAlertOptions({
+      setAlertOpts({
         variant: 'danger',
         title: 'Lỗi hệ thống',
         message:
@@ -332,9 +332,9 @@ const SubCategoryCreateScreen = () => {
       <AlertDismissibleComponent
         show={showAlert}
         handleHideAlert={handleHideAlert}
-        variant={alertOptions.variant}
-        title={alertOptions.title}
-        message={alertOptions.message}
+        variant={alertOpts.variant}
+        title={alertOpts.title}
+        message={alertOpts.message}
         alwaysShown={true}
       />
 
@@ -400,10 +400,10 @@ const SubCategoryCreateScreen = () => {
       </Row>
       <ConfirmationModalComponent
         showModal={showModal}
-        variant={modalOptions.variant}
-        title={modalOptions.title}
-        nameButton={modalOptions.nameButton}
-        message={modalOptions.message}
+        variant={modalOpts.variant}
+        title={modalOpts.title}
+        nameButton={modalOpts.nameButton}
+        message={modalOpts.message}
         handleHideModal={handleHideModal}
         handleSubmit={handleConfirmationSubmit}
       />

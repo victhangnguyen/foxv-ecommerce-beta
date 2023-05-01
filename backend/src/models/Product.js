@@ -54,7 +54,7 @@ const productSchema = new mongoose.Schema(
       // require: true,
       trim: true,
       min: 0,
-      max: 10000000,
+      max: 50000,
       default: 0,
     },
     creator: {

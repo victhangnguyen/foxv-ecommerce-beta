@@ -27,6 +27,16 @@ router.post(
   orderController.createOrderByUserId
 );
 
+//! @desc     Create a new Order
+//! @route    POST /admin/orders/create
+//! @access   Private: Admin
+router.post(
+  '/admin/orders/create',
+  authenticate,
+  isAdmin,
+  orderController.createOrder
+);
+
 //! @desc     Delete One Order
 //! @route    DEL /api/admin/orders/delete-single'
 //! @access   Private: Admin
@@ -44,7 +54,7 @@ router.delete(
   '/admin/orders/delete-multiple',
   authenticate,
   isAdmin,
-  orderController.deleteOrders
+  orderController.deleteOrdersByIds
 );
 
 //! @desc     Update One Order

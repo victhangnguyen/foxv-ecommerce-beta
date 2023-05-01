@@ -8,8 +8,8 @@ import ProductCard from '../../Product/components/Card/ProductCard';
 import BreadcrumbComponent from '../../../components/Breadcrumb/BreadcrumbComponent';
 import AlertDismissibleComponent from '../../../components/Alert/AlertDismissibleComponent';
 
-//! imp Services
-import subCategoryService from '../../SubCategory/services/subCategoryService';
+//! imp APIs
+import API from '../../../API';
 
 const SubCollectionScreen = () => {
   const { slug } = useParams(); //! subSlug
@@ -20,7 +20,7 @@ const SubCollectionScreen = () => {
   const [loading, setLoading] = React.useState(false);
   //! localState: alert
   const [showAlert, setShowAlert] = React.useState(false);
-  const [alertOptions, setAlertOptions] = React.useState({
+  const [alertOpts, setAlertOpts] = React.useState({
     variant: '',
     title: '',
     message: '',
@@ -43,30 +43,37 @@ const SubCollectionScreen = () => {
 
   //! effect DidMount
   React.useEffect(() => {
-    loadCategoryBySlug(slug);
+    const load = async () => {
+      try {
+        await loadCategoryBySlug(slug);
+      } catch (error) {
+        setAlertOpts({
+          variant: 'danger',
+          title: 'Lỗi hệ thống',
+          message:
+            error.response?.data?.message ||
+            error.response?.message ||
+            error.message,
+        });
+        setShowAlert(true);
+        toast.error(error.response?.message || error.massage);
+      }
+    };
+    load();
   }, [slug]);
 
-  const loadCategoryBySlug = async (slug) => {
+  async function loadCategoryBySlug(slug) {
     try {
       setLoading(true);
-      const response = await subCategoryService.getSubCategoryBySlug(slug);
+      const response = await API.subCategory.getSubCategoryBySlug(slug);
       setLoading(false);
       setSub(response.data.subCategory);
       setProducts(response.data.products);
     } catch (error) {
       setLoading(false);
-      setAlertOptions({
-        variant: 'danger',
-        title: 'Lỗi hệ thống',
-        message:
-          error.response?.data?.message ||
-          error.response?.message ||
-          error.message,
-      });
-      setShowAlert(true);
-      toast.error(error.response?.message || error.massage);
+      throw error;
     }
-  };
+  }
 
   return (
     <div className="container">
@@ -75,9 +82,9 @@ const SubCollectionScreen = () => {
       <AlertDismissibleComponent
         show={showAlert}
         setShow={setShowAlert}
-        variant={alertOptions.variant}
-        title={alertOptions.title}
-        message={alertOptions.message}
+        variant={alertOpts.variant}
+        title={alertOpts.title}
+        message={alertOpts.message}
         alwaysShown={true}
       />
 

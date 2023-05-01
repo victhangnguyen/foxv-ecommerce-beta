@@ -23,7 +23,7 @@ const CategoryUpdateScreen = () => {
 
   //! localState: Alert
   const [showAlert, setShowAlert] = React.useState(false);
-  const [alertOptions, setAlertOptions] = React.useState({
+  const [alertOpts, setAlertOpts] = React.useState({
     variant: '',
     title: '',
     message: '',
@@ -64,7 +64,7 @@ const CategoryUpdateScreen = () => {
       dispatch(emptyCategory());
 
       handleShowAlert();
-      setAlertOptions({
+      setAlertOpts({
         variant: 'danger',
         title: 'Lỗi hệ thống',
         message:
@@ -88,7 +88,7 @@ const CategoryUpdateScreen = () => {
       ).unwrap();
 
       handleShowAlert();
-      setAlertOptions({
+      setAlertOpts({
         variant: 'success',
         title: 'Cập nhật Loại sản phẩm (Category)',
         message: `Bạn đã cập nhật Loại sản phẩm với tên [${response.data.updatedCategory.name}] thành công!`,
@@ -97,7 +97,7 @@ const CategoryUpdateScreen = () => {
       //! Error Handling
       if (error.response?.status === 422) {
         const errors = error.response.data.errors;
-        if (!errors.length) return;
+        if (!errors?.length) return;
         errors.forEach((error) => {
           methods.setError(error.param, {
             type: 'server',
@@ -109,7 +109,7 @@ const CategoryUpdateScreen = () => {
 
       handleShowAlert();
 
-      setAlertOptions({
+      setAlertOpts({
         variant: 'danger',
         title: 'Lỗi hệ thống',
         message:
@@ -135,9 +135,9 @@ const CategoryUpdateScreen = () => {
       <AlertDismissibleComponent
         show={showAlert}
         handleHideAlert={handleHideAlert}
-        variant={alertOptions.variant}
-        title={alertOptions.title}
-        message={alertOptions.message}
+        variant={alertOpts.variant}
+        title={alertOpts.title}
+        message={alertOpts.message}
         alwaysShown={true}
       />
       <h2 className="fw-bold mb-2 text-uppercase ">

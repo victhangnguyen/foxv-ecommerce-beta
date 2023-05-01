@@ -4,19 +4,19 @@ import { useDispatch, useSelector } from 'react-redux';
 import { toast } from 'react-toastify';
 
 //! imp Services
-import API from '../../API';
+import API from '../../../../API';
 
 //! imp Actions
-import { getProductsByFilters } from '../../features/Product/ProductSlice';
+import { getProductsByFilters } from '../../ProductSlice';
 import {
   clearSearch,
   searchCategory,
   searchPrice,
   searchSubCategory,
-} from '../../features/Search/SearchSlice';
+} from '../../../Search/SearchSlice';
 
 //! imp Components
-import SearchComponent from '../../features/Search/components/SearchComponent';
+// import SearchComponent from '../../../Search/components/SearchComponent';
 import ToolSortOrderComponent from './ToolSortOrderComponent';
 import ToolPriceComponent from './ToolPriceComponent';
 import ToolCategoryComponent from './ToolCategoryComponent';
@@ -124,7 +124,7 @@ const ToolbarComponent = ({
         </div>
       </Col>
       <Col xs={4} lg={4}>
-        {searchType === 'text' && <SearchComponent />}
+        {/* {searchType === 'text' && <SearchComponent />} */}
         {searchType === 'price' && (
           <ToolPriceComponent handlePriceChange={handlePriceChange} />
         )}

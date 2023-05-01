@@ -13,7 +13,7 @@ import authService from '../services/authService';
 const ForgotPasswordScreen = () => {
   //! localState: alert
   const [showAlert, setShowAlert] = React.useState(false);
-  const [alertOptions, setAlertOptions] = React.useState({
+  const [alertOpts, setAlertOpts] = React.useState({
     variant: '',
     title: '',
     message: '',
@@ -25,7 +25,7 @@ const ForgotPasswordScreen = () => {
     try {
       const response = await authService.forgotPassword({ email });
 
-      setAlertOptions({
+      setAlertOpts({
         variant: 'success',
         title: 'Khôi phục mật khẩu',
         message: 'Gửi mật khẩu sang email thành công',
@@ -35,7 +35,7 @@ const ForgotPasswordScreen = () => {
     } catch (error) {
       console.log('error: ', error);
 
-      setAlertOptions({
+      setAlertOpts({
         variant: 'danger',
         title: 'Lỗi hệ thống',
         message:
@@ -53,9 +53,9 @@ const ForgotPasswordScreen = () => {
       <AlertDismissibleComponent
         show={showAlert}
         setShow={setShowAlert}
-        variant={alertOptions.variant}
-        title={alertOptions.title}
-        message={alertOptions.message}
+        variant={alertOpts.variant}
+        title={alertOpts.title}
+        message={alertOpts.message}
         alwaysShown={false}
       />
       <Row className="d-flex justify-content-center align-items-center">

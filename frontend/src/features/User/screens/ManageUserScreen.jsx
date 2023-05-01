@@ -14,7 +14,7 @@ import { DELETE_USERS, RESET_PASSWORDS } from '../services/actionTypes';
 import BreadcrumbComponent from '../../../components/Breadcrumb/BreadcrumbComponent';
 import ConfirmationModalComponent from '../../../components/Modal/ConfirmationModalComponent';
 import PaginationComponent from '../../../components/Pagination/PaginationComponent';
-import ToolbarSearchComponent from '../../../components/Toolbars/ToolbarSearchComponent';
+import ToolbarSearchComponent from '../components/Toolbars/ToolbarSearchComponent';
 import AdminUserCard from '../components/Card/AdminUserCard';
 //! imp Comps/Modals
 import AlertDismissibleComponent from '../../../components/Alert/AlertDismissibleComponent';
@@ -53,14 +53,14 @@ const ManageUserScreen = () => {
 
   //! localState: Modal
   const [showModal, setShowModal] = React.useState(false);
-  const [modalOptions, setModalOptions] = React.useState({
+  const [modalOpts, setModalOpts] = React.useState({
     variant: '',
     title: '',
     message: '',
   });
   //! localState: Alert
   const [showAlert, setShowAlert] = React.useState(false);
-  const [alertOptions, setAlertOptions] = React.useState({
+  const [alertOpts, setAlertOpts] = React.useState({
     variant: 'success',
     title: '',
     message: '',
@@ -96,7 +96,7 @@ const ManageUserScreen = () => {
       /* REMOVE USER ACCOUNT */
       case DELETE_USERS:
         //! set Modal style Single or Multiple
-        setModalOptions({
+        setModalOpts({
           variant: 'danger',
           title: `Xác nhận xóa ${
             selectedUsers.length > 1 ? 'nhiều' : ''
@@ -117,7 +117,7 @@ const ManageUserScreen = () => {
       /* RESET PASSWORD */
       case RESET_PASSWORDS:
         //! set Modal style Single or Multiple
-        setModalOptions({
+        setModalOpts({
           variant: 'warning',
           title: `Xác nhận Reset password ${
             selectedUsers.length > 1 ? 'nhiều' : ''
@@ -153,7 +153,7 @@ const ManageUserScreen = () => {
         const response = await userService.deleteUsers(selectedIds);
         const results = response.data.results;
         //! set Alert style
-        setAlertOptions({
+        setAlertOpts({
           variant: 'success',
           title: response.message,
           message: `Bạn đã xóa ${
@@ -166,7 +166,7 @@ const ManageUserScreen = () => {
         var results = response.data.results;
 
         //! set Alert style
-        setAlertOptions({
+        setAlertOpts({
           variant: 'success',
           title: 'Reset password thành công',
           message: `Bạn đã reset password ${
@@ -184,7 +184,7 @@ const ManageUserScreen = () => {
       scrollToTop();
     } catch (error) {
       //! Error Handling Slice
-      setAlertOptions({
+      setAlertOpts({
         variant: 'danger',
         title: 'Lỗi hệ thống',
         message:
@@ -232,9 +232,9 @@ const ManageUserScreen = () => {
       <AlertDismissibleComponent
         handleHideAlert={handleHideAlert}
         show={showAlert}
-        variant={alertOptions.variant}
-        title={alertOptions.title}
-        message={alertOptions.message}
+        variant={alertOpts.variant}
+        title={alertOpts.title}
+        message={alertOpts.message}
         alwaysShown={true}
       />
 
@@ -272,10 +272,10 @@ const ManageUserScreen = () => {
       </div>
       <ConfirmationModalComponent
         showModal={showModal}
-        variant={modalOptions.variant}
-        title={modalOptions.title}
-        nameButton={modalOptions.nameButton}
-        message={modalOptions.message}
+        variant={modalOpts.variant}
+        title={modalOpts.title}
+        nameButton={modalOpts.nameButton}
+        message={modalOpts.message}
         handleHideModal={handleHideModal}
         handleSubmit={handleSubmit}
       />

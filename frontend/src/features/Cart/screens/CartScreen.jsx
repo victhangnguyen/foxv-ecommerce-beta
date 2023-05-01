@@ -25,6 +25,10 @@ const CartScreen = () => {
   //! rootState
   const { user, token } = useSelector((state) => state.auth);
 
+  const isAdminController = user?.roles
+    ?.map((role) => role.name)
+    .includes('admin');
+
   const isAuthenticated =
     token && user.roles?.map((role) => role.name).includes('user');
 
@@ -38,7 +42,7 @@ const CartScreen = () => {
 
   //! localState: alert
   const [showAlert, setShowAlert] = React.useState(false);
-  const [alertOptions, setAlertOptions] = React.useState({
+  const [alertOpts, setAlertOpts] = React.useState({
     variant: '',
     title: '',
     message: '',
@@ -46,7 +50,7 @@ const CartScreen = () => {
 
   //! localState Modal
   const [showModal, setShowModal] = React.useState(false);
-  const [modalOptions, setModalOptions] = React.useState({
+  const [modalOpts, setModalOpts] = React.useState({
     variant: '',
     title: '',
     message: '',
@@ -82,7 +86,7 @@ const CartScreen = () => {
     setSelectedId(entity.product);
     setActionType('DELETE_CART_ITEM');
     //! Set Modal Optons
-    setModalOptions({
+    setModalOpts({
       variant: 'warning',
       title: 'Xác nhận loại bỏ sản phẩm',
       message: `Bạn có muốn loại bỏ [${entity.name}] ra khoải Giỏ hàng không?`,
@@ -98,7 +102,7 @@ const CartScreen = () => {
     setSelectedId('');
     setActionType('EMPTY_CART');
     //! Set Modal Optons
-    setModalOptions({
+    setModalOpts({
       variant: 'warning',
       title: 'Xác nhận làm trống giỏ hàng',
       message: `Bạn có muốn làm trống Giỏ hàng không?`,
@@ -134,7 +138,7 @@ const CartScreen = () => {
       handleHideModal();
     } catch (error) {
       handleHideModal();
-      setAlertOptions({
+      setAlertOpts({
         variant: 'danger',
         title: 'Lỗi hệ thống',
         message:
@@ -149,13 +153,15 @@ const CartScreen = () => {
   }
 
   function handleClickGotoCheckout() {
-    if (isAuthenticated) {
+    if (isAdminController) {
+      navigate(`/admin/orders/create`, { replace: false });
+    } else if (isAuthenticated) {
       navigate(`/users/${user._id}/checkout`, { replace: false });
     } else {
-      setAlertOptions({
+      setAlertOpts({
         variant: 'danger',
         title: 'Lỗi hệ thống',
-        message: 'Đăng nhập trước khi Thanh toán'
+        message: 'Đăng nhập trước khi Thanh toán',
       });
       handleShowAlert();
     }
@@ -173,9 +179,9 @@ const CartScreen = () => {
   return (
     <Container>
       <AlertDismissibleComponent
-        variant={alertOptions.variant}
-        title={alertOptions.title}
-        message={alertOptions.message}
+        variant={alertOpts.variant}
+        title={alertOpts.title}
+        message={alertOpts.message}
         show={showAlert}
         setShow={setShowAlert}
         alwaysShown={true}
@@ -259,7 +265,7 @@ const CartScreen = () => {
               className="btn btn-dark rounded-pill py-2 btn-block"
               onClick={handleClickGotoCheckout}
             >
-              TIẾN HÀNH THANH TOÁN
+              {isAdminController ? 'TẠO HÓA ĐƠN ' : 'TIẾN HÀNH THANH TOÁN'}
             </button>
           </div>
         </div>
@@ -267,11 +273,11 @@ const CartScreen = () => {
       <ConfirmationModalComponent
         showModal={showModal}
         handleHideModal={handleHideModal}
-        variant={modalOptions.variant}
-        title={modalOptions.title}
-        message={modalOptions.message}
+        variant={modalOpts.variant}
+        title={modalOpts.title}
+        message={modalOpts.message}
         handleSubmit={handleModalSubmit}
-        nameButton={modalOptions.nameButton}
+        nameButton={modalOpts.nameButton}
       />
       {/* <GoToButtonComponent visible={scrollPosition > 300} /> */}
     </Container>

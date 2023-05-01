@@ -22,6 +22,32 @@ export function checkoutOrder({
 }
 
 /**
+ * createOrder
+ */
+export function createOrder({
+  user,
+  items,
+  total,
+  status,
+  name,
+  address,
+  transactionNo,
+  bankTranNo,
+}) {
+  const url = `/admin/orders/create`;
+  return axiosInstance.post(url, {
+    user,
+    items,
+    total,
+    status,
+    name,
+    address,
+    transactionNo,
+    bankTranNo,
+  });
+}
+
+/**
  * getOrderById
  */
 export function getOrderById(orderId) {

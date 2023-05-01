@@ -1,8 +1,5 @@
 import multer from 'multer';
 
-//! name: product
-//! dest: products
-
 const fileStorage = multer.diskStorage({
   destination: (req, file, cb) => {
     cb(null, 'backend/images/products');
@@ -25,10 +22,12 @@ const fileFilter = (req, file, cb) => {
   }
 };
 
-const uploadImages = multer({ storage: fileStorage, fileFilter: fileFilter }).array(
-  'images[]',
-  12
-);
+const uploadImages = multer({
+  storage: fileStorage,
+  fileFilter: fileFilter,
+}).array('images[]', 12);
+
+// export default uploadImages;
 
 const uploadHandler = (req, res, next) => {
   uploadImages(req, res, (err) => {

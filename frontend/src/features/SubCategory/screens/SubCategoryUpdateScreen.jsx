@@ -31,7 +31,7 @@ const SubCategoryUpdateScreen = () => {
 
   //! localState: Alert
   const [showAlert, setShowAlert] = React.useState(false);
-  const [alertOptions, setAlertOptions] = React.useState({
+  const [alertOpts, setAlertOpts] = React.useState({
     variant: '',
     title: '',
     message: '',
@@ -54,7 +54,7 @@ const SubCategoryUpdateScreen = () => {
       setLoading(false);
     } catch (error) {
       setLoading(false);
-      setAlertOptions({
+      setAlertOpts({
         variant: 'danger',
         title: 'Lỗi hệ thống',
         message:
@@ -81,7 +81,7 @@ const SubCategoryUpdateScreen = () => {
       setLoading(false);
 
       handleShowAlert();
-      setAlertOptions({
+      setAlertOpts({
         variant: 'danger',
         title: 'Lỗi hệ thống',
         message:
@@ -117,7 +117,7 @@ const SubCategoryUpdateScreen = () => {
       setLoading(false);
       handleShowAlert();
 
-      setAlertOptions({
+      setAlertOpts({
         variant: 'success',
         title: 'Cập nhật Kiểu sản phẩm (Sub Category)',
         message: `Bạn đã cập nhật Kiểu sản phẩm với tên [${response.data.updatedSubCategory.name}] thành công!`,
@@ -132,7 +132,7 @@ const SubCategoryUpdateScreen = () => {
       //! Error Handling
       if (error.response?.status === 422) {
         const errors = error.response.data.errors;
-        if (!errors.length) return;
+        if (!errors?.length) return;
         errors.forEach((error) => {
           methods.setError(error.param, {
             type: 'server',
@@ -142,7 +142,7 @@ const SubCategoryUpdateScreen = () => {
         return;
       }
 
-      setAlertOptions({
+      setAlertOpts({
         variant: 'danger',
         title: 'Lỗi hệ thống',
         message:
@@ -185,9 +185,9 @@ const SubCategoryUpdateScreen = () => {
       <AlertDismissibleComponent
         show={showAlert}
         handleHideAlert={handleHideAlert}
-        variant={alertOptions.variant}
-        title={alertOptions.title}
-        message={alertOptions.message}
+        variant={alertOpts.variant}
+        title={alertOpts.title}
+        message={alertOpts.message}
         alwaysShown={true}
       />
       <h2 className="fw-bold mb-2 text-uppercase ">

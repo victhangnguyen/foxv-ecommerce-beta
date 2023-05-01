@@ -25,22 +25,22 @@ const validationSchema = yup.object({
   //   .string()
   //   .min(24, 'Category không hợp lệ')
   //   .max(24, 'Category không hợp lệ'),
-  subCategories: yup
-    .array()
-    .of(yup.string())
-    .required('Yêu cầu chọn Kiểu sản phẩm.'),
+  // subCategories: yup
+  //   .array()
+  //   .of(yup.string())
+  //   .required('Yêu cầu chọn Kiểu sản phẩm.'),
   price: yup
     .number()
     .min(0, 'Không được nhỏ hơn 0')
     .max(10000000, 'Nhiều nhất là 10 triệu'),
-  quantity: yup
-    .number()
-    .min(0, 'Không được nhỏ hơn 0')
-    .max(10000000, 'Nhiều nhất là 10 triệu'),
+  //   quantity: yup
+  //     .number()
+  //     .min(0, 'Không được nhỏ hơn 0')
+  //     .max(10000000, 'Nhiều nhất là 10 triệu'),
 });
 
 const ProductFormComponent = ({
-  product,
+  productId,
   initialValues,
   categories,
   subCategories,
@@ -49,13 +49,13 @@ const ProductFormComponent = ({
   loading,
   onSubmit,
 }) => {
-  const categoryOptions = categories?.map((category) => ({
+  const categoryOpts = categories?.map((category) => ({
     key: category._id,
     value: category._id,
     label: category.name,
   }));
 
-  const subCategoryOptions = subCategories?.map((sub) => ({
+  const subCategoryOpts = subCategories?.map((sub) => ({
     key: sub._id,
     value: sub._id,
     label: sub.name,
@@ -69,8 +69,6 @@ const ProductFormComponent = ({
   const colorOptions = [{ key: 0, value: 'black', label: 'Black' }];
 
   const brandOptions = [{ key: 0, value: 'dior', label: 'Dior' }];
-
-  
 
   return (
     <div className="screen-body mb-4 p-3">
@@ -106,17 +104,17 @@ const ProductFormComponent = ({
           triggerSelectChange={triggerSelectCategoryChange}
           name={'category'}
           label={'Loại sản phẩm'}
-          options={categoryOptions}
+          options={categoryOpts}
           className={'mb-3 form-group-cateogry'}
         />
         {
           //! subCategories
         }
-        {showSub ? (
+        {showSub || productId ? (
           <TagControllerComponent
             name="subCategories"
             label={'Kiểu sản phẩm'}
-            options={subCategoryOptions}
+            options={subCategoryOpts}
             placeholder={'Enter để nhập nhãn sản phẩm'}
             className={'mb-3 form-group-subcategories'}
           />
@@ -191,9 +189,9 @@ const ProductFormComponent = ({
         <Button className="btn-submit" variant="primary" type="submit">
           {loading
             ? 'Loading...'
-            : _.isEmpty(product)
-            ? 'Thêm sản phẩm'
-            : 'Cập nhật sản phẩm'}
+            : productId
+            ? 'Cập nhật sản phẩm'
+            : 'Thêm sản phẩm'}
         </Button>
       </FormComponent>
     </div>

@@ -1,25 +1,27 @@
-import React from 'react';
-import { Card, Button, FormCheck } from 'react-bootstrap';
-import { Link, useNavigate } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import React from 'react';
+import { Button, Card, FormCheck } from 'react-bootstrap';
+import { Link } from 'react-router-dom';
+import constants from '../../../../constants';
 //! imp comps/icons
 
 const AdminProductCard = ({
   product,
-  checkedProductIds,
-  handleShowDeleteModal,
+  selectedIds,
+  handleOpenModal,
   handleCheckChange,
 }) => {
   const REACT_APP_SERVER = 'http://127.0.0.1';
   const REACT_APP_PORT = 5000;
   const imagesUrl = `${REACT_APP_SERVER}:${REACT_APP_PORT}/images/products/`;
+  
   return (
     <Card as="article" className="my-3 p-3 rounded card-admin-product">
       <Card.Header>
         <FormCheck
           inline
           id={product._id}
-          checked={checkedProductIds.includes(product._id)}
+          checked={selectedIds?.includes(product._id)}
           onChange={handleCheckChange}
         />
       </Card.Header>
@@ -41,7 +43,7 @@ const AdminProductCard = ({
         </Link>
       </Card.Body>
       <Card.Footer as={'div'} className="d-flex">
-        <Link to={`/admin/product/${product._id}`}>
+        <Link to={`/admin/products/${product._id}/update`}>
           <Button size="sm" variant={'warning'}>
             <span className="me-1">
               <FontAwesomeIcon icon="fa-solid fa-pen-to-square" />{' '}
@@ -52,7 +54,7 @@ const AdminProductCard = ({
         <Button
           size="sm"
           variant={'danger'}
-          onClick={() => handleShowDeleteModal('single', product._id)}
+          onClick={() => handleOpenModal(constants.product.actionTypes.DELETE_ONE_PRODUCT, product._id)}
         >
           <span className="me-1">
             <FontAwesomeIcon icon="fa-solid fa-trash" />{' '}

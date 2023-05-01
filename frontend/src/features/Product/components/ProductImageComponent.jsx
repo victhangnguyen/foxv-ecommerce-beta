@@ -1,7 +1,7 @@
 import React from 'react';
 import _ from 'lodash';
 
-const ImageComponent = ({ product, className, ...rest }) => {
+const ProductImageComponent = ({ product, className, ...rest }) => {
   const REACT_APP_SERVER = 'http://127.0.0.1';
   const REACT_APP_PORT = 5000;
   const imagesUrl = `${REACT_APP_SERVER}:${REACT_APP_PORT}/images/products/`;
@@ -48,4 +48,4 @@ const ImageComponent = ({ product, className, ...rest }) => {
   );
 };
 
-export default ImageComponent;
+export default ProductImageComponent;

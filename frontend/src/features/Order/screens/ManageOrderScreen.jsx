@@ -1,34 +1,38 @@
-import React from 'react';
 import _ from 'lodash';
-import { toast } from 'react-toastify';
-import { Row, Col } from 'react-bootstrap';
+import React from 'react';
+import { Row } from 'react-bootstrap';
 import { useDispatch, useSelector } from 'react-redux';
+import { toast } from 'react-toastify';
 //! imp Comps
-import BreadcrumbComponent from '../../../components/Breadcrumb/BreadcrumbComponent';
 import AlertDismissibleComponent from '../../../components/Alert/AlertDismissibleComponent';
-import PaginationComponent from '../../../components/Pagination/PaginationComponent';
-import ConfirmationModalComponent from '../../../components/Modal/ConfirmationModalComponent';
+import BreadcrumbComponent from '../../../components/Breadcrumb/BreadcrumbComponent';
 import GoToButtonComponent from '../../../components/Button/GoToButtonComponent';
 import ControlledtabsComponent from '../../../components/Form/ControlledTabsComponent';
-import ToolbarComponent from '../components/ToolbarComponent';
+import ConfirmationModalComponent from '../../../components/Modal/ConfirmationModalComponent';
+import PaginationComponent from '../../../components/Pagination/PaginationComponent';
 //! imp Comps:tabs
 import OrderTabComponent from '../components/OrderTabComponent';
 //! imp Hooks
 import { useItemsPerPage } from '../../../hooks/itemsPerPage';
-import { useScrollPosition, scrollToTop } from '../../../hooks/scroll';
+import { scrollToTop, useScrollPosition } from '../../../hooks/scroll';
 //! imps Actions
-import { getOrdersByFilters, deleteOrder, deleteOrders } from '../OrderSlice';
+import {
+  deleteOrder,
+  deleteOrders,
+  getOrdersByFilters,
+  clearNotification,
+} from '../OrderSlice';
 //! imps Constants
 import constants from '../../../constants';
-//! imp APIs
-import API from '../../../API';
 
 const ManageOrderScreen = () => {
   const dispatch = useDispatch();
   const scrollPosition = useScrollPosition();
   const itemsPerPage = useItemsPerPage(5, 10, 10, 15, 20);
   //! rootState
-  const orderSelector = useSelector((state) => state.order);
+  const { orders, ordersCount, success, message, error } = useSelector(
+    (state) => state.order
+  );
 
   //! localState: Search/Pagination
   const [search, setSearch] = React.useState({
@@ -36,9 +40,10 @@ const ManageOrderScreen = () => {
     status: '',
   }); //! search orderId, status, name, address...
   const [keyword, setKeyword] = React.useState('');
-  console.log('__Debugger__ManageOrderScreen\n__***__keyword: ', keyword, '\n');
 
-  const [sort, setSort] = React.useState('createdAt');
+  //! localState: init
+  const [loading, setLoading] = React.useState();
+  const [sort, setSort] = React.useState('updatedAt');
   const [order, setOrder] = React.useState(-1);
   const [currentPage, setCurrentPage] = React.useState(1);
 
@@ -52,7 +57,7 @@ const ManageOrderScreen = () => {
 
   //! localState: Modal
   const [showModal, setShowModal] = React.useState(false);
-  const [modalOptions, setModalOptions] = React.useState({
+  const [modalOpts, setModalOpts] = React.useState({
     variant: '',
     title: '',
     message: '',
@@ -60,19 +65,60 @@ const ManageOrderScreen = () => {
 
   //! localState: Alert
   const [showAlert, setShowAlert] = React.useState(false);
-  const [alertOptions, setAlertOptions] = React.useState({
+  const [alertOpts, setAlertOpts] = React.useState({
     variant: 'success',
     title: '',
     message: '',
     button: '',
   });
 
+  //! notice when navigate
   React.useEffect(() => {
-    loadOrdersByFilters();
-  }, [sort, order, currentPage, itemsPerPage, search]);
+    if (success) {
+      setAlertOpts({
+        variant: 'success',
+        title: 'Thông báo',
+        message: message,
+      });
 
-  //! clear Search whenever Change the Tab
-  React.useEffect(() => {}, [search.status]);
+      handleShowAlert();
+    }
+    if (error) {
+      setAlertOpts({
+        variant: 'danger',
+        title: 'Lỗi hệ thống',
+        message: error,
+      });
+
+      handleShowAlert();
+    }
+    return () => {
+      dispatch(clearNotification());
+    };
+
+    //! effect
+  }, [success, error]);
+
+  React.useEffect(() => {
+    const load = async () => {
+      try {
+        await loadOrders();
+      } catch (error) {
+        handleShowAlert();
+
+        setAlertOpts({
+          variant: 'danger',
+          title: 'Lỗi hệ thống',
+          message:
+            error.response?.data?.message ||
+            error.response?.message ||
+            error.message,
+        });
+      }
+    };
+
+    load();
+  }, [sort, order, currentPage, itemsPerPage, search]);
 
   //! un-check All if selectedIds equal to 0
   React.useEffect(() => {
@@ -83,16 +129,23 @@ const ManageOrderScreen = () => {
     }
   }, [selectedIds]);
 
-  function loadOrdersByFilters() {
-    dispatch(
-      getOrdersByFilters({
-        sort: sort,
-        order: order,
-        page: currentPage,
-        perPage: itemsPerPage,
-        search: search,
-      })
-    );
+  async function loadOrders() {
+    try {
+      setLoading(true);
+      await dispatch(
+        getOrdersByFilters({
+          sort: sort,
+          order: order,
+          page: currentPage,
+          perPage: itemsPerPage,
+          search: search,
+        })
+      ).unwrap();
+      setLoading(false);
+    } catch (error) {
+      setLoading(false);
+      throw error;
+    }
   }
 
   function handleOpenModal(actionType, ids) {
@@ -106,21 +159,19 @@ const ManageOrderScreen = () => {
       //! multiple Ids
       setSelectedIds(ids);
       selectedOrders = ids?.map((id) =>
-        orderSelector.orders.find((order) => order._id === id)
+        orders.find((order) => order._id === id)
       );
     } else {
       //! single Id
       //! bổ sung: fix lại multiple selectedIds sau khi xóa id single Ids
       setSelectedId(ids);
-      selectedOrders = [
-        orderSelector.orders.find((order) => order._id === ids),
-      ];
+      selectedOrders = [orders.find((order) => order._id === ids)];
     }
 
     switch (actionType) {
       /* DELETE ONE ORDER */
       case constants.order.actionTypes.DELETE_ORDER:
-        setModalOptions({
+        setModalOpts({
           variant: 'warning',
           title: `Xác nhận xóa hóa đơn`,
           message: `Bạn có muốn xóa hóa đơn này không? [Người nhận: ${selectedOrders[0]?.name}, Tình trạng: ${selectedOrders[0]?.status}]`,
@@ -130,7 +181,7 @@ const ManageOrderScreen = () => {
         break;
       /* DELETE_ORDERS */
       case constants.order.actionTypes.DELETE_ORDERS:
-        setModalOptions({
+        setModalOpts({
           variant: 'warning',
           title: `Xác nhận xóa nhiều hóa đơn`,
           message: `Bạn có muốn xóa những hóa đơn này không? [Người nhận: ${selectedOrders[0]?.name}, Tình trạng: ${selectedOrders[0]?.status}, ...]`,
@@ -140,7 +191,7 @@ const ManageOrderScreen = () => {
         break;
 
       default:
-        setAlertOptions({
+        setAlertOpts({
           variant: 'danger',
           title: `Hệ thống đang phát triển chức năng`,
           message: `Chức năng này đang được phát triển hoặc nâng cấp. Xin vui lòng xử dụng chức năng này sau!`,
@@ -162,20 +213,21 @@ const ManageOrderScreen = () => {
         /* REMOVE USER ACCOUNT */
         const response = await dispatch(deleteOrder(selectedId)).unwrap();
 
-        setAlertOptions({
+        setAlertOpts({
           variant: response.success ? 'success' : 'danger',
           title: `Xóa hóa đơn thành công`,
-          message: response.message,
+          message: `Xoá hóa đơn [Người nhận: ${response.data.deletedOrder.name}, số tiền:  ${response.data.deletedOrder.total}đ] thành công!`,
         });
 
         checkSelectedIds();
       } else if (actionType === constants.order.actionTypes.DELETE_ORDERS) {
         /* RESET PASSWORD */
         const response = await dispatch(deleteOrders(selectedIds)).unwrap();
-        setAlertOptions({
+
+        setAlertOpts({
           variant: response.success ? 'success' : 'danger',
           title: `Xóa nhiều hóa đơn thành công`,
-          message: response.message,
+          message: `Xoá nhiều hóa đơn [Người nhận: ${response.data.deletedOrders[0].name}, số tiền:  ${response.data.deletedOrders[0].total}đ, ...] thành công!`,
         });
 
         resetCheckAll();
@@ -184,7 +236,7 @@ const ManageOrderScreen = () => {
       handleHideModal();
       handleShowAlert();
       //! re-load
-      loadOrdersByFilters();
+      loadOrders();
       // checkSelectedIds();
 
       //! gotoTop
@@ -192,8 +244,8 @@ const ManageOrderScreen = () => {
     } catch (error) {
       handleHideModal();
       handleShowAlert();
-      
-      setAlertOptions({
+
+      setAlertOpts({
         variant: 'danger',
         title: 'Lỗi hệ thống',
         message:
@@ -201,8 +253,6 @@ const ManageOrderScreen = () => {
           error.response?.message ||
           error.message,
       });
-
-      toast.error(error.response?.message || error.massage);
     }
   }
 
@@ -233,15 +283,15 @@ const ManageOrderScreen = () => {
       setSelectedIds((prevState) => [...prevState, id]);
     }
     //! reset isCheckAll
-    if (setSelectedIds.length === 0 && isCheckAll) {
-      setIsCheckAll(false);
-    }
+    // if (selectedIds.length === 0 && isCheckAll) {
+    //   setIsCheckAll(false);
+    // }
   }
 
   function handleCheckAllChange() {
     setIsCheckAll(!isCheckAll);
     if (!isCheckAll) {
-      setSelectedIds(orderSelector.orders?.map((order) => order._id));
+      setSelectedIds(orders?.map((order) => order._id));
     } else {
       setSelectedIds([]); //! unticked
     }
@@ -280,7 +330,7 @@ const ManageOrderScreen = () => {
       title: 'All Orders',
       element: (
         <OrderTabComponent
-          orders={orderSelector.orders}
+          orders={orders}
           search={search}
           selectedIds={selectedIds}
           setSearch={setSearch}
@@ -298,7 +348,7 @@ const ManageOrderScreen = () => {
       title: 'Pending',
       element: (
         <OrderTabComponent
-          orders={orderSelector.orders}
+          orders={orders}
           search={search}
           selectedIds={selectedIds}
           setSearch={setSearch}
@@ -316,7 +366,7 @@ const ManageOrderScreen = () => {
       title: 'Paid',
       element: (
         <OrderTabComponent
-          orders={orderSelector.orders}
+          orders={orders}
           search={search}
           selectedIds={selectedIds}
           setSearch={setSearch}
@@ -334,7 +384,7 @@ const ManageOrderScreen = () => {
       title: 'Completed',
       element: (
         <OrderTabComponent
-          orders={orderSelector.orders}
+          orders={orders}
           search={search}
           selectedIds={selectedIds}
           setSearch={setSearch}
@@ -352,12 +402,12 @@ const ManageOrderScreen = () => {
       title: 'Canceled',
       element: (
         <OrderTabComponent
-          orders={orderSelector.orders}
-          search={search}
-          selectedIds={selectedIds}
-          setSearch={setSearch}
-          isCheckAll={isCheckAll}
           keyword={keyword}
+          search={search}
+          setSearch={setSearch}
+          orders={orders}
+          isCheckAll={isCheckAll}
+          selectedIds={selectedIds}
           setKeyword={setKeyword}
           handleOpenModal={handleOpenModal}
           handleCheckChange={handleCheckChange}
@@ -384,14 +434,11 @@ const ManageOrderScreen = () => {
       <AlertDismissibleComponent
         show={showAlert}
         handleHideAlert={handleHideAlert}
-        variant={alertOptions.variant}
-        title={alertOptions.title}
-        message={alertOptions.message}
+        variant={alertOpts.variant}
+        title={alertOpts.title}
+        message={alertOpts.message}
         alwaysShown={true}
       />
-      <div className="col-10 col-md-11">
-        {/* <ToolbarSearchComponent search={search} setSearch={setSearch} /> */}
-      </div>
       <Row>
         {
           //! Container that in main (App-index.js)
@@ -404,7 +451,7 @@ const ManageOrderScreen = () => {
       <div className="d-flex justify-content-center">
         <PaginationComponent
           currentPage={currentPage}
-          itemsCount={orderSelector.ordersCount}
+          itemsCount={ordersCount}
           itemsPerPage={itemsPerPage}
           setCurrentPage={setCurrentPage}
           alwaysShown={false}
@@ -412,10 +459,10 @@ const ManageOrderScreen = () => {
       </div>
       <ConfirmationModalComponent
         showModal={showModal}
-        variant={modalOptions.variant}
-        title={modalOptions.title}
-        nameButton={modalOptions.nameButton}
-        message={modalOptions.message}
+        variant={modalOpts.variant}
+        title={modalOpts.title}
+        nameButton={modalOpts.nameButton}
+        message={modalOpts.message}
         handleHideModal={handleHideModal}
         handleSubmit={handleConfirmationSubmit}
       />

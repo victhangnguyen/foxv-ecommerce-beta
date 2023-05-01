@@ -33,7 +33,7 @@ const AddEditUserScreen = () => {
 
   //! localState: Alert
   const [showAlert, setShowAlert] = React.useState(false);
-  const [alertOptions, setAlertOptions] = React.useState({
+  const [alertOpts, setAlertOpts] = React.useState({
     variant: '',
     title: '',
     message: '',
@@ -85,7 +85,7 @@ const AddEditUserScreen = () => {
       setUser(userDoc?.data.user);
     } catch (error) {
       setLoading(false);
-      setAlertOptions({
+      setAlertOpts({
         variant: 'danger',
         title: 'Lỗi hệ thống',
         message:
@@ -121,7 +121,7 @@ const AddEditUserScreen = () => {
         //! reload User
         await loadUser();
 
-        setAlertOptions({
+        setAlertOpts({
           variant: 'success',
           title: 'Thay đổi thông tin thành công!',
           message: 'Bạn đã thay đổi thông tin thành công.',
@@ -150,7 +150,7 @@ const AddEditUserScreen = () => {
         //! reset Form
         methods.reset();
 
-        setAlertOptions({
+        setAlertOpts({
           variant: 'success',
           title: `Đăng ký tài khoản thành công. [username: ${response.data.user.username}]`,
           message: 'Bạn đã đăng ký tài khoản thành công.',
@@ -164,7 +164,7 @@ const AddEditUserScreen = () => {
       //! Error Handling
       if (error.response?.status === 422) {
         const errors = error.response.data.errors;
-        if (!errors.length) return;
+        if (!errors?.length) return;
         errors.forEach((error) => {
           if (error.param === 'subCategories') {
             if (!data.category) return;
@@ -177,7 +177,7 @@ const AddEditUserScreen = () => {
 
         // return;
       }
-      setAlertOptions({
+      setAlertOpts({
         variant: 'danger',
         title: 'Lỗi hệ thống',
         message:
@@ -198,7 +198,7 @@ const AddEditUserScreen = () => {
         confirmPassword,
       });
 
-      setAlertOptions({
+      setAlertOpts({
         variant: 'success',
         title: 'Thay đổi mật khẩu thành công!',
         message: 'Bạn đã thay đổi mật khẩu thành công.',
@@ -209,7 +209,7 @@ const AddEditUserScreen = () => {
       //! Error Handling
       if (error.response?.status === 422) {
         const errors = error.response.data.errors;
-        if (!errors.length) return;
+        if (!errors?.length) return;
         errors.forEach((error) => {
           if (error.param === 'subCategories') {
             if (!data.category) return;
@@ -222,7 +222,7 @@ const AddEditUserScreen = () => {
         return;
       }
 
-      setAlertOptions({
+      setAlertOpts({
         variant: 'danger',
         title: 'Lỗi hệ thống',
         message:
@@ -244,7 +244,7 @@ const AddEditUserScreen = () => {
 
       await loadUser();
     } catch (error) {
-      setAlertOptions({
+      setAlertOpts({
         variant: 'danger',
         title: 'Lỗi hệ thống',
         message:
@@ -262,9 +262,9 @@ const AddEditUserScreen = () => {
       <AlertDismissibleComponent
         show={showAlert}
         setShow={setShowAlert}
-        variant={alertOptions.variant}
-        title={alertOptions.title}
-        message={alertOptions.message}
+        variant={alertOpts.variant}
+        title={alertOpts.title}
+        message={alertOpts.message}
         alwaysShown={true}
       />
       <BreadcrumbComponent breadcrumbItems={breadcrumbItems} />

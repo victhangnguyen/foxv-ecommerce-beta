@@ -6,16 +6,14 @@ export const createProductSchema = {
     },
     isLength: {
       options: { min: 2, max: 256 },
-      errorMessage:
-        'Name must be between 2 and 256 characters long',
+      errorMessage: 'Name must be between 2 and 256 characters long',
     },
     trim: true,
   },
   description: {
     isLength: {
       options: { min: 4, max: 1024 },
-      errorMessage:
-        'Description must be between 4 and 1024 characters long',
+      errorMessage: 'Description must be between 4 and 1024 characters long',
     },
     trim: true,
   },
@@ -37,9 +35,14 @@ export const createProductSchema = {
     },
   },
   images: {
-    isArray: true,
-    notEmpty: {
-      errorMessage: 'Images must not be empty',
+    custom: {
+      options: async (value, { req, location, path }) => {
+        if (!value?.length) {
+          return Promise.reject('Images must not be empty.');
+        }
+
+        return true;
+      },
     },
   },
 };
@@ -52,16 +55,14 @@ export const updateProductSchema = {
     },
     isLength: {
       options: { min: 2, max: 256 },
-      errorMessage:
-        'Name must be between 2 and 256 characters long',
+      errorMessage: 'Name must be between 2 and 256 characters long',
     },
     trim: true,
   },
   description: {
     isLength: {
       options: { min: 4, max: 1024 },
-      errorMessage:
-        'Description must be between 4 and 1024 characters long',
+      errorMessage: 'Description must be between 4 and 1024 characters long',
     },
     trim: true,
   },
@@ -76,12 +77,7 @@ export const updateProductSchema = {
   },
   price: {
     isLength: {
-      options: { min: 0, max: 10000000 },
       errorMessage: 'Price must be between 0 and 10000000 characters long',
     },
-  },
-  images: {
-    isArray: true,
-    notEmpty: false,
   },
 };

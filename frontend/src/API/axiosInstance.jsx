@@ -24,7 +24,6 @@ export const interceptor = (store) => {
   //! inject store into interceptor
   axiosInstance.interceptors.request.use(
     function (config) {
-      // let token = store.getState().auth?.token;
       const token = store.getState().auth?.token;
       if (token) {
         config.headers.Authorization = `bearer ${token}`;
@@ -60,7 +59,8 @@ export const interceptor = (store) => {
         //! 403
         if (
           error.response.status === FORBIDDEN &&
-          error.response?.data?.message === 'Your session has expired. Please log in again to continue using our service.'
+          error.response?.data?.message ===
+            'Your session has expired. Please log in again to continue using our service.'
         ) {
           try {
             store.dispatch(signout());
@@ -81,6 +81,11 @@ export const interceptor = (store) => {
               )
               .unwrap();
             // return a request with config
+            console.log(
+              '__Debugger__axiosInstance\n__refreshToken__originalConfig: ',
+              originalConfig,
+              '\n'
+            );
             return axiosInstance(originalConfig);
           } catch (error) {
             // If Promise.reject(err) -> throw this error to handleSubmit

@@ -1,6 +1,6 @@
 import React from 'react';
 import { Form, Button } from 'react-bootstrap';
-import { searchCategory } from '../../features/Search/SearchSlice';
+import { searchCategory } from '../../../Search/SearchSlice';
 
 const ToolbarSearchComponent = ({ search, setSearch }) => {
   
