@@ -5,39 +5,39 @@ import { Card, Button } from 'react-bootstrap';
 //! imp Comps
 import MenuButton from '../Button/MenuButton';
 
-const AdminUserCard = ({ entity, handleOpenModal }) => {
+const AdminUserCard = ({ user, handleOpenModal }) => {
   const REACT_APP_SERVER = 'http://127.0.0.1';
   const REACT_APP_PORT = 5000;
-  const isAdmin = entity.roles?.map((role) => role.name).includes('admin');
+  const isAdmin = user.roles?.map((role) => role.name).includes('admin');
 
   return (
     <Card as="article" className="my-3 p-3 rounded card-admin-user">
       <Card.Header className="card-admin-user__header">
         <div className="card-admin-user__header__title-name">
-          <Link to={`/admin/users/${entity._id}/update`}>
-            <strong>{entity.username}</strong>{' '}
+          <Link to={`/admin/users/${user._id}/update`}>
+            <strong>{user.username}</strong>{' '}
           </Link>
 
           <MenuButton
             handleClickActionTypeSubmit={(actionType) =>
-              handleOpenModal(actionType, [entity._id])
+              handleOpenModal(actionType, [user._id])
             }
           />
         </div>
       </Card.Header>
-      <Link to={`/admin/users/${entity._id}/update`}>
+      <Link to={`/admin/users/${user._id}/update`}>
         <Card.Body>
-          {/* {entity.image && (
+          {/* {user.image && (
             <Card.Img
-              src={`${REACT_APP_SERVER}:${REACT_APP_PORT}/images/avatars/${entity.image}`}
+              src={`${REACT_APP_SERVER}:${REACT_APP_PORT}/images/avatars/${user.image}`}
               variant="top"
             />
           )} */}
           <Card.Title as={'div'} className="card-admin-title-user">
             <p className="mb-1">
-              Tên: {`${entity.firstName} ${entity.lastName}`}
+              Tên: {`${user.firstName} ${user.lastName}`}
             </p>
-            <p className="mb-1">Số điện thoại: {entity.phoneNumber}</p>
+            <p className="mb-1">Số điện thoại: {user.phoneNumber}</p>
             <p className="mb-1">
               Phân quyền: {`${isAdmin ? 'Admin' : 'User'}`}
             </p>

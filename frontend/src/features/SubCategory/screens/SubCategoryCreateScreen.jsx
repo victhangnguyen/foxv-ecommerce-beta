@@ -100,7 +100,8 @@ const SubCategoryCreateScreen = () => {
         message:
           error.response?.data?.message ||
           error.response?.message ||
-          error.message,
+          error.message ||
+          error,
       });
       setShowAlert(true);
       toast.error(error.response?.message || error.massage);
@@ -122,7 +123,8 @@ const SubCategoryCreateScreen = () => {
         message:
           error.response?.data?.message ||
           error.response?.message ||
-          error.message,
+          error.message ||
+          error,
       });
     }
   };
@@ -142,7 +144,8 @@ const SubCategoryCreateScreen = () => {
         message:
           error.response?.data?.message ||
           error.response?.message ||
-          error.message,
+          error.message ||
+          error,
       });
     }
   };
@@ -185,7 +188,8 @@ const SubCategoryCreateScreen = () => {
         message:
           error.response?.data?.message ||
           error.response?.message ||
-          error.message,
+          error.message ||
+          error,
       });
 
       setShowAlert(true);
@@ -283,7 +287,8 @@ const SubCategoryCreateScreen = () => {
         message:
           error.response?.data?.message ||
           error.response?.message ||
-          error.message,
+          error.message ||
+          error,
       });
     }
   };

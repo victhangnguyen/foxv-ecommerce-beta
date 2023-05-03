@@ -112,7 +112,8 @@ const ManageProductScreen = () => {
         message:
           error.response?.data?.message ||
           error.response?.message ||
-          error.message,
+          error.message ||
+          error,
       });
     }
   }
@@ -278,7 +279,8 @@ const ManageProductScreen = () => {
         message:
           error.response?.data?.message ||
           error.response?.message ||
-          error.message,
+          error.message ||
+          error,
       });
 
       toast.error(error.response?.message || error.massage);

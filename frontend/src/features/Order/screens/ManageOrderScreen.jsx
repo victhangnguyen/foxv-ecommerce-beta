@@ -2,7 +2,7 @@ import _ from 'lodash';
 import React from 'react';
 import { Row } from 'react-bootstrap';
 import { useDispatch, useSelector } from 'react-redux';
-import { toast } from 'react-toastify';
+
 //! imp Comps
 import AlertDismissibleComponent from '../../../components/Alert/AlertDismissibleComponent';
 import BreadcrumbComponent from '../../../components/Breadcrumb/BreadcrumbComponent';
@@ -74,7 +74,7 @@ const ManageOrderScreen = () => {
 
   //! notice when navigate
   React.useEffect(() => {
-    if (success) {
+    if (success && message) {
       setAlertOpts({
         variant: 'success',
         title: 'Thông báo',
@@ -95,8 +95,6 @@ const ManageOrderScreen = () => {
     return () => {
       dispatch(clearNotification());
     };
-
-    //! effect
   }, [success, error]);
 
   React.useEffect(() => {
@@ -251,7 +249,8 @@ const ManageOrderScreen = () => {
         message:
           error.response?.data?.message ||
           error.response?.message ||
-          error.message,
+          error.message ||
+          error,
       });
     }
   }
@@ -422,8 +421,8 @@ const ManageOrderScreen = () => {
     { key: 'breadcrumb-item-1', label: 'Dashboard', path: '/admin' },
     {
       key: 'breadcrumb-item-2',
-      label: 'Quản lý Tài khoản',
-      path: '/admin/users',
+      label: 'Quản lý Mua hàng',
+      path: '/admin/orders',
       active: true,
     },
   ];

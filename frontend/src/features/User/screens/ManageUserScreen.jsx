@@ -6,7 +6,7 @@ import { toast } from 'react-toastify';
 import { useItemsPerPage } from '../../../hooks/itemsPerPage';
 import { useScrollPosition, scrollToTop } from '../../../hooks/scroll';
 //! imp Actions
-import { getUsersByFilters } from '../UserSlice';
+import { getUsersByFilters, clearNotification } from '../UserSlice';
 //! imp Services
 import userService from '../services/userService';
 import { DELETE_USERS, RESET_PASSWORDS } from '../services/actionTypes';
@@ -38,13 +38,14 @@ const ManageUserScreen = () => {
   ];
 
   // rootState
-  const user = useSelector((state) => state.user);
+  const { users, usersCount, user, loading, success, message, error } =
+    useSelector((state) => state.user);
 
   const [actionType, setActionType] = React.useState('');
 
   //! localState: search/pagination
   const [search, setSearch] = React.useState({ keyword: '', age: '' });
-  const [sort, setSort] = React.useState('createdAt');
+  const [sort, setSort] = React.useState('updatedAt');
   const [order, setOrder] = React.useState(-1);
   const [currentPage, setCurrentPage] = React.useState(1);
 
@@ -72,6 +73,30 @@ const ManageUserScreen = () => {
     loadUsersByFilters();
   }, [currentPage, itemsPerPage]);
 
+  React.useEffect(() => {
+    if (success && message) {
+      setAlertOpts({
+        variant: 'success',
+        title: 'Thông báo',
+        message: message,
+      });
+
+      handleShowAlert();
+    }
+    if (success === false && error) {
+      setAlertOpts({
+        variant: 'danger',
+        title: 'Lỗi hệ thống',
+        message: error,
+      });
+
+      handleShowAlert();
+    }
+    return () => {
+      dispatch(clearNotification());
+    };
+  }, [success, message, error]);
+
   const loadUsersByFilters = () => {
     dispatch(
       getUsersByFilters({
@@ -89,7 +114,7 @@ const ManageUserScreen = () => {
     setActionType(actionType);
 
     const selectedUsers = ids?.map(
-      (id) => user.entities.find((entity) => entity._id === id) //! userObject
+      (id) => users.find((user) => user._id === id) //! userObject
     );
 
     switch (actionType) {
@@ -190,7 +215,8 @@ const ManageUserScreen = () => {
         message:
           error.response?.data?.message ||
           error.response?.message ||
-          error.message,
+          error.message ||
+          error,
       });
       setShowAlert(true);
       toast.error(error.response?.message || error.massage);
@@ -250,14 +276,11 @@ const ManageUserScreen = () => {
         {
           //! Container that in main (App-index.js)
         }
-        {user.entities?.length > 0 &&
-          user.entities?.map((entity) => {
+        {users?.length > 0 &&
+          users?.map((user) => {
             return (
-              <Col key={entity._id} xs={6} sm={4} md={4} lg={3}>
-                <AdminUserCard
-                  entity={entity}
-                  handleOpenModal={handleOpenModal}
-                />
+              <Col key={user._id} xs={6} sm={4} md={4} lg={3}>
+                <AdminUserCard user={user} handleOpenModal={handleOpenModal} />
               </Col>
             );
           })}
@@ -265,7 +288,7 @@ const ManageUserScreen = () => {
       <div className="d-flex justify-content-center">
         <PaginationComponent
           currentPage={currentPage}
-          itemsCount={user.entitiesCount}
+          itemsCount={usersCount}
           itemsPerPage={itemsPerPage}
           setCurrentPage={setCurrentPage}
         />

@@ -6,7 +6,7 @@ import API from '../../API';
 const initialState = {
   products: [],
   productsCount: 0,
-  product: null,
+  product: {},
   loading: false,
   error: null,
 };
@@ -16,7 +16,7 @@ const productSlice = createSlice({
   initialState: initialState,
   reducers: {
     emptyProduct: (state, action) => {
-      state.product = {};
+      state.product = initialState.product;
     },
   },
   extraReducers: (builder) => {

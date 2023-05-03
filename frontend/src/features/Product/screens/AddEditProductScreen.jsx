@@ -64,7 +64,9 @@ const AddEditProductScreen = () => {
           if (product?.category?._id) {
             await loadSubCategoriesByCategoryId(product.category._id);
           }
+        } else {
           //! Mode: Update/Edit Product
+          dispatch(emptyProduct());
         }
 
         loadCategories();
@@ -84,9 +86,9 @@ const AddEditProductScreen = () => {
 
     load();
 
-    return () => {
-      dispatch(emptyProduct());
-    };
+    // return () => {
+    //   dispatch(emptyProduct());
+    // };
   }, [productId]);
 
   async function loadProduct() {
@@ -131,13 +133,13 @@ const AddEditProductScreen = () => {
         message:
           error.response?.data?.message ||
           error.response?.message ||
-          error.message,
+          error.message ||
+          error,
       });
     }
   }
 
   const handleSubmit = async (data, e, methods) => {
-    console.log('__AddEditProductScreen__handleSubmit: ', data);
     const isEqualData = _.isEqual(initialValues, data);
 
     if (isEqualData) {
@@ -145,12 +147,6 @@ const AddEditProductScreen = () => {
     }
 
     const { images } = data;
-    console.log(
-      '__Debugger__AddEditProductScreen\n__handleSubmit__images: ',
-      images,
-      '\n'
-    );
-
     try {
       //! Neu thay doi Image => FileList
       //! Khong thay doi Image => Empty Array
@@ -227,7 +223,8 @@ const AddEditProductScreen = () => {
         message:
           error.response?.data?.message ||
           error.response?.message ||
-          error.message,
+          error.message ||
+          error,
       });
     }
   };
@@ -247,7 +244,8 @@ const AddEditProductScreen = () => {
         message:
           error.response?.data?.message ||
           error.response?.message ||
-          error.message,
+          error.message ||
+          error,
       });
     }
   }
@@ -323,38 +321,3 @@ const AddEditProductScreen = () => {
 };
 
 export default AddEditProductScreen;
-
-// {showAlert && (
-//   <AlertDismissibleComponent
-//     show={showAlert}
-//     setShow={setShowAlert}
-//     title={
-//       isExistProduct
-//         ? 'Sản phẩm được cập nhật thành công'
-//         : 'Sản phẩm được Thêm thành công!'
-//     }
-//     variant={_.isEmpty(product) ? 'success' : 'warning'}
-//   >
-//     {isExistProduct ? (
-//       <>
-//         <p>
-//           Sản phẩm <strong>{product.name}</strong> có Mã số là{' '}
-//           <strong>{product._id}</strong>
-//         </p>
-//       </>
-//     ) : (
-//       <>
-//         <p>
-//           Sản phẩm <strong>{newProduct.name}</strong> có Mã số là{' '}
-//           <strong>{newProduct._id}</strong>
-//         </p>
-//         <p>
-//           Xem chi tiết sản phẩm mới:{' '}
-//           <Link to={`/admin/product/${newProduct._id}`}>
-//             <strong>{newProduct.name}</strong>
-//           </Link>
-//         </p>
-//       </>
-//     )}
-//   </AlertDismissibleComponent>
-// )}

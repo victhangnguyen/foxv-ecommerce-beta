@@ -1,18 +1,24 @@
 import _ from 'lodash';
 import React from 'react';
-import { Button, Col, Row } from 'react-bootstrap';
+import { toast } from 'react-toastify';
+//! imp Hooks
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate, useParams } from 'react-router-dom';
-import { toast } from 'react-toastify';
-//! imp Services
-import userService from '../services/userService';
-import authService from '../../Auth/services/authService';
 //! imp Components
+import { Button, Col, Row } from 'react-bootstrap';
 import AlertDismissibleComponent from '../../../components/Alert/AlertDismissibleComponent';
 import BreadcrumbComponent from '../../../components/Breadcrumb/BreadcrumbComponent';
 import UserFormComponent from '../components/Form/UserFormComponent';
 import UserFormPasswordComponent from '../components/Form/UserFormPasswordComponent';
+//! imp APIs
+import API from '../../../API';
 //! imp Actions
+import {
+  getUserById,
+  createUser,
+  updateUserInfoById,
+  emptyUser,
+} from '../UserSlice';
 
 const AddEditUserScreen = () => {
   const dispatch = useDispatch();
@@ -21,82 +27,64 @@ const AddEditUserScreen = () => {
 
   //! rootState
   const auth = useSelector((state) => state.auth);
-  const isAdminController = auth.user?.roles
+  const { user, loading } = useSelector((state) => state.user);
+
+  const isAdminController = user?.roles
     ?.map((role) => role.name)
     .includes('admin');
-
-  const [loading, setLoading] = React.useState(false);
-  const [user, setUser] = React.useState({});
-
-  const isAdmin = user.roles?.map((role) => role.name).includes('admin');
-  //! role? -> ok
 
   //! localState: Alert
   const [showAlert, setShowAlert] = React.useState(false);
   const [alertOpts, setAlertOpts] = React.useState({
-    variant: '',
+    variant: 'success',
     title: '',
     message: '',
+    button: '',
   });
 
-  const isExistUser = !_.isEmpty(user);
-
-  const breadcrumbItems = [
-    { key: 'breadcrumb-item-0', label: 'Home', path: '/' },
-    {
-      key: 'breadcrumb-item-1',
-      label: 'Quản lý Tài khoản',
-      path: '/admin/users',
-    },
-    {
-      key: 'breadcrumb-item-2',
-      label: isExistUser ? 'Cập nhật Tài khoản' : 'Thêm mới Tài khoản',
-      path: isExistUser
-        ? `/admin/users/${userId}/update`
-        : `/admin/users/create`,
-      active: true,
-    },
-  ];
-
   const initialValues = {
-    firstName: user.firstName || '',
-    lastName: user.lastName || '',
-    username: user.username || '',
-    email: user.email || '',
-    phoneNumber: user.phoneNumber || '',
+    firstName: user?.firstName || '',
+    lastName: user?.lastName || '',
+    username: user?.username || '',
+    email: user?.email || '',
+    phoneNumber: user?.phoneNumber || '',
   };
 
   //! effect DidMount
   React.useEffect(() => {
-    if (userId) {
-      //! Mode: Edit User
-      loadUser(); //! setUser with data
-    } else {
-      //! Mode: Create User
-      setUser({}); //! setUser with empty data
-    }
+    const load = async () => {
+      try {
+        if (userId) {
+          //! Mode: Edit User
+          await loadUser();
+        } else {
+          //! Mode: Create User
+          dispatch(emptyUser());
+        }
+      } catch (error) {
+        handleShowAlert();
+
+        setAlertOpts({
+          variant: 'danger',
+          title: 'Lỗi hệ thống',
+          message:
+            error.response?.data?.message ||
+            error.response?.message ||
+            error.message,
+        });
+      }
+    };
+
+    load();
   }, [userId]);
 
-  const loadUser = async () => {
+  async function loadUser() {
     try {
-      setLoading(true);
-      const userDoc = await userService.getUser(userId);
-      setLoading(false);
-      setUser(userDoc?.data.user);
+      await dispatch(getUserById(userId)).unwrap();
     } catch (error) {
-      setLoading(false);
-      setAlertOpts({
-        variant: 'danger',
-        title: 'Lỗi hệ thống',
-        message:
-          error.response?.data?.message ||
-          error.response?.message ||
-          error.message,
-      });
-      setShowAlert(true);
-      toast.error(error.response?.message || error.massage);
+      throw error;
     }
-  };
+  }
 
   const handleInfoSubmit = async (data, event, methods) => {
     const isEqualData = _.isEqual(initialValues, data);
@@ -105,95 +93,59 @@ const AddEditUserScreen = () => {
       return toast.error('Chưa có thông tin nào thay đổi.');
     }
 
-    const { firstName, lastName, username, email, phoneNumber } = data;
+    const userData = {
+      firstName: data.firstName,
+      lastName: data.lastName,
+      username: data.username,
+      email: data.email,
+      phoneNumber: data.phoneNumber,
+    };
 
     try {
       if (userId) {
-        //! Mode: Edit User Account
-        const response = await userService.updateUserInfo(userId, {
-          firstName,
-          lastName,
-          username,
-          email,
-          phoneNumber,
-        });
-
-        //! reload User
-        await loadUser();
-
-        setAlertOpts({
-          variant: 'success',
-          title: 'Thay đổi thông tin thành công!',
-          message: 'Bạn đã thay đổi thông tin thành công.',
-        });
-
-        setShowAlert(true);
+        /* MODE: UPDATE / EDIT USER*/
+        await dispatch(updateUserInfoById({ userId, userData })).unwrap();
+        // await loadUser(); //! Re-load to check initialValues
       } else {
-        //! Mode: Create New User
-        const response = await authService.signup({
-          firstName,
-          lastName,
-          username,
-          email,
-          phoneNumber,
-        });
-        //! OPTION: Navigate
-
-        navigate('/admin/users', { replace: true });
-        toast.success(
-          `Đăng ký tài khoản thành công. [username: ${response.data.user.username}]`
-        );
-
-        //! OPTION: No navigate
-        /*
-
-        //! reset Form
-        methods.reset();
-
-        setAlertOpts({
-          variant: 'success',
-          title: `Đăng ký tài khoản thành công. [username: ${response.data.user.username}]`,
-          message: 'Bạn đã đăng ký tài khoản thành công.',
-        });
-
-        setShowAlert(true);
-
-        */
+        /* MODE: CREATE NEW USER */
+        await dispatch(createUser(userData)).unwrap();
+        //! Navigate
       }
+      navigate('/admin/users', { replace: true });
     } catch (error) {
+      console.log('__Debugger__AddEditUserScreen\n__handleSubmit__error: ', error, '\n');
       //! Error Handling
       if (error.response?.status === 422) {
         const errors = error.response.data.errors;
         if (!errors?.length) return;
         errors.forEach((error) => {
-          if (error.param === 'subCategories') {
-            if (!data.category) return;
-          }
           methods.setError(error.param, {
             type: 'server',
             message: error.msg,
           });
         });
 
-        // return;
+        return;
       }
+
+      handleShowAlert();
+
       setAlertOpts({
         variant: 'danger',
         title: 'Lỗi hệ thống',
         message:
           error.response?.data?.message ||
           error.response?.message ||
-          error.message,
+          error.message ||
+          error,
       });
-
-      setShowAlert(true);
     }
   };
 
   const handlePasswordSubmit = async (data, event, methods) => {
     const { password, confirmPassword } = data;
     try {
-      const response = await userService.updateUserPassword(user._id, {
+      const response = await API.user.updateUserPassword(user._id, {
         password,
         confirmPassword,
       });
@@ -228,7 +180,8 @@ const AddEditUserScreen = () => {
         message:
           error.response?.data?.message ||
           error.response?.message ||
-          error.message,
+          error.message ||
+          error,
       });
 
       setShowAlert(true);
@@ -240,7 +193,7 @@ const AddEditUserScreen = () => {
     try {
       if (!isAdminController) return;
 
-      const response = await userService.updateRole(userId, 'admin');
+      const response = await API.user.updateRole(userId, 'admin');
 
       await loadUser();
     } catch (error) {
@@ -250,24 +203,55 @@ const AddEditUserScreen = () => {
         message:
           error.response?.data?.message ||
           error.response?.message ||
-          error.message,
+          error.message ||
+          error,
       });
       setShowAlert(true);
       toast.error(error.response?.message || error.massage);
     }
   }
 
+  function handleShowAlert() {
+    setShowAlert(true);
+  }
+
+  function handleHideAlert() {
+    setShowAlert(false);
+  }
+
+  const isExistUser = !_.isEmpty(user);
+
+  const breadcrumbItems = [
+    { key: 'breadcrumb-item-0', label: 'Home', path: '/' },
+    {
+      key: 'breadcrumb-item-1',
+      label: 'Quản lý Tài khoản',
+      path: '/admin/users',
+    },
+    {
+      key: 'breadcrumb-item-2',
+      label: isExistUser ? 'Cập nhật Tài khoản' : 'Thêm mới Tài khoản',
+      path: isExistUser
+        ? `/admin/users/${userId}/update`
+        : `/admin/users/create`,
+      active: true,
+    },
+  ];
+
   return (
     <div className="screen-main mb-3 mt-md-4">
+      <BreadcrumbComponent breadcrumbItems={breadcrumbItems} />
+      {
+        //! Show Notication Alert
+      }
       <AlertDismissibleComponent
         show={showAlert}
-        setShow={setShowAlert}
+        handleHideAlert={handleHideAlert}
         variant={alertOpts.variant}
         title={alertOpts.title}
         message={alertOpts.message}
         alwaysShown={true}
       />
-      <BreadcrumbComponent breadcrumbItems={breadcrumbItems} />
       <h2 className="fw-bold mb-2 text-uppercase ">
         {loading
           ? 'Loading...'
@@ -296,13 +280,13 @@ const AddEditUserScreen = () => {
         {isAdminController && userId && (
           <Col md={{ span: 3, offset: 1 }} lg={{ span: 5, offset: 1 }}>
             <span className="me-2">
-              {isAdmin ? 'Admin đang được bật' : 'Admin đang bị tắt'}
+              {isAdminController ? 'Admin đang được bật' : 'Admin đang bị tắt'}
             </span>
             <Button
-              variant={isAdmin ? 'danger' : 'success'}
+              variant={isAdminController ? 'danger' : 'success'}
               onClick={handleClickUpdateRole}
             >
-              {isAdmin ? 'Tắt' : 'Bật'}
+              {isAdminController ? 'Tắt' : 'Bật'}
             </Button>
           </Col>
         )}

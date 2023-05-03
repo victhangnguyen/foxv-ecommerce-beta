@@ -12,7 +12,7 @@ const ToolbarSearchComponent = ({ search, setSearch }) => {
     <Form.Control
       className="form-control me-1"
       type="search"
-      placeholder="Search"
+      placeholder="Tìm kiếm username, họ và tên, số điện thoại..."
       aria-label="Search"
       onChange={handleChange}
       value={search.keyword}

@@ -7,16 +7,6 @@ import userService from '../services/userService.js';
 // Define the [User Schema]
 const userSchema = new mongoose.Schema(
   {
-    username: {
-      type: String,
-      required: true,
-      unique: true,
-    },
-    email: {
-      type: String,
-      required: true,
-      unique: true,
-    },
     firstName: {
       type: String,
       minLength: [2, 'Thấp nhất 2 ký tự'],
@@ -28,6 +18,16 @@ const userSchema = new mongoose.Schema(
       minLength: [2, 'Thấp nhất 2 ký tự'],
       maxLength: [32, 'Nhiều nhất 32 ký tự'],
       required: true,
+    },
+    username: {
+      type: String,
+      required: true,
+      unique: true,
+    },
+    email: {
+      type: String,
+      required: true,
+      unique: true,
     },
     doB: {
       type: Date,

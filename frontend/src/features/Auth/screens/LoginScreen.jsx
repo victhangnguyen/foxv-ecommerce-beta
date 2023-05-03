@@ -66,7 +66,8 @@ const LoginScreen = () => {
         message:
           error.response?.data?.message ||
           error.response?.message ||
-          error.message,
+          error.message ||
+          error,
       });
 
       handleShowAlert();

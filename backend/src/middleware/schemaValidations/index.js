@@ -3,7 +3,10 @@ export {
   createProductSchema,
   updateProductSchema,
 } from './productSchemaValidations.js';
-export { updateUserPasswordSchema } from './userSchemaValidations.js';
+export {
+  updateUserPasswordSchema,
+  updateUserInfoSchema,
+} from './userSchemaValidations.js';
 export {
   createCategorySchema,
   updateCategorySchema,

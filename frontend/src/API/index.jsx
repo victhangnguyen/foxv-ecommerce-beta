@@ -1,5 +1,6 @@
 import * as orderAPI from './orderAPI';
 import * as authAPI from './authAPI';
+import * as userAPI from './userAPI';
 import * as productAPI from './productAPI';
 import * as cartAPI from './cartAPI';
 import * as categoryAPI from './categoryAPI';
@@ -12,6 +13,8 @@ const API = {
   category: categoryAPI,
   //! subCategoryAPI
   subCategory: subCategoryAPI,
+  //! userAPI
+  user: userAPI,
   //! productAPI
   product: productAPI,
   //! cartAPI

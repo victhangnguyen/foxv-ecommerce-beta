@@ -34,8 +34,7 @@ export function createOrder({
   transactionNo,
   bankTranNo,
 }) {
-  const url = `/admin/orders/create`;
-  return axiosInstance.post(url, {
+  const orderData = {
     user,
     items,
     total,
@@ -44,7 +43,9 @@ export function createOrder({
     address,
     transactionNo,
     bankTranNo,
-  });
+  };
+  const url = `/admin/orders/create`;
+  return axiosInstance.post(url, orderData);
 }
 
 /**

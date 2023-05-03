@@ -86,7 +86,8 @@ const CategoryCreateScreen = () => {
         message:
           error.response?.data?.message ||
           error.response?.message ||
-          error.message,
+          error.message ||
+          error,
       });
       setShowAlert(true);
     }
@@ -134,7 +135,8 @@ const CategoryCreateScreen = () => {
         message:
           error.response?.data?.message ||
           error.response?.message ||
-          error.message,
+          error.message ||
+          error,
       });
 
       setShowAlert(true);
@@ -222,7 +224,8 @@ const CategoryCreateScreen = () => {
         message:
           error.response?.data?.message ||
           error.response?.message ||
-          error.message,
+          error.message ||
+          error,
       });
     }
   }

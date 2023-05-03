@@ -70,7 +70,8 @@ const CategoryUpdateScreen = () => {
         message:
           error.response?.data?.message ||
           error.response?.message ||
-          error.message,
+          error.message ||
+          error,
       });
     }
   };
@@ -115,7 +116,8 @@ const CategoryUpdateScreen = () => {
         message:
           error.response?.data?.message ||
           error.response?.message ||
-          error.message,
+          error.message ||
+          error,
       });
     }
   };
