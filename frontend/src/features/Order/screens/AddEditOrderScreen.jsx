@@ -122,6 +122,10 @@ const AddEditOrderScreen = ({ entity }) => {
     }
   }
 
+  function handleClickCancel() {
+    navigate('/admin/orders', { replace: true });
+  }
+
   function handleShowAlert() {
     setShowAlert(true);
   }
@@ -178,8 +182,10 @@ const AddEditOrderScreen = ({ entity }) => {
         </div>
         <div className="col-md-6 col-lg-6 col-xl-7 offset-md-1">
           <OrderFormComponent
+            orderId={orderId}
             initialValues={initialValues}
             onSubmit={handleUpdateSubmit}
+            handleClickCancel={handleClickCancel}
           />
         </div>
       </div>

@@ -54,7 +54,13 @@ const router = createBrowserRouter([
       { path: 'auth/forgot-password', element: <ForgotPasswordScreen /> },
       { path: 'collections/:slug', element: <CollectionScreen /> }, //! catSlug
       { path: 'collections/sub/:slug', element: <SubCollectionScreen /> }, //! subSlug
-      { path: 'cart', element: <CartScreen /> },
+      {
+        path: 'cart',
+        children: [
+          { index: true, path: '', element: <CartScreen /> },
+          { path: ':productId', element: <CartScreen /> },
+        ],
+      },
       //! Required User
       {
         path: '',

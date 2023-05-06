@@ -14,7 +14,7 @@ const OrderItemComponent = ({
   const menuItems = [
     {
       key: 'menu-item-0',
-      label: 'Xóa hóa đơn',
+      label: 'Xóa đơn hàng',
       actionType: constants.order.actionTypes.DELETE_ORDER,
     },
   ];

@@ -2,7 +2,7 @@ import _ from 'lodash';
 import React from 'react';
 import { Button, Container, Table } from 'react-bootstrap';
 import { useDispatch, useSelector } from 'react-redux';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { toast } from 'react-toastify';
 //! imp Utils
 import { parseIntlNumber } from '../../../utils/parse';
@@ -10,6 +10,10 @@ import { parseIntlNumber } from '../../../utils/parse';
 import AlertDismissibleComponent from '../../../components/Alert/AlertDismissibleComponent';
 import ConfirmationModalComponent from '../../../components/Modal/ConfirmationModalComponent';
 import CartItemComponent from '../components/CartItemComponent';
+//! imp Actions
+import { addToCart } from '../CartSlice';
+//! imp APIs
+import API from '../../../API';
 
 import {
   decrementQuantity,
@@ -24,6 +28,11 @@ const CartScreen = () => {
 
   //! rootState
   const { user, token } = useSelector((state) => state.auth);
+
+  const { productId } = useParams();
+
+  const [searchParams, setSearchParams] = useSearchParams();
+  const qty = searchParams.get('qty');
 
   const isAdminController = user?.roles
     ?.map((role) => role.name)
@@ -60,6 +69,30 @@ const CartScreen = () => {
   //! localState: selected
   const [selectedId, setSelectedId] = React.useState([]);
   const [actionType, setActionType] = React.useState('');
+
+  React.useEffect(() => {
+    let cartItem;
+
+    const loadCartProduct = async () => {
+      const response = await API.product.getProductById(productId);
+
+      cartItem = {
+        product: response.data.product._id,
+        quantity: qty,
+        slug: response.data.product.slug,
+        name: response.data.product.name,
+        category: response.data.product.category,
+        image: response.data.product.images[0],
+        price: response.data.product.price,
+      };
+
+      dispatch(addToCart(cartItem));
+    };
+
+    if (productId) {
+      loadCartProduct();
+    }
+  }, [productId, qty]);
 
   // const { productId } = useParams();
 

@@ -46,7 +46,7 @@ const UserFormComponent = ({ user, initialValues, loading, onSubmit }) => {
         <InputComponent
           type={'password'}
           name="password"
-          label={'Thay đổi mật khẩu'}
+          label={'Mật khẩu mới'}
           placeholder={'Nhập mật khẩu'}
           autoComplete={'false'}
         />

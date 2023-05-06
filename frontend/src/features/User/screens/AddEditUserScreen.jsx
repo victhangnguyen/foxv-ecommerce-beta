@@ -29,7 +29,9 @@ const AddEditUserScreen = () => {
   const auth = useSelector((state) => state.auth);
   const { user, loading } = useSelector((state) => state.user);
 
-  const isAdminController = user?.roles
+  const isAdmin = user?.roles?.map((role) => role.name).includes('admin');
+
+  const isAdminController = auth?.user?.roles
     ?.map((role) => role.name)
     .includes('admin');
 
@@ -113,7 +115,11 @@ const AddEditUserScreen = () => {
       }
       navigate('/admin/users', { replace: true });
     } catch (error) {
-      console.log('__Debugger__AddEditUserScreen\n__handleSubmit__error: ', error, '\n');
+      console.log(
+        '__Debugger__AddEditUserScreen\n__handleSubmit__error: ',
+        error,
+        '\n'
+      );
       //! Error Handling
       if (error.response?.status === 422) {
         const errors = error.response.data.errors;
@@ -280,13 +286,13 @@ const AddEditUserScreen = () => {
         {isAdminController && userId && (
           <Col md={{ span: 3, offset: 1 }} lg={{ span: 5, offset: 1 }}>
             <span className="me-2">
-              {isAdminController ? 'Admin đang được bật' : 'Admin đang bị tắt'}
+              {isAdmin ? 'Admin đang được bật' : 'Admin đang bị tắt'}
             </span>
             <Button
-              variant={isAdminController ? 'danger' : 'success'}
+              variant={isAdmin ? 'danger' : 'success'}
               onClick={handleClickUpdateRole}
             >
-              {isAdminController ? 'Tắt' : 'Bật'}
+              {isAdmin ? 'Tắt' : 'Bật'}
             </Button>
           </Col>
         )}

@@ -140,11 +140,11 @@ const HeaderComponent = () => {
                 //! Nav me-auto (margin-end)
               }
               <Nav className="me-auto">
-                <Nav.Link as="div">
+                {/* <Nav.Link as="div">
                   <NavLink className={'nav-link'} to={'/promotion'}>
                     Khuyến mãi
                   </NavLink>
-                </Nav.Link>
+                </Nav.Link> */}
                 <Nav.Link as={'div'}>
                   <NavLink className={'nav-link'} to={'/shop'}>
                     Shop

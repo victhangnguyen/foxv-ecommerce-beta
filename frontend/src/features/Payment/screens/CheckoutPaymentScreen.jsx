@@ -119,15 +119,19 @@ const CheckoutPaymentScreen = ({ entity }) => {
 
   async function handleCheckoutOrderSubmit(data, e, methods) {
     const { name, address, bankCode } = data;
-    dispatch(
-      checkoutOrder({
-        name,
-        address,
-        bankCode,
-        items: cart.cartItems,
-        orderPayAmount: total,
-      })
-    );
+    try {
+      await dispatch(
+        checkoutOrder({
+          name,
+          address,
+          bankCode,
+          items: cart.cartItems,
+          orderPayAmount: total,
+        })
+      ).unwrap();
+    } catch (error) {
+      console.log('Error: ', error);
+    }
   }
 
   return (

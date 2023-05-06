@@ -51,7 +51,7 @@ const AdminNavComponent = () => {
     {
       key: 'admin-nav-item-7',
       icon: 'fa-solid fa-cart-shopping',
-      label: 'Quản lý Mua hàng (Order)',
+      label: 'Quản lý Đơn hàng (Order)',
       pathname: '/admin/orders',
     },
     {

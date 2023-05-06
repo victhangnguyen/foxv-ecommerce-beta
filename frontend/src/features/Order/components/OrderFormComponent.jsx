@@ -13,6 +13,7 @@ import SelectControllerComponent from '../../../components/Form/SelectController
 import constants from '../../../constants';
 
 const OrderFormComponent = ({
+  orderId,
   initialValues,
   loading,
   onSubmit,
@@ -168,9 +169,9 @@ const OrderFormComponent = ({
             <Button className="btn-submit" variant="primary" type="submit">
               {loading
                 ? 'Loading...'
-                : isAdminController
-                ? 'Tạo đơn hàng mới'
-                : 'Cập nhật đơn hàng'}
+                : orderId
+                ? 'Cập nhật đơn hàng'
+                : 'Tạo đơn hàng mới'}
             </Button>
             <Button
               className="btn ms-4"
