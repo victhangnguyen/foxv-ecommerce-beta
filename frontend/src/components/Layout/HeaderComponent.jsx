@@ -36,8 +36,9 @@ const HeaderComponent = () => {
   const isAuthenticated = roles?.includes('user');
   const isAdmin = roles?.includes('admin');
   //! variable from cart
-  //! total items Type
-  const itemsCount = cart.cartItems?.length;
+  //! total items quantity
+  const itemsCount = cart.cartItems?.reduce((acc, cur) => cur.quantity + acc, 0);
+
   const badgeProps = {};
 
   if (itemsCount) {
