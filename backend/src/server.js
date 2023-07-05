@@ -60,6 +60,11 @@ app.use(express.static(publicDir));
 //! __dirname:  C:\Users\victh\foxv-ecommerce-beta\backend\images
 const imagesDir = path.join(__dirname, '..', 'images');
 app.use('/images', express.static(imagesDir));
+//! static /images
+
+//! __dirname:  C:\Users\victh\foxv-ecommerce-beta\backend\images
+const dataDir = path.join(__dirname, '..', 'data');
+app.use('/data', express.static(dataDir));
 
 app.use('/api', authRouter);
 app.use('/api', userRouter);

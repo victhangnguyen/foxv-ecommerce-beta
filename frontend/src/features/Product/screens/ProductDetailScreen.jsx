@@ -1,20 +1,20 @@
-import React from 'react';
-import { toast } from 'react-toastify';
-import _ from 'lodash';
-import { Button, Card, Col, Container, Row } from 'react-bootstrap';
-import { useDispatch, useSelector } from 'react-redux';
-import { useParams, useNavigate, Link } from 'react-router-dom';
+import React from "react";
+import { toast } from "react-toastify";
+import _ from "lodash";
+import { Button, Card, Col, Container, Row } from "react-bootstrap";
+import { useDispatch, useSelector } from "react-redux";
+import { useParams, useNavigate, Link } from "react-router-dom";
 
 //! imp Comps
-import BreadcrumbComponent from '../../../components/Breadcrumb/BreadcrumbComponent';
-import AlertDismissibleComponent from '../../../components/Alert/AlertDismissibleComponent';
-import ProductImageComponent from '../components/ProductImageComponent';
+import BreadcrumbComponent from "../../../components/Breadcrumb/BreadcrumbComponent";
+import AlertDismissibleComponent from "../../../components/Alert/AlertDismissibleComponent";
+import ProductImageComponent from "../components/ProductImageComponent";
 
 //! Services
-import productService from '../services/productService';
-import API from '../../../API';
+import productService from "../services/productService";
+import API from "../../../API";
 //! imp Actions
-import { addToCart, removeItem } from '../../Cart/CartSlice';
+import { addToCart, removeItem } from "../../Cart/CartSlice";
 
 const ProductDetail = () => {
   const dispatch = useDispatch();
@@ -29,9 +29,9 @@ const ProductDetail = () => {
   //! localState: alert
   const [showAlert, setShowAlert] = React.useState(false);
   const [alertOpts, setAlertOpts] = React.useState({
-    variant: '',
-    title: '',
-    message: '',
+    variant: "",
+    title: "",
+    message: "",
   });
 
   const isAddedToCard = cart.cartItems
@@ -51,8 +51,8 @@ const ProductDetail = () => {
     } catch (error) {
       setLoading(false);
       setAlertOpts({
-        variant: 'danger',
-        title: 'Lỗi hệ thống',
+        variant: "danger",
+        title: "Lỗi hệ thống",
         message:
           error.response?.data?.message ||
           error.response?.message ||
@@ -108,14 +108,14 @@ const ProductDetail = () => {
   }
 
   const breadcrumbItems = [
-    { key: 'breadcrumb-item-0', label: 'Home', path: '/' },
+    { key: "breadcrumb-item-0", label: "Home", path: "/" },
     {
-      key: 'breadcrumb-item-1',
+      key: "breadcrumb-item-1",
       label: product.category?.name,
       path: `/collections/${product.category?.slug}`,
     },
     {
-      key: 'breadcrumb-item-2',
+      key: "breadcrumb-item-2",
       label: product.name,
       path: `/products/${product.slug}`,
       active: true,
@@ -171,28 +171,24 @@ const ProductDetail = () => {
                     <div className="mb-3">
                       <Card.Text className="card-price h5">
                         Giá sản phẩm: {product.price}
-                      </Card.Text>{' '}
+                      </Card.Text>{" "}
                     </div>
                     <div className="mb-4">
                       <Button
                         size="sm"
                         className="me-2"
-                        variant={isAddedToCard ? 'warning' : 'primary'}
+                        variant={isAddedToCard ? "warning" : "primary"}
                         onClick={handleClickBuyNow}
                       >
-                        {isAddedToCard ? 'Xem giỏ' : 'Mua ngay'}
+                        {isAddedToCard ? "Xem giỏ" : "Mua ngay"}
                       </Button>
 
                       <Button
                         size="sm"
-                        variant={isAddedToCard ? 'secondary' : 'danger'}
-                        onClick={
-                          isAddedToCard
-                            ? handleClickRemoveItem
-                            : handleClickAddToCart
-                        }
+                        variant={isAddedToCard ? "secondary" : "danger"}
+                        onClick={handleClickAddToCart}
                       >
-                        {isAddedToCard ? 'Hủy Thêm' : 'Thêm vào Giỏ'}
+                        {isAddedToCard ? "Hủy Thêm" : "Thêm vào Giỏ"}
                       </Button>
                     </div>
                     <hr />

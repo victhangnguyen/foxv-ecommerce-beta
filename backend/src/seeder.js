@@ -1,13 +1,15 @@
 import bcrypt from 'bcryptjs';
 
-//! imp Constants
-import constants from './constants/index.js';
-
 //! library
 import Logging from './library/Logging.js';
 import slugify from 'slugify';
 
+//! imp Config
 import config from './config/index.js';
+
+//! imp Constants
+import constants from './constants/index.js';
+
 
 //! imp Datas
 import addressDatas from './data/addressDatas.js';
@@ -57,6 +59,7 @@ const importData = async () => {
     const products = productDatas.map((product) => ({
       ...product,
       slug: slugify(product.name),
+      images: product.images.map(image => (`${config.db.server.baseURL}:${config.db.server.port}/images/products/${image}`))
     }));
 
     const userDocs = await User.insertMany(users);

@@ -1,6 +1,6 @@
-import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
+import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 //! imp APIs
-import API from '../../API';
+import API from "../../API";
 
 const initialState = {
   cartItems: [],
@@ -9,17 +9,16 @@ const initialState = {
 };
 
 const CartSlice = createSlice({
-  name: 'cart',
+  name: "cart",
   initialState: initialState,
   reducers: {
     addToCart: (state, action) => {
-      const cartItem = state.cartItems?.find(
+      const itemIndex = state.cartItems.findIndex(
         (item) => item.product === action.payload.product
       );
 
-      if (cartItem) {
-        //! cartItem --refer--> object
-        cartItem.quantity++;
+      if (itemIndex >= 0) {
+        state.cartItems[itemIndex].quantity++;
       } else {
         state.cartItems?.push({
           ...action.payload,
@@ -95,7 +94,7 @@ const reducer = CartSlice.reducer;
 export default reducer;
 
 export const getCart = createAsyncThunk(
-  '/cart/getCart',
+  "/cart/getCart",
   async (_, thunkAPI) => {
     try {
       const response = await API.cart.getCart();
@@ -114,7 +113,7 @@ export const getCart = createAsyncThunk(
 );
 
 export const postCart = createAsyncThunk(
-  '/cart/postCart',
+  "/cart/postCart",
   async (_, thunkAPI) => {
     try {
       const cartItems = thunkAPI.getState().cart?.cartItems;

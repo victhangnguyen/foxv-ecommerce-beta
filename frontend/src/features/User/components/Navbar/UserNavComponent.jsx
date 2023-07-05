@@ -1,7 +1,7 @@
-import React from 'react';
-import { Nav } from 'react-bootstrap';
-import { Link, NavLink } from 'react-router-dom';
-import { useDispatch, useSelector } from 'react-redux';
+import React from "react";
+import { Nav } from "react-bootstrap";
+import { Link, NavLink } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
 
 const AdminNavComponent = () => {
   const dispatch = useDispatch();
@@ -9,10 +9,20 @@ const AdminNavComponent = () => {
   const userId = auth.user?._id;
 
   const adminNavItems = [
+    // {
+    //   key: 'user-nav-item-0',
+    //   label: 'Dashboard',
+    //   pathname: '/admin/dashboard',
+    // },
     {
-      key: 'nav-item-1',
-      label: 'Thông tin - Bảo mật',
+      key: "user-nav-item-1",
+      label: "Thông tin - Bảo mật",
       path: `/users/${userId}/update`,
+    },
+    {
+      key: "user-nav-item-2",
+      label: "Lịch sử mua hàng",
+      path: `/users/${userId}/history-orders`,
     },
   ];
   const renderAdminNavItems = adminNavItems.map((item) => (

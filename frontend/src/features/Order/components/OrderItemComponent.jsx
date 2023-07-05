@@ -17,7 +17,13 @@ const OrderItemComponent = ({
       label: 'Xóa đơn hàng',
       actionType: constants.order.actionTypes.DELETE_ORDER,
     },
+    {
+      key: 'menu-item-1',
+      label: 'Tải hóa đơn',
+      actionType: constants.order.actionTypes.DOWNLOAD_INVOICE,
+    },
   ];
+
 
   return (
     <>
@@ -29,7 +35,7 @@ const OrderItemComponent = ({
           <FormCheck
             inline
             id={order._id}
-            checked={selectedIds.includes(order._id)}
+            checked={selectedIds?.includes(order._id)}
             onChange={handleCheckChange}
           />
         </td>

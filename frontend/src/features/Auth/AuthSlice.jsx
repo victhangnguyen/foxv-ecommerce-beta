@@ -156,7 +156,7 @@ const authSlice = createSlice({
         console.log('refreshToken.fulfilled action.payload: ', action.payload);
         state.loading = false;
         state.success = action.payload?.success;
-        state.token = action.payload?.data.token;
+        state.token = action.payload?.data?.token;
       })
       .addCase(refreshToken.rejected, (state, action) => {
         console.log('refreshToken.rejected action.payload: ', action.payload);

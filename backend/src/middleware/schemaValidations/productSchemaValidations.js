@@ -22,12 +22,12 @@ export const createProductSchema = {
       errorMessage: 'Cateogry must not be empty',
     },
   },
-  subCategories: {
-    isArray: true,
-    notEmpty: {
-      errorMessage: 'Sub-category must not be empty',
-    },
-  },
+  // subCategories: {
+  //   isArray: true,
+  //   notEmpty: {
+  //     errorMessage: 'Sub-category must not be empty',
+  //   },
+  // },
   price: {
     isLength: {
       options: { min: 0, max: 10000000 },
@@ -70,11 +70,11 @@ export const updateProductSchema = {
     notEmpty: true,
     errorMessage: 'Cateogry must not be empty',
   },
-  subCategories: {
-    isArray: true,
-    notEmpty: true,
-    errorMessage: 'Sub-category must not be empty',
-  },
+  // subCategories: {
+  //   isArray: true,
+  //   notEmpty: true,
+  //   errorMessage: 'Sub-category must not be empty',
+  // },
   price: {
     isLength: {
       errorMessage: 'Price must be between 0 and 10000000 characters long',

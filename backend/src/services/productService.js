@@ -1,14 +1,14 @@
-import mongoose from 'mongoose';
-import generateSlug from '../utils/generateSlug.js';
+import mongoose from "mongoose";
+import generateSlug from "../utils/generateSlug.js";
 //! imp Models
-import Product from '../models/Product.js';
+import Product from "../models/Product.js";
 //! imp Utils
-import * as fileHelper from '../utils/file.js';
+import * as fileHelper from "../utils/file.js";
 
 async function createProduct(productData, session) {
   const { name } = productData;
 
-  const newSlug = await generateSlug(name, 'Product');
+  const newSlug = await generateSlug(name, "Product");
 
   const createdProduct = await Product.create(
     //! mongoose v 7.0.5
@@ -24,13 +24,7 @@ async function createProduct(productData, session) {
 
 async function updateProductById(productId, productData, session) {
   const { name } = productData;
-  console.log(
-    '__Debugger__productService\n__updateProductById__productData: ',
-    productData,
-    '\n'
-  );
-
-  const newSlug = await generateSlug(name, 'Product');
+  const newSlug = await generateSlug(name, "Product");
 
   const updatedProduct = await Product.findByIdAndUpdate(
     productId,
@@ -42,7 +36,7 @@ async function updateProductById(productId, productData, session) {
   );
 
   if (!updatedProduct) {
-    throw new Error('Product does not exist!'); //! Forbidden
+    throw new Error("Product does not exist!"); //! Forbidden
   }
 
   return updatedProduct;
@@ -50,13 +44,13 @@ async function updateProductById(productId, productData, session) {
 
 async function deleteProductById(productId, session) {
   if (!mongoose.Types.ObjectId.isValid(productId)) {
-    throw new Error('Product does not exist!');
+    throw new Error("Product does not exist!");
   }
 
   const product = await Product.findById(productId);
 
   if (!product) {
-    throw new Error('Product not found!');
+    throw new Error("Product not found!");
   }
 
   const deletedProduct = await product.remove({ session });

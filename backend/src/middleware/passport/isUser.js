@@ -2,7 +2,7 @@ import passport from './passport.js';
 import mongoose from 'mongoose';
 import User from '../../models/User.js';
 
-async function isUser(req, res, next) {
+async function  isUser(req, res, next) {
   const userId = req.params.userId;
   try {
     //! check Role

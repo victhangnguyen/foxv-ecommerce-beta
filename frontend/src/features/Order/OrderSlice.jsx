@@ -1,6 +1,6 @@
-import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
+import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 //! imp Services
-import API from '../../API';
+import API from "../../API";
 
 const initialState = {
   orders: [],
@@ -14,7 +14,7 @@ const initialState = {
 };
 
 const OrderSlice = createSlice({
-  name: 'order',
+  name: "order",
   initialState: initialState,
   reducers: {
     emptyNewOrder: (state) => {
@@ -89,10 +89,26 @@ const OrderSlice = createSlice({
       .addCase(deleteOrder.fulfilled, (state, action) => {
         state.loading = false;
         state.ordersCount -= 1;
+        state.success = action.payload.success;
       })
       .addCase(deleteOrder.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload.message;
+        state.success = action.payload.success;
+      });
+    builder
+      .addCase(deleteOrderByUserId.pending, (state, action) => {
+        state.loading = true;
+      })
+      .addCase(deleteOrderByUserId.fulfilled, (state, action) => {
+        state.loading = false;
+        state.ordersCount -= 1;
+        state.success = action.payload.success;
+      })
+      .addCase(deleteOrderByUserId.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload.message;
+        state.success = action.payload.success;
       });
     builder
       .addCase(deleteOrders.pending, (state, action) => {
@@ -101,10 +117,26 @@ const OrderSlice = createSlice({
       .addCase(deleteOrders.fulfilled, (state, action) => {
         state.loading = false;
         state.ordersCount -= action.payload.data.deletedOrdersCount;
+        state.success = action.payload.success;
       })
       .addCase(deleteOrders.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload.message;
+        state.success = action.payload.success;
+      });
+    builder
+      .addCase(deleteOrdersByUserId.pending, (state, action) => {
+        state.loading = true;
+      })
+      .addCase(deleteOrdersByUserId.fulfilled, (state, action) => {
+        state.loading = false;
+        state.ordersCount -= action.payload.data.deletedOrdersCount;
+        state.success = action.payload.success;
+      })
+      .addCase(deleteOrdersByUserId.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload.message;
+        state.success = action.payload.success;
       });
     builder
       .addCase(updateOrder.pending, (state, action) => {
@@ -120,6 +152,20 @@ const OrderSlice = createSlice({
         state.success = action.payload.success;
         state.error = action.payload.message;
       });
+    builder
+      .addCase(getInvoice.pending, (state, action) => {
+        state.loading = true;
+      })
+      .addCase(getInvoice.fulfilled, (state, action) => {
+        state.loading = false;
+        state.success = action.payload?.success;
+        state.message = action.payload?.message;
+      })
+      .addCase(getInvoice.rejected, (state, action) => {
+        state.loading = false;
+        state.success = action.payload?.success;
+        state.error = action.payload?.message;
+      });
   },
 });
 
@@ -130,7 +176,7 @@ export default reducer;
 
 //! async Thunk
 export const getOrderById = createAsyncThunk(
-  'order/getOrderById',
+  "order/getOrderById",
   async (orderId, thunkAPI) => {
     try {
       const response = await API.order.getOrderById(orderId);
@@ -149,7 +195,7 @@ export const getOrderById = createAsyncThunk(
 );
 
 export const checkoutOrder = createAsyncThunk(
-  'order/checkoutOrder',
+  "order/checkoutOrder",
   async ({ name, address, items, orderPayAmount, bankCode }, thunkAPI) => {
     try {
       const response = await API.order.checkoutOrder({
@@ -175,7 +221,7 @@ export const checkoutOrder = createAsyncThunk(
 );
 
 export const createOrder = createAsyncThunk(
-  'order/createOrder',
+  "order/createOrder",
   async (
     { user, items, total, status, name, address, transactionNo, bankTranNo },
     thunkAPI
@@ -207,7 +253,7 @@ export const createOrder = createAsyncThunk(
 );
 
 export const getOrdersByFilters = createAsyncThunk(
-  'order/getOrdersByFilters',
+  "order/getOrdersByFilters",
   async ({ sort, order, page, perPage, search }, thunkAPI) => {
     try {
       const response = await API.order.getOrdersByFilters({
@@ -232,7 +278,7 @@ export const getOrdersByFilters = createAsyncThunk(
 );
 
 export const deleteOrder = createAsyncThunk(
-  'order/deleteOrder',
+  "order/deleteOrder",
   async (orderId, thunkAPI) => {
     try {
       const response = await API.order.deleteOrder(orderId);
@@ -250,8 +296,27 @@ export const deleteOrder = createAsyncThunk(
   }
 );
 
+export const deleteOrderByUserId = createAsyncThunk(
+  "order/deleteOrderByUserId",
+  async (orderId, thunkAPI) => {
+    try {
+      const response = await API.order.deleteOrderByUserId(orderId);
+      return thunkAPI.fulfillWithValue(response);
+    } catch (error) {
+      return thunkAPI.rejectWithValue({
+        message: error.message,
+        response: {
+          data: error.response.data,
+          status: error.response.status,
+          statusText: error.response.statusText,
+        },
+      });
+    }
+  }
+);
+
 export const deleteOrders = createAsyncThunk(
-  'order/deleteOrders',
+  "order/deleteOrders",
   async (orderIds, thunkAPI) => {
     try {
       const response = await API.order.deleteOrders(orderIds);
@@ -269,8 +334,27 @@ export const deleteOrders = createAsyncThunk(
   }
 );
 
+export const deleteOrdersByUserId = createAsyncThunk(
+  "order/deleteOrdersByUserId",
+  async (orderIds, thunkAPI) => {
+    try {
+      const response = await API.order.deleteOrdersByUserId(orderIds);
+      return thunkAPI.fulfillWithValue(response);
+    } catch (error) {
+      return thunkAPI.rejectWithValue({
+        message: error.message,
+        response: {
+          data: error.response.data,
+          status: error.response.status,
+          statusText: error.response.statusText,
+        },
+      });
+    }
+  }
+);
+
 export const updateOrder = createAsyncThunk(
-  'order/updateOrderById',
+  "order/updateOrderById",
   async ({ orderId, orderData }, thunkAPI) => {
     const { address, bankTranNo, name, status, transactionNo } = orderData;
     try {
@@ -281,6 +365,25 @@ export const updateOrder = createAsyncThunk(
         status,
         transactionNo,
       });
+      return thunkAPI.fulfillWithValue(response);
+    } catch (error) {
+      return thunkAPI.rejectWithValue({
+        message: error.message,
+        response: {
+          data: error.response.data,
+          status: error.response.status,
+          statusText: error.response.statusText,
+        },
+      });
+    }
+  }
+);
+
+export const getInvoice = createAsyncThunk(
+  "order/getInvoice",
+  async (orderId, thunkAPI) => {
+    try {
+      const response = await API.order.getInvoice(orderId);
       return thunkAPI.fulfillWithValue(response);
     } catch (error) {
       return thunkAPI.rejectWithValue({

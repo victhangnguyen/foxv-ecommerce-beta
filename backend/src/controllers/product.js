@@ -1,17 +1,20 @@
-import mongoose from 'mongoose';
-import slugify from 'slugify';
-import config from '../config/index.js';
-import path from 'path';
+import _ from "lodash";
+import mongoose from "mongoose";
+import slugify from "slugify";
+import config from "../config/index.js";
+import path from "path";
 
 //! imp Library
-import Logging from '../library/Logging.js';
+import Logging from "../library/Logging.js";
 //! imp Utils
-import * as fileHelper from '../utils/file.js';
-import { execWithTransaction } from '../utils/transaction.js';
+import * as fileHelper from "../utils/file.js";
+import { execWithTransaction } from "../utils/transaction.js";
+import { getFileNameFromURL } from "../utils/url.js";
+
 //! imp Models
-import Product from '../models/Product.js';
+import Product from "../models/Product.js";
 //! imp Services
-import productService from '../services/productService.js';
+import productService from "../services/productService.js";
 
 const baseURL = config.db.server.baseURL;
 const port = config.db.server.port;
@@ -19,31 +22,31 @@ const port = config.db.server.port;
 export const getProductById = async (req, res, next) => {
   const productId = req.params.productId;
   console.log(
-    '__Debugger__product\n__getProductById__productId: ',
+    "__Debugger__product\n__getProductById__productId: ",
     productId,
-    '\n'
+    "\n"
   );
   try {
     if (!mongoose.Types.ObjectId.isValid(productId)) {
-      throw new Error('Product does not exist!');
+      throw new Error("Product does not exist!");
     }
 
     const product = await Product.findById(productId)
-      .populate('category')
-      .populate('subCategories')
+      .populate("category")
+      .populate("subCategories")
       .exec();
 
     if (!product) {
-      throw new Error('Product does not exist!');
+      throw new Error("Product does not exist!");
     }
 
     res.status(200).json({
       success: true,
-      message: 'Get a Product by id successful!',
+      message: "Get a Product by id successful!",
       data: { product },
     });
   } catch (error) {
-    Logging.error('Error__ctrls__product: ' + error);
+    Logging.error("Error__ctrls__product: " + error);
     const err = new Error(error);
     err.statusCode = 400;
     return next(err);
@@ -54,19 +57,19 @@ export async function getProductBySlug(req, res, next) {
   const slug = req.params.slug;
   try {
     const product = await Product.findOne({ slug })
-      .populate('category')
-      .populate('subCategories')
+      .populate("category")
+      .populate("subCategories")
       .exec();
     if (!product) {
-      throw new Error('Product does not exist!');
+      throw new Error("Product does not exist!");
     }
     res.status(200).json({
       success: true,
-      message: 'Get Product by Slug successful!',
+      message: "Get Product by Slug successful!",
       data: { product },
     });
   } catch (error) {
-    Logging.error('Error__ctrls__product: ' + error);
+    Logging.error("Error__ctrls__product: " + error);
     const err = new Error(error);
     err.statusCode = 400;
     return next(err);
@@ -76,7 +79,7 @@ export async function getProductBySlug(req, res, next) {
 export const getProducts = async (req, res, next) => {
   try {
   } catch (error) {
-    Logging.error('Error__ctrls__product: ' + error);
+    Logging.error("Error__ctrls__product: " + error);
     const err = new Error(error);
     err.statusCode = 400;
     return next(err);
@@ -95,7 +98,7 @@ export const getProductList = async (req, res, next) => {
     const products = await Product.find({})
       .sort([
         [sort, order],
-        ['_id', 'desc'],
+        ["_id", "desc"],
       ])
       .skip((page - 1) * perPage)
       .limit(perPage)
@@ -107,11 +110,11 @@ export const getProductList = async (req, res, next) => {
 
     return res.status(200).json({
       success: true,
-      message: 'Get Product List sucessful!',
+      message: "Get Product List sucessful!",
       data: { products, productsCount },
     });
   } catch (error) {
-    Logging.error('Error__ctrls__product: ' + error);
+    Logging.error("Error__ctrls__product: " + error);
     const err = new Error(error);
     err.statusCode = 400;
     return next(err);
@@ -126,12 +129,14 @@ export const createProduct = async (req, res, next) => {
     if (!req.body.category) req.body.category = null;
 
     if (images?.length < 1) {
-      throw new Error('Chưa đính kèm tập tin hình ảnh!');
+      throw new Error("Chưa đính kèm tập tin hình ảnh!");
     }
 
     const productData = {
       ...req.body,
-      images: images?.map((img) => img.filename),
+      images: images?.map(
+        (img) => `${baseURL}:${port}/images/products/${img.filename}`
+      ),
     };
 
     const product = await execWithTransaction(async (session) => {
@@ -142,50 +147,93 @@ export const createProduct = async (req, res, next) => {
 
     return res.status(201).json({
       success: true,
-      messsage: 'Create a new product successfull!',
+      messsage: "Create a new product successfull!",
       data: { product },
     });
   } catch (error) {
-    Logging.error('Error__ctrls__product: ' + error);
+    Logging.error("Error__ctrls__product: " + error);
     const err = new Error(error);
     err.statusCode = 400;
     return next(err);
   }
 };
 
+//! @desc     Update One Product
+//! @route    PUT /api/products/:productId/update
+//! @access   Admin
 export const updateProductById = async (req, res, next) => {
   //! Frontend put Empty Array or Image Array
   const productId = req.params.productId;
-  let { images, ...otherProps } = req.body;
-
+  let { images, imagesArray, ...otherProps } = req.body;
   try {
+    const product = await Product.findById(productId);
+    if (!product) {
+      throw new Error("Product not found!");
+    }
+
     const updatedProduct = await execWithTransaction(async (session) => {
-      //! check
-      const product = await Product.findById(productId);
-      if (!product) {
-        throw new Error('Product not found!');
-      }
+      const currentImagesArray = product.images;
+      const imageUrlsArray = imagesArray
+        .filter((imgObj) => imgObj.type?.includes("url"))
+        .map((imgObj) => imgObj.image);
+
+      const isDifferenceArray = _.difference(
+        currentImagesArray,
+        imageUrlsArray
+      ); // => Delete function
+
+      const isExistImages = images?.length; //! => Edit, Add function
 
       let productData;
       let fileDir, files;
-      const isExistImages = images?.length;
 
-      //! images?.length > 0 when change Images
-      //! images?.length === 0 when dont change
-      if (isExistImages) {
-        //! image handling
-        images = images.map((img) => img.filename);
-        productData = { ...otherProps, images };
+      if (isExistImages || isDifferenceArray) {
+        //! Update Information and Images
+        //! update images prop
+
+        const updatedImages = imagesArray.map((imageObj) => {
+          if (imageObj.type?.includes("image")) {
+            //! File => get image url
+            //! update File base on index of Arrray
+            const imgObsArray = imagesArray?.filter((imgObj) =>
+              imgObj.type?.includes("image")
+            );
+            const imageIndex = imgObsArray.findIndex(
+              (imgObj) => imageObj.lastModified === imgObj.lastModified
+            );
+            const imageName = images[imageIndex].filename;
+
+            return `${baseURL}:${port}/images/products/${imageName}`;
+          } else {
+            return imageObj.image;
+          }
+        });
+
+        productData = { ...otherProps, images: updatedImages };
 
         //! Check images-link
-        fileDir = path.join(fileHelper.rootDir, 'images', 'products');
-        files = product.images;
+        fileDir = path.join(fileHelper.rootDir, "images", "products");
+        const currentImages = product.images;
+        //! get the Difference url
+        const deletedImages = _.difference(currentImages, updatedImages);
+        console.log(
+          "__Debugger__product\n__updateProductById__currentImages: ",
+          currentImages,
+          "\n"
+        );
+        console.log(
+          "__Debugger__product\n__updateProductById__updatedImages: ",
+          updatedImages,
+          "\n"
+        );
+        files = deletedImages.map((url) => getFileNameFromURL(url));
 
         const isReadable = await fileHelper.checkFilesPermission(
           fileDir,
           files
         );
       } else {
+        //! only Update Infomation
         productData = { ...otherProps };
       }
 
@@ -214,7 +262,7 @@ export const updateProductById = async (req, res, next) => {
 
     return res.status(201).json(updatedProduct);
   } catch (error) {
-    Logging.error('Error__ctrls__product: ' + error);
+    Logging.error("Error__ctrls__product: " + error);
     const err = new Error(error);
     err.statusCode = 400;
     return next(err);
@@ -227,13 +275,13 @@ export const deleteProductById = async (req, res, next) => {
     const product = await Product.findById(productId);
 
     if (!product) {
-      throw new Error('Product not found!');
+      throw new Error("Product not found!");
     }
 
     const deletedProduct = await execWithTransaction(async (session) => {
       //! Check images-link
-      const fileDir = path.join(fileHelper.rootDir, 'images', 'products');
-      const files = product.images;
+      const fileDir = path.join(fileHelper.rootDir, "images", "products");
+      const files = product.images.map((url) => getFileNameFromURL(url));
 
       const isFilesPermission = await fileHelper.checkFilesPermission(
         fileDir,
@@ -241,7 +289,7 @@ export const deleteProductById = async (req, res, next) => {
       );
 
       if (!isFilesPermission) {
-        throw new Error('The file or directory is corrupted and unreadable');
+        throw new Error("The file or directory is corrupted and unreadable");
       }
 
       const result = await productService.deleteProductById(productId, session);
@@ -254,11 +302,11 @@ export const deleteProductById = async (req, res, next) => {
 
     res.status(200).json({
       success: true,
-      message: 'Delete One Product successful!',
+      message: "Delete One Product successful!",
       data: { deletedProduct },
     });
   } catch (error) {
-    Logging.error('Error__ctrls__product: ' + error);
+    Logging.error("Error__ctrls__product: " + error);
     const err = new Error(error);
     err.statusCode = 400;
     return next(err);
@@ -267,7 +315,7 @@ export const deleteProductById = async (req, res, next) => {
 
 export const deleteProductsByIds = async (req, res, next) => {
   const productIds = req.query.productIds;
-  console.log('productIds: ', productIds);
+  console.log("productIds: ", productIds);
   try {
     const deletedProducts = await execWithTransaction(async (session) => {
       if (!productIds.length) return; //! exists productIds
@@ -278,19 +326,19 @@ export const deleteProductsByIds = async (req, res, next) => {
       const productQuene = productIds.map(async (productId) => {
         try {
           const product = await Product.findById(productId);
-          const files = product.images;
+          const files = product.images.map((url) => getFileNameFromURL(url));
 
           files.forEach((file) => {
             const isExistItem = imageFiles.includes(file);
             if (isExistItem) {
-              throw new Error('Cannot delete the duplicate images of products');
+              throw new Error("Cannot delete the duplicate images of products");
             } else {
               imageFiles.push(file);
             }
           });
 
           //! Check images-link
-          const fileDir = path.join(fileHelper.rootDir, 'images', 'products');
+          const fileDir = path.join(fileHelper.rootDir, "images", "products");
           const isFilesPermission = await fileHelper.checkFilesPermission(
             fileDir,
             files
@@ -298,7 +346,7 @@ export const deleteProductsByIds = async (req, res, next) => {
 
           if (!isFilesPermission) {
             throw new Error(
-              'The file or directory is corrupted and unreadable'
+              "The file or directory is corrupted and unreadable"
             );
           }
 
@@ -320,12 +368,12 @@ export const deleteProductsByIds = async (req, res, next) => {
 
       res.status(200).json({
         success: true,
-        message: 'Get many products successful!',
+        message: "Get many products successful!",
         data: { deletedProducts },
       });
     });
   } catch (error) {
-    Logging.error('Error__ctrls__product: ' + error);
+    Logging.error("Error__ctrls__product: " + error);
     const err = new Error(error);
     err.statusCode = 400;
     return next(err);
@@ -341,16 +389,16 @@ export async function getProductsByFilters(req, res, next) {
     //! filterOpt: keyword
     if (keyword) {
       match.$or = [
-        { name: new RegExp(keyword, 'i') },
-        { status: new RegExp(keyword, 'i') },
+        { name: new RegExp(keyword, "i") },
+        { status: new RegExp(keyword, "i") },
         // { category: new RegExp(keyword, 'i') },
       ];
     }
 
     //! filterOpt: price
     if (price) {
-      const priceGte = price.split('-')[0];
-      const priceLte = price.split('-')[1];
+      const priceGte = price.split("-")[0];
+      const priceLte = price.split("-")[1];
       match.price = {
         $gte: +priceGte,
         $lte: +priceLte,
@@ -366,29 +414,29 @@ export async function getProductsByFilters(req, res, next) {
       //! populate: category
       {
         $lookup: {
-          from: 'categories',
-          localField: 'category',
-          foreignField: '_id',
-          as: 'category',
+          from: "categories",
+          localField: "category",
+          foreignField: "_id",
+          as: "category",
         },
       },
       {
-        $unwind: '$category',
+        $unwind: "$category",
       },
       //! populate: subCategory
       {
         $lookup: {
-          from: 'subcategories',
-          localField: 'subCategories',
-          foreignField: '_id',
-          as: 'subCategories',
+          from: "subcategories",
+          localField: "subCategories",
+          foreignField: "_id",
+          as: "subCategories",
         },
       },
       { $sort: { [sort]: +order, _id: 1 } },
       {
         $facet: {
           products: [{ $skip: (page - 1) * perPage }, { $limit: +perPage }],
-          productsCount: [{ $count: 'count' }],
+          productsCount: [{ $count: "count" }],
         },
       },
     ]).exec();
@@ -398,11 +446,11 @@ export async function getProductsByFilters(req, res, next) {
 
     res.status(200).json({
       success: true,
-      message: 'Get many products successful!',
+      message: "Get many products successful!",
       data: { products, productsCount },
     });
   } catch (error) {
-    Logging.error('Error__ctrls__product: ' + error);
+    Logging.error("Error__ctrls__product: " + error);
     const err = new Error(error);
     err.statusCode = 400;
     return next(err);

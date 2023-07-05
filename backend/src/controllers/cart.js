@@ -13,7 +13,7 @@ export async function getCart(req, res, next) {
       data: { cart },
     });
   } catch (error) {
-    Logging.error('Error__ctrls__user: ' + error);
+    Logging.error('Error__ctrls__cart: ' + error);
     const err = new Error(error);
     err.statusCode = 400;
     return next(err);
@@ -34,7 +34,7 @@ export async function postCart(req, res, next) {
       data: { cart },
     });
   } catch (error) {
-    Logging.error('Error__ctrls__user: ' + error);
+    Logging.error('Error__ctrls__cart: ' + error);
     const err = new Error(error);
     err.statusCode = 400;
     return next(err);

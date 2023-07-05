@@ -1,22 +1,22 @@
-import mongoose from 'mongoose';
-import bcrypt from 'bcryptjs';
+import mongoose from "mongoose";
+import bcrypt from "bcryptjs";
 
 //! imp Services
-import userService from '../services/userService.js';
+import userService from "../services/userService.js";
 
 // Define the [User Schema]
 const userSchema = new mongoose.Schema(
   {
     firstName: {
       type: String,
-      minLength: [2, 'Thấp nhất 2 ký tự'],
-      maxLength: [32, 'Nhiều nhất 32 ký tự'],
+      minLength: [2, "Thấp nhất 2 ký tự"],
+      maxLength: [32, "Nhiều nhất 32 ký tự"],
       required: true,
     },
     lastName: {
       type: String,
-      minLength: [2, 'Thấp nhất 2 ký tự'],
-      maxLength: [32, 'Nhiều nhất 32 ký tự'],
+      minLength: [2, "Thấp nhất 2 ký tự"],
+      maxLength: [32, "Nhiều nhất 32 ký tự"],
       required: true,
     },
     username: {
@@ -35,14 +35,14 @@ const userSchema = new mongoose.Schema(
     },
     phoneNumber: {
       type: String,
-      minLength: [8, 'Thấp nhất 8 ký tự'],
-      maxLength: [32, 'Nhiều nhất 32 ký tự'],
+      minLength: [8, "Thấp nhất 8 ký tự"],
+      maxLength: [32, "Nhiều nhất 32 ký tự"],
       required: true,
     },
     password: {
       type: String,
-      minLength: [8, 'Thấp nhất 8 ký tự'],
-      maxLength: [64, 'Nhiều nhất 64 ký tự'],
+      minLength: [8, "Thấp nhất 8 ký tự"],
+      maxLength: [64, "Nhiều nhất 64 ký tự"],
       required: true,
     },
     image: {
@@ -51,26 +51,25 @@ const userSchema = new mongoose.Schema(
     roles: [
       {
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'Role',
-        default: async function () {
-          const role = await mongoose.model('Role').findOne({ name: 'user' });
-          return [role._id];
-        },
+        ref: "Role",
       },
     ],
     status: {
       type: String,
-      enum: ['pending', 'active', 'inactive', 'deleting'],
-      default: 'pending',
+      enum: ["pending", "active", "inactive", "deleting"],
+      default: "pending",
     },
   },
   { timestamps: true, toObject: { virtuals: true }, toJSON: { virtuals: true } }
 );
 
 // Hash the password before saving it to the database
-userSchema.pre('save', async function (next) {
-  if (this.isModified('password')) {
+userSchema.pre("save", async function (next) {
+  const userRole = await mongoose.model("Role").findOne({ name: "user" });
+  if (this.isModified("password")) {
     this.password = await bcrypt.hash(this.password, 10);
+    //! active Account
+    this.roles = [userRole._id];
   }
   next();
 });
@@ -89,5 +88,5 @@ userSchema.methods.resetPassword = async function (session) {
   return newPassword;
 };
 
-const User = mongoose.model('User', userSchema);
+const User = mongoose.model("User", userSchema);
 export default User;

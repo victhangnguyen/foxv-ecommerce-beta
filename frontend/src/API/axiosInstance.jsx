@@ -1,19 +1,19 @@
-import axios from 'axios';
-import Qs from 'qs';
+import axios from "axios";
+import Qs from "qs";
 
 //! imp Actions
-import { refreshToken, signout } from '../features/Auth/AuthSlice';
+import { refreshToken, signout } from "../features/Auth/AuthSlice";
 
 const axiosInstance = axios.create({
-  baseURL: 'http://127.0.0.1:5000/api',
+  baseURL: "http://127.0.0.1:5000/api",
   headers: {
-    'Content-Type': 'application/json',
+    "Content-Type": "application/json",
   },
   // paramsSerializer: function (params) {
   //   return Qs.stringify(params, { arrayFormat: 'brackets' });
   // },
   paramsSerializer: {
-    encode: (params) => Qs.stringify(params, { arrayFormat: 'brackets' }),
+    encode: (params) => Qs.stringify(params, { arrayFormat: "brackets" }),
   },
 });
 
@@ -33,7 +33,7 @@ export const interceptor = (store) => {
     },
     function (error) {
       // Do something with request error
-      console.log('__Debugger__interceptors.request__error: ', error);
+      console.log("__Debugger__interceptors.request__error: ", error);
       return Promise.reject(error);
     }
   );
@@ -46,24 +46,23 @@ export const interceptor = (store) => {
       return response;
     },
     async function (error) {
-      console.log(
-        '__Debugger__axiosInstance\n__interceptors__error: ',
-        error,
-        '\n'
-      );
       let originalConfig = error.config;
+      const token = store.getState().auth?.token;
+      if (!token) return;
+
       //! No retry when auth/signin
-      if (error.url !== '/auth/signin' && error.response) {
+      if (error.url !== "/auth/signin" && error.response) {
         //! check AccessToken is unauthorized and retry flag
         // error instanceof jwt.TokenExpiredError
         //! 403
         if (
           error.response.status === FORBIDDEN &&
           error.response?.data?.message ===
-            'Your session has expired. Please log in again to continue using our service.'
+            "Your session has expired. Please log in again to continue using our service."
         ) {
           try {
-            store.dispatch(signout());
+            /* Return to Stop every thing */
+            return store.dispatch(signout());
           } catch (error) {
             Promise.reject(error.error);
           }
@@ -82,9 +81,9 @@ export const interceptor = (store) => {
               .unwrap();
             // return a request with config
             console.log(
-              '__Debugger__axiosInstance\n__refreshToken__originalConfig: ',
+              "__Debugger__axiosInstance\n__refreshToken__originalConfig: ",
               originalConfig,
-              '\n'
+              "\n"
             );
             return axiosInstance(originalConfig);
           } catch (error) {

@@ -35,9 +35,10 @@ const HeaderComponent = () => {
   const roles = auth.user?.roles?.map((role) => role.name);
   const isAuthenticated = roles?.includes('user');
   const isAdmin = roles?.includes('admin');
+  const token = auth.token;
   //! variable from cart
   //! total items quantity
-  const itemsCount = cart.cartItems?.reduce((acc, cur) => cur.quantity + acc, 0);
+  const itemsCount = cart.cartItems?.reduce((acc, cur) => +cur.quantity + acc, 0);
 
   const badgeProps = {};
 
@@ -51,8 +52,11 @@ const HeaderComponent = () => {
 
   async function handleLogout() {
     try {
-      //! save Cart to database
-      await dispatch(postCart()).unwrap(); //! not authenticated
+      //! if no Token then signout
+      if (token) {
+        //! save Cart to database
+        await dispatch(postCart()).unwrap(); //! not authenticated
+      }
 
       //! logout
       dispatch(signout());

@@ -11,7 +11,7 @@ const isAdmin = async function (req, res, next) {
     if (!isAdmin) {
       return res.status(403).json({
         success: false,
-        message: "You don't have permission to access this page.",
+        message: "You don't have permission to access this function.",
       });
     }
 

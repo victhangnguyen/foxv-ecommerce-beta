@@ -1,91 +1,122 @@
-import React from 'react';
-import { Col, Form, Row } from 'react-bootstrap';
+import React from "react";
+import { Col, Form, Row } from "react-bootstrap";
+//! constants
+import constants from "../../constants";
+//! imp Comps
+import MenuButtonComponent from "../Button/MenuButtonComponent";
 
 const ImageComponent = ({ methods, name, label, className, ...rest }) => {
+  const inputRef = React.useRef(null);
+  // const [imagesArray, setimagesArray] = React.useState([]);
+
   const [imageMain, setImageMain] = React.useState(null);
   const [images, setImages] = React.useState([]);
+  const [actionType, setActionType] = React.useState(null);
+  const [indexFile, setIndexFile] = React.useState(0);
 
-  const REACT_APP_SERVER = 'http://127.0.0.1';
+  const REACT_APP_SERVER = "http://127.0.0.1";
   const REACT_APP_PORT = 5000;
   const imagesUrl = `${REACT_APP_SERVER}:${REACT_APP_PORT}/images/products/`;
 
-  const imageFiles = methods.getValues(name) || [];
+  const imagesArray = methods.getValues(name) || [];
 
-  React.useEffect(() => {
-    //! if Array (response from Backend)
-    if (Array.isArray(imageFiles)) {
-      //! rhf.State === Array
-      setImages(imageFiles); 
-      setImageMain(imageFiles[0]);
-      return;
+  const handleImageSliceClick = (index) => {
+    console.log(
+      "__Debugger__ImageComponent\n__handleImageSliceClick__index: ",
+      index,
+      "\n"
+    );
+    let mainImageUrl;
+    if (imagesArray[index].type?.includes("image/")) {
+      mainImageUrl = URL.createObjectURL(imagesArray[index]);
+    } else {
+      mainImageUrl = imagesArray[index];
     }
+    setImageMain(mainImageUrl);
 
-    //! handle FileList
-    const fileReaders = [];
-    let isCancel = false;
-    if (imageFiles.length) {
-      const promises = Array.from(imageFiles).map((file) => {
-        return new Promise((resolve, reject) => {
-          const fileReader = new FileReader();
-          fileReaders.push(fileReader);
-          fileReader.onload = (e) => {
-            const { result } = e.target;
-            if (result) {
-              resolve(result);
-            }
-          };
-          fileReader.onabort = () => {
-            reject(new Error('File reading aborted'));
-          };
-          fileReader.onerror = () => {
-            reject(new Error('Failed to read file'));
-          };
-          fileReader.readAsDataURL(file);
-        });
-      });
+    // // Change the prop from multiple to single
+    // inputRef.current.multiple = false;
 
-      Promise.all(promises)
-        .then((images) => {
-          if (!isCancel) {
-            setImages(images);
-            setImageMain(images[0]);
-          }
-        })
-        .catch((reason) => {
-          console.log(reason);
-        });
-    }
-    return () => {
-      if (!imageFiles.length) return;
-
-      isCancel = true;
-      fileReaders.forEach((fileReader) => {
-        if (fileReader.readyState === 1) {
-          fileReader.abort();
-        }
-      });
-    };
-  }, [imageFiles]);
-
-  const handleImage = (index) => {
-    setImageMain(images[index]);
+    setIndexFile(index);
   };
 
-  const renderSlices = images?.map((image, index) => {
-    // const renderSlices = imageFiles.map((image, index) => {
-    return (
-      <div
-        key={index}
-        className="form-image__image-slides__image-slide"
-        onClick={() => handleImage(index)}
-      >
-        <img
-          src={image?.includes('data:image/') ? image : imagesUrl + image}
-          alt=""
-        />
-      </div>
-    );
-  });
+  function handleActionType(type, indexFile) {
+    if (type === constants.product.actionTypes.ALTER_IMAGE) {
+      //! MODE: ALTER IMAGE
+      inputRef.current.click();
+      setActionType(constants.product.actionTypes.ALTER_IMAGE);
+    } else if (type === constants.product.actionTypes.DELETE_IMAGE) {
+      const updatedImagesArray = imagesArray.filter(
+        (file, index) => index !== indexFile
+      );
+      console.log(
+        "__Debugger__ImageComponent\n__DELETE-IMAGE__updatedImagesArray: ",
+        updatedImagesArray,
+        "\n"
+      );
+      methods.setValue(name, updatedImagesArray);
+    } else {
+      console.log("Chưa phát triển chức năng này");
+    }
+  }
+
+  function handleAddImage() {
+    inputRef.current.click();
+    setActionType(constants.product.actionTypes.ADD_IMAGES);
+  }
+
+  function handleFileChange(event) {
+    const selectedFiles = event.target.files && event.target.files;
+    const selectedFile = selectedFiles[0];
+    if (!selectedFile) return;
+
+    if (actionType === constants.product.actionTypes.ALTER_IMAGE) {
+      //! MODE: CHANGE IMAGE
+      const updatedImagesArray = imagesArray.map((file, index) => {
+        console.log("indexFile: ", indexFile);
+        if (index === indexFile) {
+          return selectedFile;
+        } else {
+          return file;
+        }
+      });
+
+      const imageObjectURL = URL.createObjectURL(selectedFile);
+      setImageMain(imageObjectURL);
+      methods.setValue(name, updatedImagesArray);
+      //! reset
+      // setIndexFile(-1);
+      // setActionType(null);
+      return;
+    } else if (actionType === constants.product.actionTypes.ADD_IMAGES) {
+      //! MODE: ADD IMAGES
+      const selectedFilesArray = Array.from(selectedFiles);
+      const newImagesArray = imagesArray.concat(selectedFilesArray);
+      methods.setValue(name, newImagesArray);
+      return;
+    } else {
+      //! MODE: UPLOAD ALL OF IMAGES
+      const selectedFilesArray = Array.from(selectedFiles);
+      // const imagesArray = selectedFilesArray.map((file) =>
+      //   URL.createObjectURL(file)
+      // );
+
+      methods.setValue(name, selectedFilesArray);
+    }
+  }
+
+  const menuItems = [
+    {
+      key: "menu-item-0",
+      label: "Thay đổi",
+      actionType: constants.product.actionTypes.ALTER_IMAGE,
+    },
+    {
+      key: "menu-item-1",
+      label: "Xóa",
+      actionType: constants.product.actionTypes.DELETE_IMAGE,
+    },
+  ];
 
   return (
     <Form.Group
@@ -95,30 +126,52 @@ const ImageComponent = ({ methods, name, label, className, ...rest }) => {
     >
       {label && <Form.Label>{label}</Form.Label>}
       <div className="">
-        <div className="form-image__image-main">
-          {imageMain && (
-            <img
-              src={
-                imageMain.includes('data:image/')
-                  ? imageMain
-                  : imagesUrl + imageMain
+        {
+          //! Main Image
+        }
+        <div className="image-main">
+          <div className="image-header">
+            <MenuButtonComponent
+              menuItems={menuItems}
+              handleClickActionTypeSubmit={(actionType) =>
+                handleActionType(actionType, indexFile)
               }
-              alt=""
             />
-          )}
+          </div>
+
+          <div className="image-body">
+            <img src={imageMain || imagesArray[indexFile]} alt="" />
+          </div>
         </div>
-        {images && (
-          <div className="form-image__image-slides">{renderSlices}</div>
-        )}
+        {
+          //! Images Slice
+        }
+        <div className="image-slides">
+          {imagesArray.length > 0 &&
+            imagesArray.map((image, index) => {
+              return (
+                <ImageSliceComponent
+                  key={index}
+                  image={image}
+                  onClick={() => handleImageSliceClick(index)}
+                />
+              );
+            })}
+          <div className="image-slide btn-add" onClick={handleAddImage}>
+            <span>Thêm</span>
+          </div>
+        </div>
       </div>
       <Col>
         <Form.Control
           isInvalid={methods.formState.errors[name] ? true : false}
           size="sm"
-          type="file"
           accept="image/png, image/jpg, image/jpeg"
           {...methods.register(name)}
           {...rest}
+          ref={inputRef}
+          type="file"
+          onChange={handleFileChange}
         />
         {methods.formState.errors[name] && (
           <Form.Control.Feedback type="invalid">
@@ -127,6 +180,24 @@ const ImageComponent = ({ methods, name, label, className, ...rest }) => {
         )}
       </Col>
     </Form.Group>
+  );
+};
+
+//! Image Slice Presentation Component
+const ImageSliceComponent = (props) => {
+  let imageUrl;
+  if (props.image.type?.includes("image/")) {
+    imageUrl = URL.createObjectURL(props.image);
+  } else {
+    imageUrl = props.image;
+  }
+
+  return (
+    <div className="image-slide" {...props}>
+      <div className="image-body">
+        <img src={imageUrl} alt={imageUrl} />
+      </div>
+    </div>
   );
 };
 

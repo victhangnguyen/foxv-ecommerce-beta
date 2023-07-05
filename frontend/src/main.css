@@ -151,7 +151,7 @@ h2 {
     width: 450px;
   }
 }
-.form-image__image-main {
+.form-image .image-main {
   display: flex;
   justify-content: center;
   margin: 1rem;
@@ -163,51 +163,78 @@ h2 {
   background-color: rgb(254, 254, 254);
   overflow: hidden;
 }
+.form-image .image-main .image-header {
+  opacity: 0;
+  position: absolute;
+  display: flex;
+  justify-content: flex-end;
+  width: 100%;
+  padding: 1rem;
+}
+.form-image .image-main:hover .image-header {
+  opacity: 1;
+}
 @media screen and (min-width: 768px) {
-  .form-image__image-main {
+  .form-image .image-main {
     height: 350px;
   }
 }
 @media screen and (min-width: 992px) {
-  .form-image__image-main {
+  .form-image .image-main {
     height: 450px;
   }
 }
 @media screen and (min-width: 1200px) {
-  .form-image__image-main {
+  .form-image .image-main {
     height: 550px;
   }
 }
-.form-image__image-slides {
+.form-image .image-slides {
   display: flex;
   justify-content: space-between;
   margin: 1rem;
+  overflow: scroll;
+  white-space: nowrap;
+  overflow-y: hidden;
 }
-.form-image__image-slides__image-slide {
+.form-image .image-slides .image-slide {
   border: 1px solid rgb(214, 216, 218);
   border-radius: 6px;
   background-color: rgb(254, 254, 254);
-  overflow: hidden;
+  margin-right: 1rem;
   cursor: pointer;
 }
-.form-image__image-slides__image-slide img {
+.form-image .image-slides .image-slide img {
   width: 75px;
 }
+.form-image .image-slides .image-slide.btn-add {
+  max-width: 75px;
+  background-color: #f4a866;
+  font-weight: bold;
+  display: flex;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
 @media screen and (min-width: 768px) {
-  .form-image__image-slides__image-slide img {
+  .form-image .image-slides .image-slide img {
     width: 50px;
   }
 }
 @media screen and (min-width: 992px) {
-  .form-image__image-slides__image-slide img {
+  .form-image .image-slides .image-slide img {
     width: 60px;
   }
 }
 @media screen and (min-width: 1200px) {
-  .form-image__image-slides__image-slide img {
+  .form-image .image-slides .image-slide img {
     width: 70px;
   }
 }
+.form-image .image-slides .image-slide .image-body {
+  overflow: hidden;
+}
+
 .screen-main {
   max-width: 1400px;
 }
@@ -220,6 +247,11 @@ main {
 .btn-EllipsisV {
   width: 2rem;
   height: 2rem;
+  border: solid white 3px;
+}
+.btn-EllipsisV:hover {
+  border: solid white 1px;
+  background-color: white;
 }
 
 .back-to-top-btn {

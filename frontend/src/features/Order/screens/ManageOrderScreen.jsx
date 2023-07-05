@@ -15,11 +15,12 @@ import OrderTabComponent from '../components/OrderTabComponent';
 //! imp Hooks
 import { useItemsPerPage } from '../../../hooks/itemsPerPage';
 import { scrollToTop, useScrollPosition } from '../../../hooks/scroll';
-//! imps Actions
+//! imp Actions
 import {
   deleteOrder,
   deleteOrders,
   getOrdersByFilters,
+  getInvoice,
   clearNotification,
 } from '../OrderSlice';
 //! imps Constants
@@ -146,7 +147,7 @@ const ManageOrderScreen = () => {
     }
   }
 
-  function handleOpenModal(actionType, ids) {
+  async function handleOpenModal(actionType, ids) {
     //! clear Form
     handleHideAlert();
 
@@ -185,8 +186,16 @@ const ManageOrderScreen = () => {
           message: `Bạn có muốn xóa những hóa đơn này không? [Người nhận: ${selectedOrders[0]?.name}, Tình trạng: ${selectedOrders[0]?.status}, ...]`,
           nameButton: 'Xác nhận xóa nhiều',
         });
-
         break;
+
+        case constants.order.actionTypes.DOWNLOAD_INVOICE:
+          try {
+            const response = await dispatch(getInvoice(ids)).unwrap();
+            window.open(response.data.invoiceUrl);
+          } catch (error) {
+            console.log("Error: ", error);
+          }
+          return;
 
       default:
         setAlertOpts({
