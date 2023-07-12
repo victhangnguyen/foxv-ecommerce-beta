@@ -7,8 +7,8 @@ import { toast } from 'react-toastify';
 import AlertDismissibleComponent from '../../../components/Alert/AlertDismissibleComponent';
 import ForgotPasswordFormComponent from '../components/ForgotPasswordFormComponent';
 
-//! imp Services
-import authService from '../services/authService';
+//! imp APIs
+import API from '../../../API';
 
 const ForgotPasswordScreen = () => {
   //! localState: alert
@@ -23,7 +23,7 @@ const ForgotPasswordScreen = () => {
     const { email } = data;
 
     try {
-      const response = await authService.forgotPassword({ email });
+      const response = await API.auth.forgotPassword({ email });
 
       setAlertOpts({
         variant: 'success',
@@ -31,7 +31,7 @@ const ForgotPasswordScreen = () => {
         message: 'Gửi mật khẩu sang email thành công',
       });
 
-      setShowAlert(true);
+      handleShowAlert();
     } catch (error) {
       console.log('error: ', error);
 
@@ -44,19 +44,27 @@ const ForgotPasswordScreen = () => {
           error.massage,
       });
 
-      setShowAlert(true);
+      handleShowAlert();
     }
   };
+
+  function handleHideAlert() {
+    setShowAlert(false);
+  }
+
+  function handleShowAlert() {
+    setShowAlert(true);
+  }
 
   return (
     <>
       <AlertDismissibleComponent
         show={showAlert}
-        setShow={setShowAlert}
+        handleHideAlert={handleHideAlert}
         variant={alertOpts.variant}
         title={alertOpts.title}
         message={alertOpts.message}
-        alwaysShown={false}
+        alwaysShown={true}
       />
       <Row className="d-flex justify-content-center align-items-center">
         <Col xs={12} sm={8} md={8} lg={6} xl={4}>

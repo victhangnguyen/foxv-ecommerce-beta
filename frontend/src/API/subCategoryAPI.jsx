@@ -29,9 +29,9 @@ export function getSubCategoriesByFilters(filterOptions) {
 }
 
 export function createSubCategory(subCategory) {
-  const { categoryId, name } = subCategory;
+  const { parent, name } = subCategory;
   const url = `/admin/subcategories/create`;
-  return axiosInstance.post(url, { categoryId, name });
+  return axiosInstance.post(url, { parent, name });
 }
 
 export function updateSubCategoryById(subCategoryId, subCategoryData) {

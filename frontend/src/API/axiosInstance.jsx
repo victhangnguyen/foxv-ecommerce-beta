@@ -48,10 +48,18 @@ export const interceptor = (store) => {
     async function (error) {
       let originalConfig = error.config;
       const token = store.getState().auth?.token;
-      if (!token) return;
-
+      console.log(
+        "__Debugger__axiosInstance\n__interceptors.response__error: ",
+        error,
+        "\n"
+      );
       //! No retry when auth/signin
-      if (error.url !== "/auth/signin" && error.response) {
+      if (
+        error.response?.config.url !== "/auth/signin" &&
+        error.response?.config.url !== "/auth/signup" &&
+        error.response?.config.url !== "/auth/forgot-password"
+      ) {
+        if (!token) return;
         //! check AccessToken is unauthorized and retry flag
         // error instanceof jwt.TokenExpiredError
         //! 403

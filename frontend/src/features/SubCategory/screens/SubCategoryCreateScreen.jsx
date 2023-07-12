@@ -151,16 +151,17 @@ const SubCategoryCreateScreen = () => {
   };
 
   const handleCreateSubCategorySubmit = async (data, e, methods) => {
-    const { categoryId, name } = data;
+    const { parent, name } = data;
+    console.log('__Debugger__SubCategoryCreateScreen\n__createSub__data: ', data, '\n');
     try {
-      const response = await subCategoryService.createSubCategory({
-        categoryId,
+      const response = await API.subCategory.createSubCategory({
+        parent,
         name,
       });
       //! clear Form
       methods.reset();
       //! re-load Data
-      loadSubCategoriesByCategoryId(categoryId);
+      loadSubCategoriesByCategoryId(parent);
       //! show Alert
       setAlertOpts({
         variant: 'success',

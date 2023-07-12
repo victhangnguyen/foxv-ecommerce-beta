@@ -1,7 +1,7 @@
-import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
+import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 
 //! imp APIs
-import API from '../../API';
+import API from "../../API";
 
 const initialState = {
   users: [],
@@ -15,7 +15,7 @@ const initialState = {
 };
 
 const userSlice = createSlice({
-  name: 'user',
+  name: "user",
   initialState: initialState,
   reducers: {
     emptyUser: (state) => {
@@ -82,6 +82,35 @@ const userSlice = createSlice({
         state.message = action.payload.message;
       })
       .addCase(updateUserInfoById.rejected, (state, action) => {
+        
+        state.loading = false;
+        state.success = action.payload.success;
+        state.error = action.payload.message;
+      });
+    builder
+      .addCase(updatePasswordByAdmin.pending, (state, action) => {
+        state.loading = true;
+      })
+      .addCase(updatePasswordByAdmin.fulfilled, (state, action) => {
+        state.loading = false;
+        state.success = action.payload.success;
+        state.message = action.payload.message;
+      })
+      .addCase(updatePasswordByAdmin.rejected, (state, action) => {
+        state.loading = false;
+        state.success = action.payload.success;
+        state.error = action.payload.message;
+      });
+    builder
+      .addCase(updatePasswordByUser.pending, (state, action) => {
+        state.loading = true;
+      })
+      .addCase(updatePasswordByUser.fulfilled, (state, action) => {
+        state.loading = false;
+        state.success = action.payload.success;
+        state.message = action.payload.message;
+      })
+      .addCase(updatePasswordByUser.rejected, (state, action) => {
         state.loading = false;
         state.success = action.payload.success;
         state.error = action.payload.message;
@@ -96,7 +125,7 @@ export default reducer;
 
 //! Async Thunk
 export const getUserById = createAsyncThunk(
-  '/user/getUserById',
+  "/user/getUserById",
   async (userId, thunkAPI) => {
     try {
       const response = await API.user.getUserById(userId);
@@ -115,7 +144,7 @@ export const getUserById = createAsyncThunk(
 );
 
 export const getUsersByFilters = createAsyncThunk(
-  '/user/getUsersByFilters',
+  "/user/getUsersByFilters",
   async ({ sort, order, page, perPage, search }, thunkAPI) => {
     try {
       const response = await API.user.getUsersByFilters({
@@ -141,7 +170,7 @@ export const getUsersByFilters = createAsyncThunk(
 );
 
 export const createUser = createAsyncThunk(
-  '/user/createUser',
+  "/user/createUser",
   async (
     { firstName, lastName, username, email, phoneNumber, password },
     thunkAPI
@@ -164,10 +193,53 @@ export const createUser = createAsyncThunk(
 );
 
 export const updateUserInfoById = createAsyncThunk(
-  '/user/updateUserById',
+  "/user/updateUserById",
   async ({ userId, userData }, thunkAPI) => {
     try {
       const response = await API.user.updateUserInfo(userId, userData);
+      return thunkAPI.fulfillWithValue(response);
+    } catch (error) {
+      return thunkAPI.rejectWithValue({
+        message: error.message,
+        response: {
+          data: error.response.data,
+          status: error.response.status,
+          statusText: error.response.statusText,
+        },
+      });
+    }
+  }
+);
+
+export const updatePasswordByAdmin = createAsyncThunk(
+  "/user/updatePasswordByAdmin",
+  async ({ userId, userData }, thunkAPI) => {
+    try {
+      const response = await API.user.updatePasswordByAdmin(userId, userData);
+      return thunkAPI.fulfillWithValue(response);
+    } catch (error) {
+      return thunkAPI.rejectWithValue({
+        message: error.message,
+        response: {
+          data: error.response.data,
+          status: error.response.status,
+          statusText: error.response.statusText,
+        },
+      });
+    }
+  }
+);
+
+export const updatePasswordByUser = createAsyncThunk(
+  "/user/updatePasswordByUser",
+  async ({ userId, userData }, thunkAPI) => {
+    try {
+      const response = await API.user.updatePasswordByUser(userId, userData);
+      console.log(
+        "__Debugger__UserSlice\n__updatePasswordByUser__response: ",
+        response,
+        "\n"
+      );
       return thunkAPI.fulfillWithValue(response);
     } catch (error) {
       return thunkAPI.rejectWithValue({

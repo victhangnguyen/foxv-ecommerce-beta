@@ -18,11 +18,12 @@ const FormComponent = ({
   const methods = useForm({
     resolver,
     mode: 'onTouched',
+    criteriaMode: "all",
     // defaultValues: defaultValues,
   });
 
   const watchAllFields = useWatch({ control: methods.control });
-  console.log('watchAllFields: ', watchAllFields);
+  // console.log('watchAllFields: ', watchAllFields);
 
   const fields = children.map((child) => child?.props?.name);
 

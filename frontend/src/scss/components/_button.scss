@@ -37,3 +37,12 @@
 .back-to-top-btn svg {
   font-size: 23px;
 }
+
+.control-quantity {
+  .btn:disabled,
+  .btn.disabled,
+  fieldset:disabled .btn {
+    cursor: pointer;
+    pointer-events: visible;
+  }
+}

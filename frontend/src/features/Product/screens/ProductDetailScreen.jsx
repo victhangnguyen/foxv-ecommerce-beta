@@ -10,13 +10,11 @@ import BreadcrumbComponent from "../../../components/Breadcrumb/BreadcrumbCompon
 import AlertDismissibleComponent from "../../../components/Alert/AlertDismissibleComponent";
 import ProductImageComponent from "../components/ProductImageComponent";
 
-//! Services
-import productService from "../services/productService";
 import API from "../../../API";
 //! imp Actions
 import { addToCart, removeItem } from "../../Cart/CartSlice";
 
-const ProductDetail = () => {
+const ProductDetailScreen = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { slug } = useParams(); //! productSlug
@@ -37,6 +35,11 @@ const ProductDetail = () => {
   const isAddedToCard = cart.cartItems
     .map((item) => item.product)
     .includes(product._id);
+
+  const cartProductQuantity =
+    cart.cartItems?.find((item) => item.product === product._id)?.quantity || 0;
+
+  const isPurchasePossible = cartProductQuantity < product.quantity;
 
   React.useEffect(() => {
     loadProductBySlug(slug);
@@ -140,14 +143,14 @@ const ProductDetail = () => {
                 <BreadcrumbComponent breadcrumbItems={breadcrumbItems} />
               </Row>
               <Row>
-                <Col as="aside" md={4}>
+                <Col as="aside" md={5}>
                   <article className="gallery-wrap">
                     <div className="thumbs-wrap">
                       <ProductImageComponent product={product} />
                     </div>
                   </article>
                 </Col>
-                <Col md={8} as="main">
+                <Col md={7} as="main">
                   <article>
                     <Card.Title>{product.name}</Card.Title>
                     <Card.Text className="card-id">
@@ -185,10 +188,14 @@ const ProductDetail = () => {
 
                       <Button
                         size="sm"
-                        variant={isAddedToCard ? "secondary" : "danger"}
+                        disabled={!isPurchasePossible}
+                        variant={"success"}
                         onClick={handleClickAddToCart}
                       >
-                        {isAddedToCard ? "Hủy Thêm" : "Thêm vào Giỏ"}
+                        <i className="fa fa-shopping-bag"></i>{" "}
+                        {isPurchasePossible
+                          ? "Thêm vào Giỏ"
+                          : `Chỉ còn ${cartProductQuantity} SP`}
                       </Button>
                     </div>
                     <hr />
@@ -248,4 +255,4 @@ const ProductDetail = () => {
   );
 };
 
-export default ProductDetail;
+export default ProductDetailScreen;

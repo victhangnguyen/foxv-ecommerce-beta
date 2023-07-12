@@ -15,18 +15,23 @@ const ProductCard = ({ product }) => {
   //! rootState
   const cart = useSelector((state) => state.cart);
 
-  let mainImageUrl;
-  if (product.images[0].type?.includes("image/")) {
-    //! imageFile
-    mainImageUrl = URL.createObjectURL(product.images[0]);
-  } else {
-    //! Url
-    mainImageUrl = product.images[0];
-  }
+  const mainImageUrl = product.images[0];
+  // if (product.images[0].type?.includes("image/")) {
+  //   //! imageFile
+  //   mainImageUrl = URL.createObjectURL(product.images[0]);
+  // } else {
+  //   //! Url
+  //   mainImageUrl = product.images[0];
+  // }
 
   const isAddedToCard = cart.cartItems
     ?.map((item) => item.product)
     .includes(product._id);
+
+  const cartProductQuantity =
+    cart.cartItems?.find((item) => item.product === product._id)?.quantity || 0;
+
+  const isPurchasePossible = cartProductQuantity < product.quantity;
 
   //! localState
   const [qty, setQty] = React.useState(1);
@@ -42,7 +47,17 @@ const ProductCard = ({ product }) => {
       image: product.images[0],
       price: product.price,
     };
-    dispatch(addToCart(cartItem));
+
+    // console.log('__Debugger__ProductCard\n__handleClickAddToCart__cart: ', cart, '\n');
+
+    // console.log(
+    //   "__Debugger__ProductCard\n__handleClickAddToCart__product.quantity: ",
+    //   product.quantity,
+    //   "\n"
+    // );
+    if (isPurchasePossible) {
+      dispatch(addToCart(cartItem));
+    }
   }
 
   function handleClickBuyNow() {
@@ -66,8 +81,13 @@ const ProductCard = ({ product }) => {
             </button>
           </li>
           <li>
-            <button onClick={handleClickAddToCart}>
-              <i className="fa fa-shopping-bag"></i> Thêm vào Giỏ
+            <button
+              className={isPurchasePossible ? null : `btn-disable`}
+              disabled={!isPurchasePossible}
+              onClick={handleClickAddToCart}
+            >
+              <i className="fa fa-shopping-bag"></i>{" "}
+              {isPurchasePossible ? "Thêm vào Giỏ" : `Chỉ còn ${cartProductQuantity} SP` }
             </button>
           </li>
         </ul>

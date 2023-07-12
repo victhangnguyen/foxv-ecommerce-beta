@@ -53,7 +53,7 @@ router.get(
 //! @access   Private: Admin
 router.post(
   '/admin/subcategories/create',
-  validateSchema(createSubCategorySchema),
+  // validateSchema(createSubCategorySchema),
   authenticate,
   isAdmin,
   subCategoryController.createSubCategory

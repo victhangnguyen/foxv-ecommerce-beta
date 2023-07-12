@@ -216,6 +216,9 @@ a {
         button {
           background-color: #0984e3;
           animation: none;
+          &.btn-disable {
+            background-color: $color-secondary;
+          }
         }
       }
     }

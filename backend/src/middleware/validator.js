@@ -1,4 +1,4 @@
-import { validationResult, checkSchema } from 'express-validator';
+import { validationResult, checkSchema } from "express-validator";
 
 export const validateSchema = (chemaValidation) => async (req, res, next) => {
   const validations = checkSchema(chemaValidation);
@@ -8,6 +8,11 @@ export const validateSchema = (chemaValidation) => async (req, res, next) => {
     await Promise.all(validations.map((validation) => validation.run(req)));
     const errors = validationResult(req);
     const validationErrorArray = errors.array({ onlyFirstError: true });
+    console.log(
+      "__Debugger__validator\n__validateSchema__validationErrorArray: ",
+      validationErrorArray,
+      "\n"
+    );
 
     if (!errors.isEmpty()) {
       return res

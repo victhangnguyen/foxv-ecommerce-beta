@@ -1,26 +1,26 @@
-import _ from 'lodash';
-import React from 'react';
-import { Button, Container, Table } from 'react-bootstrap';
-import { useDispatch, useSelector } from 'react-redux';
-import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
-import { toast } from 'react-toastify';
+import _ from "lodash";
+import React from "react";
+import { Button, Container, Table } from "react-bootstrap";
+import { useDispatch, useSelector } from "react-redux";
+import { useNavigate, useParams, useSearchParams } from "react-router-dom";
+import { toast } from "react-toastify";
 //! imp Utils
-import { parseIntlNumber } from '../../../utils/parse';
+import { parseIntlNumber } from "../../../utils/parse";
 //! imp Comps
-import AlertDismissibleComponent from '../../../components/Alert/AlertDismissibleComponent';
-import ConfirmationModalComponent from '../../../components/Modal/ConfirmationModalComponent';
-import CartItemComponent from '../components/CartItemComponent';
+import AlertDismissibleComponent from "../../../components/Alert/AlertDismissibleComponent";
+import ConfirmationModalComponent from "../../../components/Modal/ConfirmationModalComponent";
+import CartItemComponent from "../components/CartItemComponent";
 //! imp Actions
-import { addToCart } from '../CartSlice';
+import { addToCart } from "../CartSlice";
 //! imp APIs
-import API from '../../../API';
+import API from "../../../API";
 
 import {
   decrementQuantity,
   emptyCart,
   incrementQuantity,
   removeItem,
-} from '../CartSlice';
+} from "../CartSlice";
 
 const CartScreen = () => {
   const dispatch = useDispatch();
@@ -32,14 +32,14 @@ const CartScreen = () => {
   const { productId } = useParams();
 
   const [searchParams, setSearchParams] = useSearchParams();
-  const qty = searchParams.get('qty');
+  const qty = searchParams.get("qty");
 
   const isAdminController = user?.roles
     ?.map((role) => role.name)
-    .includes('admin');
+    .includes("admin");
 
   const isAuthenticated =
-    token && user.roles?.map((role) => role.name).includes('user');
+    token && user.roles?.map((role) => role.name).includes("user");
 
   const cart = useSelector((state) => state.cart);
   //! cart
@@ -52,23 +52,23 @@ const CartScreen = () => {
   //! localState: alert
   const [showAlert, setShowAlert] = React.useState(false);
   const [alertOpts, setAlertOpts] = React.useState({
-    variant: '',
-    title: '',
-    message: '',
+    variant: "",
+    title: "",
+    message: "",
   });
 
   //! localState Modal
   const [showModal, setShowModal] = React.useState(false);
   const [modalOpts, setModalOpts] = React.useState({
-    variant: '',
-    title: '',
-    message: '',
+    variant: "",
+    title: "",
+    message: "",
     nameButton: null,
   });
 
   //! localState: selected
   const [selectedId, setSelectedId] = React.useState([]);
-  const [actionType, setActionType] = React.useState('');
+  const [actionType, setActionType] = React.useState("");
 
   React.useEffect(() => {
     let cartItem;
@@ -94,19 +94,6 @@ const CartScreen = () => {
     }
   }, [productId, qty]);
 
-  // const { productId } = useParams();
-
-  // const [searchParams, setSearchParams] = useSearchParams();
-  // const qty = searchParams.get('qty');
-
-  // const { cartItems, loading, error } = useSelector((state) => state.cart); //! by BT after qty, above Effect
-
-  // React.useEffect(() => {
-  //   if (productId) {
-  //     // dispatch(addToCart({ productId, qty }));
-  //   }
-  // }, [dispatch, productId, qty]); //! by BT
-
   function handleClickIncrementQuantity(entity) {
     dispatch(incrementQuantity(entity.product));
   }
@@ -117,13 +104,13 @@ const CartScreen = () => {
 
   function handleClickDeleteCartItem(entity) {
     setSelectedId(entity.product);
-    setActionType('DELETE_CART_ITEM');
+    setActionType("DELETE_CART_ITEM");
     //! Set Modal Optons
     setModalOpts({
-      variant: 'warning',
-      title: 'Xác nhận loại bỏ sản phẩm',
+      variant: "warning",
+      title: "Xác nhận loại bỏ sản phẩm",
       message: `Bạn có muốn loại bỏ [${entity.name}] ra khoải Giỏ hàng không?`,
-      nameButton: 'Xác nhận Loại bỏ',
+      nameButton: "Xác nhận Loại bỏ",
     });
 
     handleShowModal();
@@ -132,14 +119,14 @@ const CartScreen = () => {
   function handleClickEmptyCart() {
     if (_.isEmpty(cart.cartItems)) return;
 
-    setSelectedId('');
-    setActionType('EMPTY_CART');
+    setSelectedId("");
+    setActionType("EMPTY_CART");
     //! Set Modal Optons
     setModalOpts({
-      variant: 'warning',
-      title: 'Xác nhận làm trống giỏ hàng',
+      variant: "warning",
+      title: "Xác nhận làm trống giỏ hàng",
       message: `Bạn có muốn làm trống Giỏ hàng không?`,
-      nameButton: 'Xác nhận Làm trống',
+      nameButton: "Xác nhận Làm trống",
     });
 
     handleShowModal();
@@ -156,11 +143,11 @@ const CartScreen = () => {
   async function handleModalSubmit() {
     try {
       switch (actionType) {
-        case 'DELETE_CART_ITEM':
+        case "DELETE_CART_ITEM":
           dispatch(removeItem(selectedId));
           break;
 
-        case 'EMPTY_CART':
+        case "EMPTY_CART":
           dispatch(emptyCart());
           break;
 
@@ -172,8 +159,8 @@ const CartScreen = () => {
     } catch (error) {
       handleHideModal();
       setAlertOpts({
-        variant: 'danger',
-        title: 'Lỗi hệ thống',
+        variant: "danger",
+        title: "Lỗi hệ thống",
         message:
           error.response?.data?.message ||
           error.response?.message ||
@@ -193,9 +180,9 @@ const CartScreen = () => {
       navigate(`/users/${user._id}/checkout`, { replace: false });
     } else {
       setAlertOpts({
-        variant: 'danger',
-        title: 'Lỗi hệ thống',
-        message: 'Đăng nhập trước khi Thanh toán',
+        variant: "danger",
+        title: "Lỗi hệ thống",
+        message: "Đăng nhập trước khi Thanh toán",
       });
       handleShowAlert();
     }
@@ -248,10 +235,11 @@ const CartScreen = () => {
               <tbody>
                 {/* <!-- Shopping cart table : Table Body --> */}
                 {/* <!-- render cart item --> */}
-                {cart.cartItems?.map((item) => (
+                {cart.cartItems?.map((cartItem) => (
                   <CartItemComponent
-                    key={item.product}
-                    entity={item}
+                    key={cartItem.product}
+                    cart={cart}
+                    cartItem={cartItem}
                     handleClickIncrementQuantity={handleClickIncrementQuantity}
                     handleClickDecrementQuantity={handleClickDecrementQuantity}
                     handleClickDeleteCartItem={handleClickDeleteCartItem}
@@ -299,7 +287,7 @@ const CartScreen = () => {
               className="btn btn-dark rounded-pill py-2 btn-block"
               onClick={handleClickGotoCheckout}
             >
-              {isAdminController ? 'TẠO HÓA ĐƠN ' : 'TIẾN HÀNH THANH TOÁN'}
+              {isAdminController ? "TẠO HÓA ĐƠN " : "TIẾN HÀNH THANH TOÁN"}
             </button>
           </div>
         </div>

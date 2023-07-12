@@ -1,15 +1,15 @@
-import React from 'react';
-import { Card, Col, Row } from 'react-bootstrap';
-import { useDispatch, useSelector } from 'react-redux';
-import { Link, useNavigate } from 'react-router-dom';
-import { toast } from 'react-toastify';
+import React from "react";
+import { Card, Col, Row } from "react-bootstrap";
+import { useDispatch, useSelector } from "react-redux";
+import { Link, useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
 //! imp Actions
-import { signin } from '../AuthSlice';
-import { getCart } from '../../Cart/CartSlice';
+import { signin } from "../AuthSlice";
+import { getCart } from "../../Cart/CartSlice";
 
 //! imp Comps
-import LoginFormComponent from '../components/LoginFormComponent';
-import AlertDismissibleComponent from '../../../components/Alert/AlertDismissibleComponent';
+import LoginFormComponent from "../components/LoginFormComponent";
+import AlertDismissibleComponent from "../../../components/Alert/AlertDismissibleComponent";
 
 const LoginScreen = () => {
   const dispatch = useDispatch();
@@ -18,41 +18,47 @@ const LoginScreen = () => {
   //! localState: Alert
   const [showAlert, setShowAlert] = React.useState(false);
   const [alertOpts, setAlertOpts] = React.useState({
-    variant: '',
-    title: '',
-    message: '',
+    variant: "",
+    title: "",
+    message: "",
   });
 
   const cart = useSelector((state) => state.cart);
 
   const handleLoginSubmit = async (data, e, methods) => {
     const { username, password } = data;
+    console.log('__Debugger__LoginScreen\n__***__data: ', data, '\n');
     try {
       const response = await dispatch(signin({ username, password })).unwrap();
 
       //! load Cart
-      await dispatch(getCart());
+      // await dispatch(getCart());
 
       const roles = response.data?.user.roles.map((role) => role.name);
       //! navigate
-      if (roles?.includes('admin')) {
-        navigate('/admin/users');
-      } else if (roles?.includes('user')) {
+      if (roles?.includes("admin")) {
+        navigate("/admin/users");
+      } else if (roles?.includes("user")) {
         if (cart.cartItems?.length > 0) {
-          return navigate('/cart');
+          return navigate("/cart");
         }
-        navigate('/');
+        navigate("/");
       }
 
       toast.success(response.message);
     } catch (error) {
+      console.log(
+        "__Debugger__LoginScreen\n__handleLoginSubmit__error: ",
+        error,
+        "\n"
+      );
       //! Error Handling
       if (error.response?.status === 422) {
         const errors = error.response.data.errors;
         if (!errors?.length) return;
         errors.forEach((error) => {
           methods.setError(error.param, {
-            type: 'server',
+            type: "server",
             message: error.msg,
           });
         });
@@ -61,8 +67,8 @@ const LoginScreen = () => {
       }
 
       setAlertOpts({
-        variant: 'danger',
-        title: 'Lỗi hệ thống',
+        variant: "danger",
+        title: "Lỗi hệ thống",
         message:
           error.response?.data?.message ||
           error.response?.message ||
@@ -110,7 +116,7 @@ const LoginScreen = () => {
                 <div className="mb-3">
                   <p className="mb-0">
                     <Link
-                      to={'/auth/forgot-password'}
+                      to={"/auth/forgot-password"}
                       className="text-primary fst-italic"
                     >
                       Quên mật khẩu ?
@@ -119,9 +125,9 @@ const LoginScreen = () => {
                 </div>
                 <div className="mb-3">
                   <p className="mb-0  text-center">
-                    Bạn chưa có tài khoản?{' '}
+                    Bạn chưa có tài khoản?{" "}
                     <Link
-                      to={'/auth/register'}
+                      to={"/auth/register"}
                       className="text-primary fw-bold"
                     >
                       Đăng ký

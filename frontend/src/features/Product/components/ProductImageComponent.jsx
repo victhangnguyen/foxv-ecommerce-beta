@@ -1,17 +1,12 @@
-import React from 'react';
-import _ from 'lodash';
+import React from "react";
+import _ from "lodash";
 
 const ProductImageComponent = ({ product, className, ...rest }) => {
-  const REACT_APP_SERVER = 'http://127.0.0.1';
-  const REACT_APP_PORT = 5000;
-  const imagesUrl = `${REACT_APP_SERVER}:${REACT_APP_PORT}/images/products/`;
-
-  const [imageMain, setImageMain] = React.useState(null);
-
+  const [indexMainImage, setIndexMainImage] = React.useState(0);
   const images = product?.images;
   //! handle FileList
-  const handleImage = (index) => {
-    setImageMain(images[index]);
+  const handleClickImage = (index) => {
+    setIndexMainImage(index);
   };
 
   const renderSlices = images?.map((image, index) => {
@@ -19,32 +14,23 @@ const ProductImageComponent = ({ product, className, ...rest }) => {
     return (
       <div
         key={index}
-        className="form-image__image-slides__image-slide"
-        onClick={() => handleImage(index)}
+        className="image-slide"
+        onClick={() => handleClickImage(index)}
       >
-        <img src={imagesUrl + image} alt="" />
+        <img src={image} alt="" />
       </div>
     );
   });
 
   return (
-    <>
-      <div className="form-image__image-main">
-        {
-          <img
-            src={
-              imageMain
-                ? imagesUrl + imageMain
-                : images
-                ? imagesUrl + images[0]
-                : null
-            }
-            alt=""
-          />
-        }
+    <div className="form-image">
+      <div className="image-main">
+        <div className="image-body">
+          <img src={images[indexMainImage]} alt="" />
+        </div>
       </div>
-      <div className="form-image__image-slides">{renderSlices}</div>
-    </>
+      <div className="image-slides">{renderSlices}</div>
+    </div>
   );
 };
 

@@ -99,6 +99,7 @@ export const signup = async (req, res, next) => {
 
 export const signin = async (req, res, next) => {
   const { username, password } = req.body;
+  console.log('__Debugger__auth\n__signin__req.body: ', req.body, '\n');
 
   try {
     const user = await User.findOne({ username }).populate("roles").exec();

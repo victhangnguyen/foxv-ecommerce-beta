@@ -35,7 +35,7 @@ const categorySlice = createSlice({
     builder
       .addCase(getCategoryById.pending, (state, action) => {
         state.loading = true;
-        state.error = initialState.error;
+      state.error = initialState.error;
       })
       .addCase(getCategoryById.fulfilled, (state, action) => {
         state.loading = false;
