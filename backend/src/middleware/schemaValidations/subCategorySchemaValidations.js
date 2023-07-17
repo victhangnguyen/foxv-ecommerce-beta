@@ -43,7 +43,7 @@ export const createSubCategorySchema = {
 };
 
 export const updateSubCategorySchema = {
-  categoryId: {
+  parent: {
     trim: true,
     notEmpty: {
       errorMessage: 'Category must not be empty',
@@ -54,7 +54,6 @@ export const updateSubCategorySchema = {
         if (!categoryDoc) {
           return Promise.reject("Category's not valid!");
         }
-
         return true;
       },
     },

@@ -14,7 +14,7 @@ const validationSchema = yup.object({
 });
 
 const CategoryFormComponent = ({
-  entitySlug,
+  categoryId,
   loading,
   handleSubmit,
   initialValues,
@@ -36,7 +36,7 @@ const CategoryFormComponent = ({
       {
         //! slug
       }
-      {entitySlug && (
+      {categoryId && (
         <InputComponent
           disabled={true}
           name={'slug'}
@@ -49,7 +49,7 @@ const CategoryFormComponent = ({
       }
       <div>
         <Button variant="primary" type="submit">
-          {loading ? 'Loading...' : entitySlug ? 'Cập nhật' : 'Tạo ngay'}
+          {loading ? 'Loading...' : categoryId ? 'Cập nhật' : 'Tạo ngay'}
         </Button>
       </div>
     </FormComponent>

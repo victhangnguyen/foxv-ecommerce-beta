@@ -51,8 +51,14 @@ const AdminNavComponent = () => {
     {
       key: 'admin-nav-item-7',
       icon: 'fa-solid fa-cart-shopping',
-      label: 'Quản lý Mua hàng (Order)',
+      label: 'Quản lý Đơn hàng (Order)',
       pathname: '/admin/orders',
+    },
+    {
+      key: 'admin-nav-item-8',
+      icon: 'fa-solid fa-cart-shopping',
+      label: 'Tạo đơn hàng',
+      pathname: '/cart',
     },
   ];
   const renderAdminNavItems = adminNavItems.map((item) => (

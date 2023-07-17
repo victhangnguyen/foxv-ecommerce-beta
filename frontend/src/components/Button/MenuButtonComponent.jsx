@@ -14,7 +14,7 @@ const MenuButtonComponent = ({ handleClickActionTypeSubmit, menuItems }) => {
       }}
     >
       {children}
-      <FontAwesomeIcon icon="fa-solid fa-ellipsis-vertical" />
+      <FontAwesomeIcon icon="fa-solid fa-ellipsis-vertical" ssize="6x" />
     </button>
   ));
 
@@ -37,7 +37,6 @@ const MenuButtonComponent = ({ handleClickActionTypeSubmit, menuItems }) => {
 
       <Dropdown.Menu>
         {renderDropdownItems}
-        {/* <Dropdown.Item eventKey="3" active> */}
       </Dropdown.Menu>
     </Dropdown>
   );

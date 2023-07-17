@@ -1,9 +1,9 @@
-import React from 'react';
-import { Link } from 'react-router-dom';
-import { FormCheck } from 'react-bootstrap';
-import MenuButtonComponent from '../../../components/Button/MenuButtonComponent';
+import React from "react";
+import { Link } from "react-router-dom";
+import { FormCheck } from "react-bootstrap";
+import MenuButtonComponent from "../../../components/Button/MenuButtonComponent";
 //! imp Constants
-import constants from '../../../constants';
+import constants from "../../../constants";
 
 const OrderItemComponent = ({
   order,
@@ -13,9 +13,14 @@ const OrderItemComponent = ({
 }) => {
   const menuItems = [
     {
-      key: 'menu-item-0',
-      label: 'Xóa hóa đơn',
+      key: "menu-item-0",
+      label: "Xóa đơn hàng",
       actionType: constants.order.actionTypes.DELETE_ORDER,
+    },
+    {
+      key: "menu-item-1",
+      label: "Tải hóa đơn",
+      actionType: constants.order.actionTypes.DOWNLOAD_INVOICE,
     },
   ];
 
@@ -28,8 +33,8 @@ const OrderItemComponent = ({
         <td className="py-1 px-3">
           <FormCheck
             inline
-            id={order._id}
-            checked={selectedIds.includes(order._id)}
+            id={`chk-${order._id}`}
+            checked={selectedIds?.includes(order._id)}
             onChange={handleCheckChange}
           />
         </td>

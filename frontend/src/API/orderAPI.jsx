@@ -1,5 +1,6 @@
-import axiosInstance from './axiosInstance';
-import * as urlHandling from '../utils/url';
+import axiosInstance from "./axiosInstance";
+import * as urlHandling from "../utils/url";
+import axios from "axios";
 
 /**
  * checkoutOrder
@@ -22,6 +23,33 @@ export function checkoutOrder({
 }
 
 /**
+ * createOrder
+ */
+export function createOrder({
+  user,
+  items,
+  total,
+  status,
+  name,
+  address,
+  transactionNo,
+  bankTranNo,
+}) {
+  const orderData = {
+    user,
+    items,
+    total,
+    status,
+    name,
+    address,
+    transactionNo,
+    bankTranNo,
+  };
+  const url = `/admin/orders/create`;
+  return axiosInstance.post(url, orderData);
+}
+
+/**
  * getOrderById
  */
 export function getOrderById(orderId) {
@@ -41,9 +69,26 @@ export function getOrdersByFilters({ sort, order, page, perPage, search }) {
   return axiosInstance.get(urlQueryParams);
 }
 
-//! Private: Admin
+/**
+ * deleteOrder
+ * Private: Admin
+ */
 export function deleteOrder(orderId) {
-  const url = `/admin/orders/delete-one?orderId=${orderId}`;
+  const url = `/admin/orders/delete-single?orderId=${orderId}`;
+  return axiosInstance.delete(url);
+}
+
+/**
+ * deleteOrderByUserId
+ * Private: User
+ */
+export function deleteOrderByUserId(orderId) {
+  console.log(
+    "__Debugger__orderAPI\n__deleteByUserId__orderId: ",
+    orderId,
+    "\n"
+  );
+  const url = `/orders/delete-single?orderId=${orderId}`;
   return axiosInstance.delete(url);
 }
 
@@ -53,7 +98,21 @@ export function deleteOrders(orderIds) {
   const urlQueryParams = urlHandling.serializeQueryArray(
     url,
     orderIds,
-    'orderIds'
+    "orderIds"
+  );
+  return axiosInstance.delete(urlQueryParams);
+}
+
+/**
+ * deleteOrdersByUserId
+ * Private: User
+ */
+export function deleteOrdersByUserId(orderIds) {
+  const url = `/orders/delete-multiple`;
+  const urlQueryParams = urlHandling.serializeQueryArray(
+    url,
+    orderIds,
+    "orderIds"
   );
   return axiosInstance.delete(urlQueryParams);
 }
@@ -71,4 +130,10 @@ export function updateOrderById(
     status,
     transactionNo,
   });
+}
+
+// Private: Public
+export function getInvoice(orderId) {
+  const url = `/orders/${orderId}/invoice`;
+  return axiosInstance.get(url);
 }

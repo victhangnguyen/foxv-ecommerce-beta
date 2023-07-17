@@ -1,53 +1,45 @@
-import React from 'react';
-import { toast } from 'react-toastify';
-import _ from 'lodash';
-import { Button, Card, Col, Container, Row } from 'react-bootstrap';
-import { useDispatch, useSelector } from 'react-redux';
-import { useParams, Link } from 'react-router-dom';
+import React from "react";
+import { toast } from "react-toastify";
+import _ from "lodash";
+import { Button, Card, Col, Container, Row } from "react-bootstrap";
+import { useDispatch, useSelector } from "react-redux";
+import { useParams, useNavigate, Link } from "react-router-dom";
 
 //! imp Comps
-import BreadcrumbComponent from '../../../components/Breadcrumb/BreadcrumbComponent';
-import AlertDismissibleComponent from '../../../components/Alert/AlertDismissibleComponent';
-import ProductImageComponent from '../components/ProductImageComponent';
+import BreadcrumbComponent from "../../../components/Breadcrumb/BreadcrumbComponent";
+import AlertDismissibleComponent from "../../../components/Alert/AlertDismissibleComponent";
+import ProductImageComponent from "../components/ProductImageComponent";
 
-//! Services
-import productService from '../services/productService';
+import API from "../../../API";
 //! imp Actions
-import { addToCart, removeItem } from '../../Cart/CartSlice';
+import { addToCart, removeItem } from "../../Cart/CartSlice";
 
-const ProductDetail = () => {
+const ProductDetailScreen = () => {
   const dispatch = useDispatch();
+  const navigate = useNavigate();
   const { slug } = useParams(); //! productSlug
   const cart = useSelector((state) => state.cart);
 
   //! localState: init
   const [loading, setLoading] = React.useState(false);
+  const [qty, setQty] = React.useState(1);
   const [product, setProduct] = React.useState({});
   //! localState: alert
   const [showAlert, setShowAlert] = React.useState(false);
-  const [alertOptions, setAlertOptions] = React.useState({
-    variant: '',
-    title: '',
-    message: '',
+  const [alertOpts, setAlertOpts] = React.useState({
+    variant: "",
+    title: "",
+    message: "",
   });
-  const breadcrumbItems = [
-    { key: 'breadcrumb-item-0', label: 'Home', path: '/' },
-    {
-      key: 'breadcrumb-item-1',
-      label: product.category?.name,
-      path: `/collections/${product.category?.slug}`,
-    },
-    {
-      key: 'breadcrumb-item-2',
-      label: product.name,
-      path: `/products/${product.slug}`,
-      active: true,
-    },
-  ];
 
   const isAddedToCard = cart.cartItems
     .map((item) => item.product)
     .includes(product._id);
+
+  const cartProductQuantity =
+    cart.cartItems?.find((item) => item.product === product._id)?.quantity || 0;
+
+  const isPurchasePossible = cartProductQuantity < product.quantity;
 
   React.useEffect(() => {
     loadProductBySlug(slug);
@@ -56,18 +48,19 @@ const ProductDetail = () => {
   const loadProductBySlug = async (slug) => {
     setLoading(true);
     try {
-      const response = await productService.getProductBySlug(slug);
+      const response = await API.product.getProductBySlug(slug);
       setLoading(false);
       setProduct(response.data.product);
     } catch (error) {
       setLoading(false);
-      setAlertOptions({
-        variant: 'danger',
-        title: 'Lỗi hệ thống',
+      setAlertOpts({
+        variant: "danger",
+        title: "Lỗi hệ thống",
         message:
           error.response?.data?.message ||
           error.response?.message ||
-          error.message,
+          error.message ||
+          error,
       });
       setShowAlert(true);
       toast.error(error.response?.message || error.massage);
@@ -111,18 +104,35 @@ const ProductDetail = () => {
     dispatch(removeItem(product._id));
   }
 
-  function handleClickBuyNow(e) {
-    console.log('__Debugger__ProductDetailScreen\n__handleClickBuyNow', '\n');
+  function handleClickBuyNow() {
+    navigate(
+      isAddedToCard ? `/cart` : `/cart/${product?._id}?qty=${qty ? qty : 1}`
+    );
   }
+
+  const breadcrumbItems = [
+    { key: "breadcrumb-item-0", label: "Home", path: "/" },
+    {
+      key: "breadcrumb-item-1",
+      label: product.category?.name,
+      path: `/collections/${product.category?.slug}`,
+    },
+    {
+      key: "breadcrumb-item-2",
+      label: product.name,
+      path: `/products/${product.slug}`,
+      active: true,
+    },
+  ];
 
   return (
     <Container>
       <AlertDismissibleComponent
         show={showAlert}
         setShow={setShowAlert}
-        variant={alertOptions.variant}
-        title={alertOptions.title}
-        message={alertOptions.message}
+        variant={alertOpts.variant}
+        title={alertOpts.title}
+        message={alertOpts.message}
         alwaysShown={true}
       />
       {!_.isEmpty(product) && (
@@ -133,21 +143,24 @@ const ProductDetail = () => {
                 <BreadcrumbComponent breadcrumbItems={breadcrumbItems} />
               </Row>
               <Row>
-                <Col as="aside" md={4}>
+                <Col as="aside" md={5}>
                   <article className="gallery-wrap">
                     <div className="thumbs-wrap">
                       <ProductImageComponent product={product} />
                     </div>
                   </article>
                 </Col>
-                <Col md={8} as="main">
+                <Col md={7} as="main">
                   <article>
                     <Card.Title>{product.name}</Card.Title>
                     <Card.Text className="card-id">
                       ID sản phẩm: {product._id}
                     </Card.Text>
                     <Card.Text className="card-category">
-                      Loại: {product.category?.name}
+                      <span className="me-2">Loại:</span>
+                      <Link to={`/collections/${product?.category.slug}`}>
+                        <strong>{product.category?.name}</strong>
+                      </Link>
                     </Card.Text>
                     <Card.Text className="card-category">
                       Kiểu sản phẩm (tags):
@@ -159,28 +172,30 @@ const ProductDetail = () => {
                       <Card.Text>{product.description}</Card.Text>
                     </div>
                     <div className="mb-3">
-                      <Card.Text className="card-price">
-                        {product.price}
-                      </Card.Text>{' '}
+                      <Card.Text className="card-price h5">
+                        Giá sản phẩm: {product.price}
+                      </Card.Text>{" "}
                     </div>
                     <div className="mb-4">
                       <Button
+                        size="sm"
                         className="me-2"
-                        variant="dark"
+                        variant={isAddedToCard ? "warning" : "primary"}
                         onClick={handleClickBuyNow}
                       >
-                        Mua Ngay
+                        {isAddedToCard ? "Xem giỏ" : "Mua ngay"}
                       </Button>
+
                       <Button
                         size="sm"
-                        variant={isAddedToCard ? 'secondary' : 'danger'}
-                        onClick={
-                          isAddedToCard
-                            ? handleClickRemoveItem
-                            : handleClickAddToCart
-                        }
+                        disabled={!isPurchasePossible}
+                        variant={"success"}
+                        onClick={handleClickAddToCart}
                       >
-                        {isAddedToCard ? 'Hủy Thêm' : 'Thêm vào Giỏ'}
+                        <i className="fa fa-shopping-bag"></i>{" "}
+                        {isPurchasePossible
+                          ? "Thêm vào Giỏ"
+                          : `Chỉ còn ${cartProductQuantity} SP`}
                       </Button>
                     </div>
                     <hr />
@@ -240,4 +255,4 @@ const ProductDetail = () => {
   );
 };
 
-export default ProductDetail;
+export default ProductDetailScreen;

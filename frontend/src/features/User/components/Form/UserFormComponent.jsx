@@ -20,7 +20,7 @@ const UserFormComponent = ({ user, initialValues, loading, onSubmit }) => {
         'Username không được có những ký tự đặc biệt'
       )
       .min(8, 'Ít nhất 8 ký tự.')
-      .max(64, 'Nhiều nhất 64 ký tự.')
+      .max(32, 'Nhiều nhất 32 ký tự.')
       .required('Yêu cầu nhập Username của bạn'),
     email: yup
       .string()

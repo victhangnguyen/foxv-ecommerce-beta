@@ -1,5 +1,6 @@
 import _ from 'lodash';
 import React from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate, useParams } from 'react-router-dom';
 import { toast } from 'react-toastify';
 
@@ -8,28 +9,29 @@ import AlertDismissibleComponent from '../../../components/Alert/AlertDismissibl
 import BreadcrumbComponent from '../../../components/Breadcrumb/BreadcrumbComponent';
 import CategoryFormComponent from '../components/Form/CategoryFormComponent';
 
-//! imp Services
-import categoryService from '../services/categoryService';
+import {
+  emptyCategory,
+  getCategoryById,
+  updateCategoryById,
+} from '../CategorySlice';
 
 const CategoryUpdateScreen = () => {
-  const navigate = useNavigate();
-  const { slug } = useParams();
+  const dispatch = useDispatch();
+  const categorySelector = useSelector((state) => state.category);
+
+  const { categoryId } = useParams();
 
   //! localState: Alert
   const [showAlert, setShowAlert] = React.useState(false);
-  const [alertOptions, setAlertOptions] = React.useState({
+  const [alertOpts, setAlertOpts] = React.useState({
     variant: '',
     title: '',
     message: '',
   });
 
-  //! localState: Category
-  const [loading, setLoading] = React.useState(false);
-  const [category, setCategory] = React.useState({});
-
   const initialValues = {
-    name: category?.name,
-    slug: category?.slug,
+    name: categorySelector.category?.name,
+    slug: categorySelector.category?.slug,
   };
 
   const breadcrumbItems = [
@@ -42,33 +44,35 @@ const CategoryUpdateScreen = () => {
     {
       key: 'breadcrumb-item-2',
       label: 'Cập nhật Loại sản phẩm',
-      path: `/admin/categories/${slug}/update`,
+      path: `/admin/categories/${categoryId}/update`,
       active: true,
     },
   ];
 
   React.useEffect(() => {
-    loadCategoryBySlug(slug);
-  }, []);
+    loadCategory();
 
-  const loadCategoryBySlug = async (slug) => {
+    return () => {
+      dispatch(emptyCategory());
+    };
+  }, [categoryId]);
+
+  const loadCategory = async () => {
     try {
-      setLoading(true);
-      const response = await categoryService.getCateogryBySlug(slug);
-      setLoading(false);
-      setCategory(response.data.category);
+      await dispatch(getCategoryById(categoryId)).unwrap();
     } catch (error) {
-      setLoading(false);
-      setAlertOptions({
+      dispatch(emptyCategory());
+
+      handleShowAlert();
+      setAlertOpts({
         variant: 'danger',
         title: 'Lỗi hệ thống',
         message:
           error.response?.data?.message ||
           error.response?.message ||
-          error.message,
+          error.message ||
+          error,
       });
-      setShowAlert(true);
-      toast.error(error.response?.message || error.massage);
     }
   };
 
@@ -80,28 +84,21 @@ const CategoryUpdateScreen = () => {
 
     const { name } = data;
     try {
-      const response = await categoryService.updateCategoryBySlug(slug, {
-        name,
-      });
-      toast.success(response.message);
-      //! re-load to navigate
-      navigate(`/admin/categories/${response.data.category.slug}/update`, {
-        replace: true,
-      });
-      loadCategoryBySlug(response.data.category.slug);
+      const response = await dispatch(
+        updateCategoryById({ categoryId, categoryData: { name } })
+      ).unwrap();
 
-      setAlertOptions({
+      handleShowAlert();
+      setAlertOpts({
         variant: 'success',
         title: 'Cập nhật Loại sản phẩm (Category)',
-        message: `Bạn đã cập nhật Loại sản phẩm với tên [${response.data.category.name}] thành công!`,
+        message: `Bạn đã cập nhật Loại sản phẩm với tên [${response.data.updatedCategory.name}] thành công!`,
       });
-      setShowAlert(true);
     } catch (error) {
-      setLoading(false);
       //! Error Handling
       if (error.response?.status === 422) {
         const errors = error.response.data.errors;
-        if (!errors.length) return;
+        if (!errors?.length) return;
         errors.forEach((error) => {
           methods.setError(error.param, {
             type: 'server',
@@ -111,18 +108,27 @@ const CategoryUpdateScreen = () => {
         return;
       }
 
-      setAlertOptions({
+      handleShowAlert();
+
+      setAlertOpts({
         variant: 'danger',
         title: 'Lỗi hệ thống',
         message:
           error.response?.data?.message ||
           error.response?.message ||
-          error.message,
+          error.message ||
+          error,
       });
-
-      setShowAlert(true);
     }
   };
+
+  function handleShowAlert() {
+    setShowAlert(true);
+  }
+
+  function handleHideAlert() {
+    setShowAlert(false);
+  }
 
   return (
     <>
@@ -130,10 +136,10 @@ const CategoryUpdateScreen = () => {
 
       <AlertDismissibleComponent
         show={showAlert}
-        setShow={setShowAlert}
-        variant={alertOptions.variant}
-        title={alertOptions.title}
-        message={alertOptions.message}
+        handleHideAlert={handleHideAlert}
+        variant={alertOpts.variant}
+        title={alertOpts.title}
+        message={alertOpts.message}
         alwaysShown={true}
       />
       <h2 className="fw-bold mb-2 text-uppercase ">
@@ -146,8 +152,8 @@ const CategoryUpdateScreen = () => {
         //! CategoryFormComponent
       }
       <CategoryFormComponent
-        entitySlug={slug}
-        loading={loading}
+        categoryId={categoryId}
+        loading={categorySelector.loading}
         initialValues={initialValues}
         handleSubmit={handleUpdateCategorySubmit}
       />

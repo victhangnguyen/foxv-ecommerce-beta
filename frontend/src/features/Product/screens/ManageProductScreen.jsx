@@ -1,44 +1,371 @@
+import _ from 'lodash';
 import React from 'react';
 import { Col, Row } from 'react-bootstrap';
-import { useDispatch, useSelector } from 'react-redux';
 import { toast } from 'react-toastify';
-import _ from 'lodash';
-//! imp Hooks
-import { useItemsPerPage } from '../../../hooks/itemsPerPage';
-
-//! imp Actions RTK
-import {
-  getProductsByFilters,
-  removeProduct,
-  removeProducts,
-} from '../ProductSlice';
-
-import { clearSearch } from '../../Search/SearchSlice';
 
 //! imp Components
-import BreadcrumbComponent from '../../../components/Breadcrumb/BreadcrumbComponent';
-import DeleteConfirmationModalComponent from '../../../components/Modal/ConfirmationModalComponent';
-import PaginationComponent from '../../../components/Pagination/PaginationComponent';
-import ToolbarComponent from '../../../components/Toolbars/ToolbarComponent';
-import AdminLoadingProductCard from '../components/Card/AdminLoadingProductCard';
-import AdminProductCard from '../components/Card/AdminProductCard';
 import AlertDismissibleComponent from '../../../components/Alert/AlertDismissibleComponent';
+import BreadcrumbComponent from '../../../components/Breadcrumb/BreadcrumbComponent';
+import GoToButtonComponent from '../../../components/Button/GoToButtonComponent';
+import ConfirmationModalComponent from '../../../components/Modal/ConfirmationModalComponent';
+import PaginationComponent from '../../../components/Pagination/PaginationComponent';
+import AdminProductCard from '../components/Card/AdminProductCard';
+import ToolbarComponent from '../components/Toolbars/ToolbarComponent';
+import ProductToolbarComponent from '../components/Toolbars/ProductToolbarComponent';
+
+//! imp Hooks
+import { useDispatch, useSelector } from 'react-redux';
+import { useItemsPerPage } from '../../../hooks/itemsPerPage';
+import { scrollToTop, useScrollPosition } from '../../../hooks/scroll';
+
+//! imp Actions
+import { getProductsByFilters } from '../ProductSlice';
+
+//! imp Constants
+import constants from '../../../constants';
+
+//! imp APIs
+import API from '../../../API';
 
 const ManageProductScreen = () => {
+  const dispatch = useDispatch();
+  const scrollPosition = useScrollPosition();
   const itemsPerPage = useItemsPerPage(10, 15, 20, 30, 30);
 
+  //! rootState
+  const { products, productsCount } = useSelector((state) => state.product);
+
+  //! localState: init
+  const [loading, setLoading] = React.useState(false);
+
+  //! localState: FilterOpts/Pagination
+  const [filterOpts, seFilterOpts] = React.useState({
+    keyword: '',
+    price: '',
+    category: '',
+  });
+
   const [sort, setSort] = React.useState('createdAt');
-  const [order, setOrder] = React.useState('desc');
-
+  const [order, setOrder] = React.useState(-1);
   const [currentPage, setCurrentPage] = React.useState(1);
-  // const productsPerPage = useHookWidth
-  //! used to make LoadingCard by PaginationComponent
-  const [productsCountPerPage, setProductsCountPerPage] =
-    React.useState(itemsPerPage);
 
-  //! Toolbars
+  //! localState: Select Ids
   const [isCheckAll, setIsCheckAll] = React.useState(false);
-  const [checkedProductIds, setCheckedProductIds] = React.useState([]); //! Nhung doi tuong checkAll co trong product
+  const [selectedIds, setSelectedIds] = React.useState([]);
+  const [selectedId, setSelectedId] = React.useState('');
+
+  //! localState: actionType
+  const [actionType, setActionType] = React.useState('');
+
+  //! localState: Modal
+  const [showModal, setShowModal] = React.useState(false);
+  const [modalOpts, setModalOpts] = React.useState({
+    variant: '',
+    title: '',
+    message: '',
+  });
+
+  //! localState: Alert
+  const [showAlert, setShowAlert] = React.useState(false);
+  const [alertOpts, setAlertOpts] = React.useState({
+    variant: 'success',
+    title: '',
+    message: '',
+    button: '',
+  });
+
+  //! effect deps: Pagination, Search
+  React.useEffect(() => {
+    loadProductsByFilters();
+  }, [sort, order, currentPage, itemsPerPage, filterOpts]);
+
+  //! un-check All if selectedIds equal to 0
+  React.useEffect(() => {
+    if (selectedIds.length !== 0) return;
+
+    if (isCheckAll) {
+      handleCheckAllChange();
+    }
+  }, [selectedIds]);
+
+  //! slug, _id,
+  async function loadProductsByFilters() {
+    try {
+      setLoading(true);
+      dispatch(
+        getProductsByFilters({
+          sort: sort,
+          order: order,
+          page: currentPage,
+          perPage: itemsPerPage,
+          filterOpts: filterOpts,
+        })
+      );
+      setLoading(false);
+    } catch (error) {
+      handleShowAlert();
+
+      setLoading(false);
+      setAlertOpts({
+        variant: 'danger',
+        title: 'Lỗi hệ thống',
+        message:
+          error.response?.data?.message ||
+          error.response?.message ||
+          error.message ||
+          error,
+      });
+    }
+  }
+
+  function deleteOneProduct() {
+    //! localFunction
+  }
+
+  function deleteManyProduct() {
+    //! localFunction
+  }
+
+  // const deleteProduct = async (productId) => {
+  //   try {
+  //     const deletedProduct = await dispatch(removeProduct(productId)).unwrap();
+  //     toast.success(`Sản phẩm ${deletedProduct.name} đã được xóa`);
+  //   } catch (error) {
+  //     toast.error(error);
+  //   }
+  // };
+
+  // const deleteProducts = (productIds) => {
+  //   dispatch(removeProducts(productIds))
+  //     .unwrap()
+  //     .then((result) => {
+  //       setCheckedProductIds([]);
+  //     })
+  //     .catch((error) => {
+  //       toast.error(error);
+  //     });
+  // };
+
+  function handleCheckAllChange() {
+    setIsCheckAll(!isCheckAll);
+    if (!isCheckAll) {
+      setSelectedIds(products?.map((product) => product._id));
+    } else {
+      setSelectedIds([]); //! unticked
+    }
+  }
+
+  function handleCheckChange(e) {
+    const { id, checked } = e.target;
+
+    if (!checked) {
+      setSelectedIds((prevState) =>
+        prevState.filter((productId) => productId !== id)
+      );
+    } else {
+      setSelectedIds((prevState) => [...prevState, id]);
+    }
+  }
+
+  function handleOpenModal(actionType, ids) {
+    //! clear Form
+    handleHideAlert();
+
+    setActionType(actionType);
+
+    let selectedProducts;
+    if (_.isArray(ids)) {
+      //! multiple Ids
+      setSelectedIds(ids);
+      selectedProducts = ids?.map((id) =>
+        products.find((product) => product._id === id)
+      );
+    } else {
+      //! single Id
+      //! bổ sung: fix lại multiple selectedIds sau khi xóa id single Ids
+      setSelectedId(ids);
+      selectedProducts = [products.find((product) => product._id === ids)];
+    }
+
+    switch (actionType) {
+      /* DELETE_ONE_PRODUCT */
+      case constants.product.actionTypes.DELETE_ONE_PRODUCT:
+        console.log(
+          '__Debugger__ManageProductScreen\n__DELETE_ONE_PRODUCT__selectedProducts[0]: ',
+          selectedProducts[0]?.category.name,
+          '\n'
+        );
+        setModalOpts({
+          variant: 'warning',
+          title: `Xác nhận xóa sản phẩm`,
+          message: `Bạn có muốn xóa sản phẩm này không? [Tên sản phẩm: ${selectedProducts[0]?.name}, Kiểu: ${selectedProducts[0]?.category.name}]`,
+          nameButton: 'Xác nhận xóa',
+        });
+
+        break;
+      /* DELETE_MANY_PRODUCTS */
+      case constants.product.actionTypes.DELETE_MANY_PRODUCTS:
+        setModalOpts({
+          variant: 'warning',
+          title: `Xác nhận xóa nhiều sản phẩm`,
+          message: `Bạn có muốn xóa những sản phẩm này không? [Tên sản phẩm: ${selectedProducts[0]?.name}, Kiểu: ${selectedProducts[0]?.category.name}, ...]`,
+          nameButton: 'Xác nhận xóa nhiều',
+        });
+
+        break;
+
+      default:
+        setAlertOpts({
+          variant: 'danger',
+          title: `Hệ thống đang phát triển chức năng`,
+          message: `Chức năng này đang được phát triển hoặc nâng cấp. Xin vui lòng xử dụng chức năng này sau!`,
+        });
+
+        handleShowAlert();
+        return;
+    }
+
+    //! Show Confirmation Modal
+    handleShowModal();
+  }
+
+  async function handleConfirmationSubmit() {
+    try {
+      //! single Ids
+      if (actionType === constants.product.actionTypes.DELETE_ONE_PRODUCT) {
+        /* DELETE_ONE_PRODUCT */
+        const response = await API.product.deleteProductById(selectedId);
+        console.log(
+          '__Debugger__ManageProductScreen\n__handleConfirmationSubmit__response: ',
+          response,
+          '\n'
+        );
+        setAlertOpts({
+          variant: response.success ? 'success' : 'danger',
+          title: `Xóa sản phẩm thành công`,
+          message: `Bạn đã xóa sản phẩm [Tên: ${response.data.deletedProduct.name}] thành công!`,
+        });
+
+        checkSelectedIds();
+      } else if (
+        actionType === constants.product.actionTypes.DELETE_MANY_PRODUCTS
+      ) {
+        /* DELETE_MANY_PRODUCTS */
+        // const response = await dispatch(deleteOrders(selectedIds)).unwrap();
+        const response = await API.product.deleteProductsByIds(selectedIds);
+        setAlertOpts({
+          variant: response.success ? 'success' : 'danger',
+          title: `Xóa nhiều sản phẩm thành công`,
+          message: `Bạn đã xóa sản phẩm [Tên: ${response.data.deletedProducts[0].name}, ...] thành công!`,
+        });
+
+        resetCheckAll();
+      }
+
+      handleHideModal();
+      handleShowAlert();
+      //! re-load
+      loadProductsByFilters();
+
+      //! gotoTop
+      scrollToTop();
+    } catch (error) {
+      handleHideModal();
+      handleShowAlert();
+
+      setAlertOpts({
+        variant: 'danger',
+        title: 'Lỗi hệ thống',
+        message:
+          error.response?.data?.message ||
+          error.response?.message ||
+          error.message ||
+          error,
+      });
+
+      toast.error(error.response?.message || error.massage);
+    }
+  }
+
+  //! DeleteConfirmationModal
+  // const handleShowDeleteModal = (type, productIds) => {
+  //   setDeleteIds(productIds); //! string or array
+  //   setDeleteType(type); //! single or multiple
+  //   setSingleMessage(null);
+  //   setMultipleMessage(null);
+
+  //   if (type === 'single') {
+  //     setDeleteMessage(
+  //       // fruits.find((x) => x.id === id).name
+  //       `Bạn có muốn xóa sản phẩm [${
+  //         products.find((product) => product._id === productIds).name
+  //       }] này không?`
+  //     );
+  //     setSingleMessage(
+  //       // fruits.find((x) => x.id === id).name
+  //       `Bạn đã xóa sản phẩm [${
+  //         products.find((product) => product._id === productIds).name
+  //       }] thành công.`
+  //     );
+  //   } else if (type === 'multiple') {
+  //     setDeleteMessage(
+  //       `Có ${productIds.length} sản phẩm chờ được xóa. Bạn muốn xóa không?`
+  //     );
+  //     setMultipleMessage(
+  //       `Bạn đã xóa ${productIds.length} sản phẩm thành công.`
+  //     );
+  //   }
+  //   //! show Modal
+  //   setShowConfirmationModal(true);
+  // };
+
+  // const handleSubmitDelete = async () => {
+  //   if (deleteType === 'single') {
+  //     //! single Id
+  //     await deleteProduct(deleteIds);
+  //   } else if (deleteType === 'multiple') {
+  //     //! multiple Ids
+  //     await deleteProducts(deleteIds);
+  //   }
+  //   loadAllProducts();
+  //   handleHideModal();
+  //   setShowAlert(true);
+  //   // clearMessage();
+  // };
+
+  // const clearAlertMessage = () => {
+  //   setDeleteMessage('');
+  //   setMultipleMessage('');
+  //   setSingleMessage('');
+  // };
+
+  function resetCheckAll() {
+    //! reset CheckAll
+    setSelectedId('');
+    setSelectedIds([]);
+    setIsCheckAll(false);
+  }
+
+  function checkSelectedIds() {
+    if (selectedIds.length === 0) return;
+    setSelectedIds((prevState) => prevState.filter((id) => id !== selectedId));
+  }
+
+  function handleHideAlert() {
+    setShowAlert(false);
+  }
+
+  function handleShowAlert() {
+    setShowAlert(true);
+  }
+
+  function handleHideModal() {
+    setShowModal(false);
+  }
+
+  function handleShowModal() {
+    setShowModal(true);
+  }
 
   const breadcrumbItems = [
     { key: 'breadcrumb-item-0', label: 'Home', path: '/' },
@@ -51,225 +378,79 @@ const ManageProductScreen = () => {
     },
   ];
 
-  //! localState DeleteComfirmationModalComponent
-  const [deleteType, setDeleteType] = React.useState(null); //! single or multiple
-  const [deleteIds, setDeleteIds] = React.useState(null); //! id
-  const [showConfirmationModal, setShowConfirmationModal] =
-    React.useState(false);
-  const [deleteMessage, setDeleteMessage] = React.useState(null);
-  const [singleMessage, setSingleMessage] = React.useState(null);
-  const [multipleMessage, setMultipleMessage] = React.useState(null);
-
-  //! localState Alert
-  const [showAlert, setShowAlert] = React.useState(false);
-
-  //! reduxState:
-  const dispatch = useDispatch();
-  const product = useSelector((state) => state.product);
-  const search = useSelector((state) => state.search);
-
-  //! effect deps: Pagination, Search
-  React.useEffect(() => {
-    loadAllProducts();
-  }, [search, sort, order, currentPage, itemsPerPage]);
-
-  React.useEffect(() => {
-    return () => dispatch(clearSearch());
-  }, []);
-
-  //! effect Error
-  React.useEffect(() => {
-    product.error && toast.error(product.error);
-  }, [product.error]);
-
-  //! slug, _id,
-  const loadAllProducts = () => {
-    dispatch(
-      getProductsByFilters({
-        search,
-        sort,
-        order,
-        page: currentPage,
-        perPage: itemsPerPage,
-      })
-    );
-  };
-
-  const deleteProduct = async (productId) => {
-    try {
-      const deletedProduct = await dispatch(removeProduct(productId)).unwrap();
-      toast.success(`Sản phẩm ${deletedProduct.name} đã được xóa`);
-    } catch (error) {
-      toast.error(error);
-    }
-  };
-
-  const deleteProducts = (productIds) => {
-    dispatch(removeProducts(productIds))
-      .unwrap()
-      .then((result) => {
-        setCheckedProductIds([]);
-      })
-      .catch((error) => {
-        toast.error(error);
-      });
-  };
-
-  const handleSelectAll = () => {
-    setIsCheckAll(!isCheckAll);
-    if (!isCheckAll) {
-      setCheckedProductIds(product.products.map((product) => product._id));
-    } else {
-      setCheckedProductIds([]); //! unticked
-    }
-  };
-
-  const handleCardCheckChange = (e) => {
-    const { id, checked } = e.target;
-    if (!checked) {
-      setCheckedProductIds(
-        checkedProductIds.filter((productId) => productId !== id)
-      );
-    } else {
-      setCheckedProductIds([...checkedProductIds, id]);
-    }
-    //! reset isCheckAll
-    if (checkedProductIds.length === 0 && isCheckAll) {
-      setIsCheckAll(false);
-    }
-  };
-
-  //! DeleteConfirmationModal
-  const handleShowDeleteModal = (type, productIds) => {
-    setDeleteIds(productIds); //! string or array
-    setDeleteType(type); //! single or multiple
-    setSingleMessage(null);
-    setMultipleMessage(null);
-
-    if (type === 'single') {
-      setDeleteMessage(
-        // fruits.find((x) => x.id === id).name
-        `Bạn có muốn xóa sản phẩm [${
-          product.products.find((product) => product._id === productIds).name
-        }] này không?`
-      );
-      setSingleMessage(
-        // fruits.find((x) => x.id === id).name
-        `Bạn đã xóa sản phẩm [${
-          product.products.find((product) => product._id === productIds).name
-        }] thành công.`
-      );
-    } else if (type === 'multiple') {
-      setDeleteMessage(
-        `Có ${productIds.length} sản phẩm chờ được xóa. Bạn muốn xóa không?`
-      );
-      setMultipleMessage(
-        `Bạn đã xóa ${productIds.length} sản phẩm thành công.`
-      );
-    }
-    //! show Modal
-    setShowConfirmationModal(true);
-  };
-
-  const handleHideModal = () => {
-    setShowConfirmationModal(false);
-  };
-
-  //! handle the deletion of the product
-  const handleSubmitDelete = async () => {
-    if (deleteType === 'single') {
-      //! single Id
-      await deleteProduct(deleteIds);
-    } else if (deleteType === 'multiple') {
-      //! multiple Ids
-      await deleteProducts(deleteIds);
-    }
-    loadAllProducts();
-    handleHideModal();
-    setShowAlert(true);
-    // clearMessage();
-  };
-
-  const clearAlertMessage = () => {
-    setDeleteMessage('');
-    setMultipleMessage('');
-    setSingleMessage('');
-  };
-
   return (
     <>
       <BreadcrumbComponent breadcrumbItems={breadcrumbItems} />
       <h1>Quản lý Sản phẩm </h1>
-      {singleMessage ? (
-        <AlertDismissibleComponent
-          show={showAlert}
-          setShow={setShowAlert}
-          variant="success"
-          alwaysShown={false}
-        >
-          {singleMessage}
-        </AlertDismissibleComponent>
-      ) : null}
-      {multipleMessage ? (
-        <AlertDismissibleComponent
-          show={showAlert}
-          setShow={setShowAlert}
-          variant="success"
-        >
-          {multipleMessage}
-        </AlertDismissibleComponent>
-      ) : null}
+      <AlertDismissibleComponent
+        show={showAlert}
+        handleHideAlert={handleHideAlert}
+        variant={alertOpts.variant}
+        title={alertOpts.title}
+        message={alertOpts.message}
+        alwaysShown={true}
+      />
+      {
+        //! ProductToolbarComponent
+      }
+      <ProductToolbarComponent
+        seFilterOpts={seFilterOpts}
+        isCheckAll={isCheckAll}
+        selectedIds={selectedIds}
+        handleCheckAllChange={handleCheckAllChange}
+        handleOpenModal={handleOpenModal}
+      />
 
-      <ToolbarComponent
+      {/* <ToolbarComponent
         setSort={setSort}
         setOrder={setOrder}
         role="toolbar"
         aria-label="Toolbar with button groups"
         isCheckAll={isCheckAll}
-        checkedProductIds={checkedProductIds}
+        selectedIds={selectedIds}
         currentPage={currentPage}
-        handleCheckChange={handleSelectAll}
+        handleCheckAllChange={handleCheckAllChange}
         handleShowDeleteModal={handleShowDeleteModal}
-      />
-      {product.loading === true ? (
-        <AdminLoadingProductCard count={productsCountPerPage} />
-      ) : (
-        <>
-          <Row>
-            {
-              //! Container that in main (App-index.js)
-            }
-            {product.products?.length > 0 &&
-              product.products?.map((product) => {
-                return (
-                  <Col key={product._id} xs={6} sm={4} md={3} lg={2}>
-                    <AdminProductCard
-                      product={product}
-                      checkedProductIds={checkedProductIds}
-                      handleCheckChange={handleCardCheckChange}
-                      handleShowDeleteModal={handleShowDeleteModal}
-                    />
-                  </Col>
-                );
-              })}
-          </Row>
-          <div className="d-flex justify-content-center">
-            <PaginationComponent
-              currentPage={currentPage}
-              itemsCount={product.productsCount}
-              itemsPerPage={itemsPerPage}
-              setCurrentPage={setCurrentPage}
-            />
-          </div>
-        </>
-      )}
-      <DeleteConfirmationModalComponent
-        title={'Xác nhận xóa sản phẩm'}
-        showModal={showConfirmationModal}
-        message={deleteMessage}
+      /> */}
+      <>
+        <Row>
+          {
+            //! Container that in main (App-index.js)
+          }
+          {products?.length > 0 &&
+            products?.map((product) => {
+              return (
+                <Col key={product._id} xs={6} sm={4} md={3} lg={2}>
+                  <AdminProductCard
+                    product={product}
+                    selectedIds={selectedIds}
+                    handleCheckChange={handleCheckChange}
+                    handleOpenModal={handleOpenModal}
+                  />
+                </Col>
+              );
+            })}
+        </Row>
+        <div className="d-flex justify-content-center">
+          <PaginationComponent
+            currentPage={currentPage}
+            itemsCount={productsCount}
+            itemsPerPage={itemsPerPage}
+            setCurrentPage={setCurrentPage}
+            alwaysShown={false}
+          />
+        </div>
+      </>
+      <ConfirmationModalComponent
+        showModal={showModal}
+        variant={modalOpts.variant}
+        title={modalOpts.title}
+        nameButton={modalOpts.nameButton}
+        message={modalOpts.message}
         handleHideModal={handleHideModal}
-        handleSubmitDelete={handleSubmitDelete}
+        handleSubmit={handleConfirmationSubmit}
       />
+      <GoToButtonComponent visible={scrollPosition > 300} />
     </>
   );
 };

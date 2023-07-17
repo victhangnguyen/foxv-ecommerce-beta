@@ -13,11 +13,6 @@ import Order from '../models/Order.js';
 export async function getVnpayReturn(req, res, next) {
   try {
     const result = await paymentService.checkPaymentStatus(req.query);
-    console.log(
-      '__Debugger__payment\n__getVnpayReturn__result: ',
-      result,
-      '\n'
-    );
 
     const order = await Order.findById(result.data.orderId);
 

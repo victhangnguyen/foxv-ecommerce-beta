@@ -1,17 +1,18 @@
-import nodemailer from 'nodemailer';
-import smtpTransport from 'nodemailer-smtp-transport';
-import jwt from 'jsonwebtoken';
+import nodemailer from "nodemailer";
+import smtpTransport from "nodemailer-smtp-transport";
+import jwt from "jsonwebtoken";
 //! imp Library
-import Logging from '../library/Logging.js';
+import Logging from "../library/Logging.js";
 //! imp Utils
-import sendEmail from '../utils/sendEmail.js';
+import sendEmail from "../utils/sendEmail.js";
 //! imp Services
-import userService from '../services/userService.js';
-import authService from '../services/authService.js';
+import userService from "../services/userService.js";
+import authService from "../services/authService.js";
 //! imp Models
-import User from '../models/User.js';
+import User from "../models/User.js";
+import Role from "../models/Role.js";
 //! imp Configs
-import config from '../config/index.js';
+import config from "../config/index.js";
 
 export const signup = async (req, res, next) => {
   const { firstName, lastName, username, email, phoneNumber, password } =
@@ -24,7 +25,7 @@ export const signup = async (req, res, next) => {
     if (existingUser) {
       return res
         .status(400)
-        .json({ message: 'Username or email already exists.' });
+        .json({ message: "Username or email already exists." });
     }
 
     //! generatePassword and hash password
@@ -49,7 +50,7 @@ export const signup = async (req, res, next) => {
 
     const transporter = nodemailer.createTransport(
       smtpTransport({
-        service: 'Gmail',
+        service: "Gmail",
         auth: {
           user: emailUsername,
           pass: emailPassword,
@@ -60,8 +61,8 @@ export const signup = async (req, res, next) => {
     const mailOptions = {
       from: emailUsername,
       to: email,
-      subject: 'Welcome to Foxv Ecommerce Beta',
-      text: 'Please click on the following link to login your email address:',
+      subject: "Welcome to Foxv Ecommerce Beta",
+      text: "Please click on the following link to login your email address:",
       html: `
       <div>
         <p>Please click <a href="http://localhost:3000/auth/login">here</a> to login</p>
@@ -73,23 +74,23 @@ export const signup = async (req, res, next) => {
 
     await transporter.sendMail(mailOptions, (error, info) => {
       if (error) {
-        Logging.error('Error sending email:' + error);
+        Logging.error("Error sending email:" + error);
         return res.status(500).json({
           success: false,
-          message: 'You have failed to register an account.',
+          message: "You have failed to register an account.",
         });
       }
-      Logging.success('Email sent:' + info.response);
+      Logging.success("Email sent:" + info.response);
       return res.status(201).json({
         success: true,
-        message: 'You have successfully registered an account!',
+        message: "You have successfully registered an account!",
         data: {
           user: newUser,
         },
       });
     });
   } catch (error) {
-    Logging.error('Error__ctrls__auth: ' + error);
+    Logging.error("Error__ctrls__auth: " + error);
     const err = new Error(error);
     err.statusCode = 400;
     return next(err);
@@ -98,22 +99,27 @@ export const signup = async (req, res, next) => {
 
 export const signin = async (req, res, next) => {
   const { username, password } = req.body;
+  console.log('__Debugger__auth\n__signin__req.body: ', req.body, '\n');
 
   try {
-    const user = await User.findOne({ username }).populate('roles').exec();
+    const user = await User.findOne({ username }).populate("roles").exec();
     if (!user || !user.comparePassword(password))
       return res.status(400).json({
         success: false,
-        message: 'Invalid email or password.',
+        message: "Invalid email or password.",
       });
 
     const token = authService.generateAccessToken(user._id);
     const refreshToken = await authService.generateRefreshToken(user._id);
-    console.log('__Debugger__auth\n__signin__refreshToken: ', refreshToken, '\n');
+    console.log(
+      "__Debugger__auth\n__signin__refreshToken: ",
+      refreshToken,
+      "\n"
+    );
 
     return res.status(201).json({
       success: true,
-      message: 'Login successful',
+      message: "Login successful",
       data: {
         user,
         token,
@@ -125,20 +131,25 @@ export const signin = async (req, res, next) => {
     res.status(500).json({
       success: false,
       message:
-        'Oops! Something went wrong on our end. Please try again in a few minutes.',
+        "Oops! Something went wrong on our end. Please try again in a few minutes.",
     });
   }
 };
 
 export const refreshToken = async (req, res, next) => {
   const { refreshToken } = req.body;
+  console.log(
+    "__Debugger__auth\n__refreshToken__refreshToken: ",
+    refreshToken,
+    "\n"
+  );
 
   try {
     // If refresh token is missing
     if (!refreshToken) {
       return res
         .status(403) //! Required re-signin
-        .json({ success: false, message: 'Refresh token is required' });
+        .json({ success: false, message: "Refresh token is required" });
     }
 
     authService
@@ -148,23 +159,23 @@ export const refreshToken = async (req, res, next) => {
 
         return res.status(201).json({
           success: true,
-          message: 'refresh AccessToken successful',
+          message: "Refresh AccessToken successful",
           data: { token },
         });
       })
       .catch((error) => {
         if (error instanceof jwt.TokenExpiredError) {
-          return res.status(403).send({
+          return res.status(403).json({
             success: false,
             // message: 'Unauthorized! Refresh Token was expired.',
             message:
-              'Your session has expired. Please log in again to continue using our service.',
+              "Your session has expired. Please log in again to continue using our service.",
           });
         }
 
         return res
-          .sendStatus(401)
-          .send({ success: false, message: 'Unauthorized!' });
+          .status(401)
+          .json({ success: false, message: "Unauthorized!" });
       });
   } catch (error) {
     next(error);
@@ -178,7 +189,7 @@ export const forgotPassword = async (req, res, next) => {
     if (!user) {
       return res
         .status(400)
-        .json({ success: false, message: 'User does not exist!' });
+        .json({ success: false, message: "User does not exist!" });
     }
 
     const newPassword = userService.generatePassword(12);
@@ -195,15 +206,15 @@ export const forgotPassword = async (req, res, next) => {
     // email, subject, text, template
     const info = await sendEmail(
       email,
-      'Khôi phục mật khẩu',
-      'Khôi phục mật khẩu',
+      "Khôi phục mật khẩu",
+      "Khôi phục mật khẩu",
       htmlTemplate
     );
 
     await user.save();
     res
       .status(200)
-      .json({ success: true, message: 'Recover password successful!', info });
+      .json({ success: true, message: "Recover password successful!", info });
   } catch (error) {
     next(error);
   }

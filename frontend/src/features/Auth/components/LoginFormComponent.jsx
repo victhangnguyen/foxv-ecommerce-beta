@@ -4,6 +4,7 @@ import * as yup from 'yup';
 import { Button } from 'react-bootstrap';
 import FormComponent from '../../../components/Form/FormComponent';
 import InputComponent from '../../../components/Form/InputComponent';
+import PasswordComponent from '../../../components/Form/PasswordComponent';
 
 const LoginFormComponent = ({ onSubmit }) => {
   const validationSchema = yup.object({
@@ -29,7 +30,7 @@ const LoginFormComponent = ({ onSubmit }) => {
       {
         //! password
       }
-      <InputComponent
+      <PasswordComponent
         type={'password'}
         name="password"
         label={'Mật khẩu'}

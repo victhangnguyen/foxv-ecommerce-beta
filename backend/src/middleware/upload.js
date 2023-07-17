@@ -1,23 +1,20 @@
-import multer from 'multer';
-
-//! name: product
-//! dest: products
+import multer from "multer";
 
 const fileStorage = multer.diskStorage({
   destination: (req, file, cb) => {
-    cb(null, 'backend/images/products');
+    cb(null, "backend/images/products");
   },
   filename: (req, file, cb) => {
-    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
-    cb(null, 'product-' + uniqueSuffix + '.jpg');
+    const uniqueSuffix = Date.now() + "-" + Math.round(Math.random() * 1e9);
+    cb(null, "product-" + uniqueSuffix + ".jpg");
   },
 });
 
 const fileFilter = (req, file, cb) => {
   if (
-    file.mimetype === 'image/png' ||
-    file.mimetype === 'image/jpg' ||
-    file.mimetype === 'image/jpeg'
+    file.mimetype === "image/png" ||
+    file.mimetype === "image/jpg" ||
+    file.mimetype === "image/jpeg"
   ) {
     cb(null, true);
   } else {
@@ -25,10 +22,16 @@ const fileFilter = (req, file, cb) => {
   }
 };
 
-const uploadImages = multer({ storage: fileStorage, fileFilter: fileFilter }).array(
-  'images[]',
-  12
-);
+const uploadImages = multer({
+  storage: fileStorage,
+  fileFilter: fileFilter,
+})
+  // .fields([{ name: "images" }]);
+  // .single('images', 12);
+  // .array("images", 12); //! ok
+  .array("images[]", 12);
+
+// export default uploadImages;
 
 const uploadHandler = (req, res, next) => {
   uploadImages(req, res, (err) => {
@@ -37,7 +40,9 @@ const uploadHandler = (req, res, next) => {
       return res.status(400).json({ message: `Bad request, ${err.message}` });
     } else {
       // special workaround for files validating with express-validator
+      // req.body.images = req.files;
       req.body.images = req.files;
+      console.log(req.files);
       next();
     }
   });

@@ -17,6 +17,7 @@ const orderConstants = {
   actionTypes: {
     DELETE_ORDER: 'DELETE_ORDER',
     DELETE_ORDERS: 'DELETE_ORDERS',
+    DOWNLOAD_INVOICE: 'DOWNLOAD_INVOICE',
   },
 };
 

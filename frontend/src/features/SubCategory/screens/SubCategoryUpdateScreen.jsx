@@ -1,7 +1,9 @@
 import _ from 'lodash';
 import React from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
 import { toast } from 'react-toastify';
+//! imp Hooks
+import { useDispatch, useSelector } from 'react-redux';
+import { useParams } from 'react-router-dom';
 
 //! imp Comps
 import AlertDismissibleComponent from '../../../components/Alert/AlertDismissibleComponent';
@@ -12,28 +14,157 @@ import SubCategoryFormComponent from '../components/Form/SubCategoryFormComponen
 import subCategoryService from '../services/subCategoryService';
 import categoryService from '../../Category/services/categoryService';
 
+//! imp Actions
+import { getSubCategoryById, updateSubCategoryById } from '../SubCategorySlice';
+
+//! imp APIs
+import API from '../../../API';
+
 const SubCategoryUpdateScreen = () => {
-  const navigate = useNavigate();
-  const { slug } = useParams();
+  const dispatch = useDispatch();
+  const { subCategoryId } = useParams();
+  const { subCategory } = useSelector((state) => state.subCategory);
+
+  //! localState: init
+  const [loading, setLoading] = React.useState(false);
+  const [categories, setCategories] = React.useState();
 
   //! localState: Alert
   const [showAlert, setShowAlert] = React.useState(false);
-  const [alertOptions, setAlertOptions] = React.useState({
+  const [alertOpts, setAlertOpts] = React.useState({
     variant: '',
     title: '',
     message: '',
   });
 
-  //! localState: Category
-  const [loading, setLoading] = React.useState(false);
-  const [categories, setCategories] = React.useState();
-  const [subCategory, setSubCategory] = React.useState({});
-
   const initialValues = {
-    categoryId: subCategory?.parent,
+    parent: subCategory?.parent,
     name: subCategory?.name,
     slug: subCategory?.slug,
   };
+
+  React.useEffect(() => {
+    loadSubCategoryById(subCategoryId);
+  }, [subCategoryId]);
+
+  async function loadSubCategoryById(subCategoryId) {
+    try {
+      setLoading(true);
+      await dispatch(getSubCategoryById(subCategoryId)).unwrap();
+      setLoading(false);
+    } catch (error) {
+      setLoading(false);
+      setAlertOpts({
+        variant: 'danger',
+        title: 'Lỗi hệ thống',
+        message:
+          error.response?.data?.message ||
+          error.response?.message ||
+          error.message ||
+          error,
+      });
+      setShowAlert(true);
+      toast.error(error.response?.message || error.massage);
+    }
+  }
+
+  React.useEffect(() => {
+    loadCategories();
+  }, []);
+
+  async function loadCategories() {
+    try {
+      setLoading(true);
+      const response = await API.category.getCategories();
+      setLoading(false);
+      setCategories(response.data.categories);
+    } catch (error) {
+      setLoading(false);
+
+      handleShowAlert();
+      setAlertOpts({
+        variant: 'danger',
+        title: 'Lỗi hệ thống',
+        message:
+          error.response?.data?.message ||
+          error.response?.message ||
+          error.message ||
+          error,
+      });
+    }
+  }
+
+  async function handleUpdateSubCategorySubmit(data, e, methods) {
+    const isEqualData = _.isEqual(initialValues, data);
+    if (isEqualData) {
+      return toast.error('Chưa có thông tin nào thay đổi.');
+    }
+
+    console.log(
+      '__Debugger__SubCategoryUpdateScreen\n__handleUpdate__data: ',
+      data,
+      '\n'
+    );
+
+    const subCategoryData = {
+      parent: data.parent,
+      name: data.name,
+    };
+    try {
+      setLoading(true);
+      const response = await dispatch(
+        updateSubCategoryById({ subCategoryId, subCategoryData })
+      ).unwrap();
+      console.log('response: ', response);
+      setLoading(false);
+      handleShowAlert();
+
+      setAlertOpts({
+        variant: 'success',
+        title: 'Cập nhật Kiểu sản phẩm (Sub Category)',
+        message: `Bạn đã cập nhật Kiểu sản phẩm với tên [${response.data.updatedSubCategory.name}] thành công!`,
+      });
+    } catch (error) {
+      console.log(
+        '__Debugger__SubCategoryUpdateScreen\n__handleUpdate__error: ',
+        error,
+        '\n'
+      );
+      setLoading(false);
+      //! Error Handling
+      if (error.response?.status === 422) {
+        const errors = error.response.data.errors;
+        if (!errors?.length) return;
+        errors.forEach((error) => {
+          methods.setError(error.param, {
+            type: 'server',
+            message: error.msg,
+          });
+        });
+        return;
+      }
+
+      setAlertOpts({
+        variant: 'danger',
+        title: 'Lỗi hệ thống',
+        message:
+          error.response?.data?.message ||
+          error.response?.message ||
+          error.message ||
+          error,
+      });
+
+      setShowAlert(true);
+    }
+  }
+
+  function handleShowAlert() {
+    setShowAlert(true);
+  }
+
+  function handleHideAlert() {
+    setShowAlert(false);
+  }
 
   const breadcrumbItems = [
     { key: 'breadcrumb-item-0', label: 'Home', path: '/' },
@@ -45,117 +176,10 @@ const SubCategoryUpdateScreen = () => {
     {
       key: 'breadcrumb-item-2',
       label: 'Cập nhật Kiểu sản phẩm',
-      path: `/admin/subcategories/${slug}/update`,
+      path: `/admin/subcategories/${subCategory}/update`,
       active: true,
     },
   ];
-
-  React.useEffect(() => {
-    loadSubCategoryBySlug(slug);
-  }, []);
-
-  const loadSubCategoryBySlug = async (slug) => {
-    try {
-      setLoading(true);
-      const response = await subCategoryService.getSubCategoryBySlug(slug);
-      setLoading(false);
-      setSubCategory(response.data.subCategory);
-    } catch (error) {
-      setLoading(false);
-      setAlertOptions({
-        variant: 'danger',
-        title: 'Lỗi hệ thống',
-        message:
-          error.response?.data?.message ||
-          error.response?.message ||
-          error.message,
-      });
-      setShowAlert(true);
-      toast.error(error.response?.message || error.massage);
-    }
-  };
-
-  React.useEffect(() => {
-    loadCategories();
-  }, []);
-
-  const loadCategories = async () => {
-    try {
-      setLoading(true);
-      const response = await categoryService.getCategories();
-      setLoading(false);
-      setCategories(response.data.categories);
-    } catch (error) {
-      setLoading(false);
-      setAlertOptions({
-        variant: 'danger',
-        title: 'Lỗi hệ thống',
-        message:
-          error.response?.data?.message ||
-          error.response?.message ||
-          error.message,
-      });
-      setShowAlert(true);
-      toast.error(error.response?.message || error.massage);
-    }
-  };
-
-  const handleUpdateSubCategorySubmit = async (data, e, methods) => {
-    const isEqualData = _.isEqual(initialValues, data);
-    if (isEqualData) {
-      return toast.error('Chưa có thông tin nào thay đổi.');
-    }
-
-    const { categoryId, name } = data;
-    try {
-      const response = await subCategoryService.updateSubCategoryBySlug(slug, {
-        categoryId,
-        name,
-      });
-
-      toast.success(response.message);
-      //! re-load to navigate
-      navigate(
-        `/admin/subcategories/${response.data.subCategory.slug}/update`,
-        {
-          replace: true,
-        }
-      );
-      loadSubCategoryBySlug(response.data.subCategory.slug);
-
-      setAlertOptions({
-        variant: 'success',
-        title: 'Cập nhật Loại sản phẩm (Category)',
-        message: `Bạn đã cập nhật Loại sản phẩm với tên [${response.data.subCategory.name}] thành công!`,
-      });
-      setShowAlert(true);
-    } catch (error) {
-      setLoading(false);
-      //! Error Handling
-      if (error.response?.status === 422) {
-        const errors = error.response.data.errors;
-        if (!errors.length) return;
-        errors.forEach((error) => {
-          methods.setError(error.param, {
-            type: 'server',
-            message: error.msg,
-          });
-        });
-        return;
-      }
-
-      setAlertOptions({
-        variant: 'danger',
-        title: 'Lỗi hệ thống',
-        message:
-          error.response?.data?.message ||
-          error.response?.message ||
-          error.message,
-      });
-
-      setShowAlert(true);
-    }
-  };
 
   return (
     <>
@@ -163,10 +187,10 @@ const SubCategoryUpdateScreen = () => {
 
       <AlertDismissibleComponent
         show={showAlert}
-        setShow={setShowAlert}
-        variant={alertOptions.variant}
-        title={alertOptions.title}
-        message={alertOptions.message}
+        handleHideAlert={handleHideAlert}
+        variant={alertOpts.variant}
+        title={alertOpts.title}
+        message={alertOpts.message}
         alwaysShown={true}
       />
       <h2 className="fw-bold mb-2 text-uppercase ">
@@ -180,7 +204,7 @@ const SubCategoryUpdateScreen = () => {
       }
       <SubCategoryFormComponent
         initialValues={initialValues}
-        entitySlug={slug}
+        subCategoryId={subCategoryId}
         entity={subCategory}
         categories={categories}
         loading={loading}

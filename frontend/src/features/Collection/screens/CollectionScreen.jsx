@@ -8,8 +8,8 @@ import ProductCard from '../../Product/components/Card/ProductCard';
 import BreadcrumbComponent from '../../../components/Breadcrumb/BreadcrumbComponent';
 import AlertDismissibleComponent from '../../../components/Alert/AlertDismissibleComponent';
 
-//! imp Services
-import categoryService from '../../Category/services/categoryService';
+//! imp APIs
+import API from '../../../API';
 
 const CollectionScreen = () => {
   const { slug } = useParams(); //! categorySlug
@@ -20,7 +20,7 @@ const CollectionScreen = () => {
   const [loading, setLoading] = React.useState(false);
   //! localState: alert
   const [showAlert, setShowAlert] = React.useState(false);
-  const [alertOptions, setAlertOptions] = React.useState({
+  const [alertOpts, setAlertOpts] = React.useState({
     variant: '',
     title: '',
     message: '',
@@ -49,19 +49,20 @@ const CollectionScreen = () => {
   const loadCategoryBySlug = async (slug) => {
     try {
       setLoading(true);
-      const response = await categoryService.getCateogryBySlug(slug);
+      const response = await API.category.getCategoryBySlug(slug);
       setLoading(false);
       setCategory(response.data.category);
       setProducts(response.data.products);
     } catch (error) {
       setLoading(false);
-      setAlertOptions({
+      setAlertOpts({
         variant: 'danger',
         title: 'Lỗi hệ thống',
         message:
           error.response?.data?.message ||
           error.response?.message ||
-          error.message,
+          error.message ||
+          error,
       });
       setShowAlert(true);
       toast.error(error.response?.message || error.massage);
@@ -75,9 +76,9 @@ const CollectionScreen = () => {
       <AlertDismissibleComponent
         show={showAlert}
         setShow={setShowAlert}
-        variant={alertOptions.variant}
-        title={alertOptions.title}
-        message={alertOptions.message}
+        variant={alertOpts.variant}
+        title={alertOpts.title}
+        message={alertOpts.message}
         alwaysShown={true}
       />
 

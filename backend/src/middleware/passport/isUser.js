@@ -2,27 +2,29 @@ import passport from './passport.js';
 import mongoose from 'mongoose';
 import User from '../../models/User.js';
 
-const isUser = function (req, res, next) {
+async function  isUser(req, res, next) {
   const userId = req.params.userId;
   try {
     //! check Role
     const roles = req.user.roles.map((role) => role.name);
-    const isAdmin = roles.includes('admin');
+    const isAdminController = roles.includes('admin');
 
-        if (!isAdmin) {
-          if (String(userDoc?._id) !== userId) {
-            return res.status(403).json({
-              success: false,
-              message: 'Unauthenticated! Require Admin Role.',
-            });
-          }
-        }
+    const userDoc = await User.findById(req.user._id).populate('roles');
+
+    if (!isAdminController) {
+      if (String(userDoc?._id) !== userId) {
+        return res.status(403).json({
+          success: false,
+          message: 'Unauthenticated! Require Admin Role.',
+        });
+      }
+    }
 
     next();
   } catch (error) {
     next(error);
   }
-};
+}
 //   const userId = req.params.userId;
 //   try {
 //     if (err) {

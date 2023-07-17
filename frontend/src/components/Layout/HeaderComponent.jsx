@@ -15,8 +15,7 @@ import {
 } from 'react-bootstrap';
 
 //! imp Services
-import categoryService from '../../features/Category/services/categoryService';
-import subCategoryService from '../../features/SubCategory/services/subCategoryService';
+import API from '../../API';
 
 //! imp Actions
 import { signout } from '../../features/Auth/AuthSlice';
@@ -36,9 +35,11 @@ const HeaderComponent = () => {
   const roles = auth.user?.roles?.map((role) => role.name);
   const isAuthenticated = roles?.includes('user');
   const isAdmin = roles?.includes('admin');
+  const token = auth.token;
   //! variable from cart
-  //! total items Type
-  const itemsCount = cart.cartItems?.length;
+  //! total items quantity
+  const itemsCount = cart.cartItems?.reduce((acc, cur) => +cur.quantity + acc, 0);
+
   const badgeProps = {};
 
   if (itemsCount) {
@@ -49,18 +50,26 @@ const HeaderComponent = () => {
   const [categories, setCategories] = React.useState([]);
   const [subCategories, setSubCategories] = React.useState([]);
 
-  const handleLogout = () => {
-    //! logout
-    dispatch(signout());
+  async function handleLogout() {
+    try {
+      //! if no Token then signout
+      if (token) {
+        //! save Cart to database
+        await dispatch(postCart()).unwrap(); //! not authenticated
+      }
 
-    //! save Cart
-    dispatch(postCart());
-    //! empty Order
-    dispatch(emptyNewOrder());
+      //! logout
+      dispatch(signout());
 
-    navigate('/auth/login');
-    toast.success(`${auth.user.lastName} has successfully signed out!`);
-  };
+      //! empty Order
+      dispatch(emptyNewOrder());
+
+      navigate('/auth/login');
+      toast.success(`${auth.user.lastName} has successfully signed out!`);
+    } catch (error) {
+      console.log('Error: ', error);
+    }
+  }
 
   React.useEffect(() => {
     loadCategories();
@@ -74,9 +83,8 @@ const HeaderComponent = () => {
       page: 1,
       perPage: 10,
     };
-    const response = await categoryService.getCategoriesByFilters(
-      filterOptions
-    );
+    const response = await API.category.getCategoriesByFilters(filterOptions);
+
     setCategories(response.data?.categories); //! vrf ?.cate..
   };
 
@@ -87,7 +95,7 @@ const HeaderComponent = () => {
       page: 1,
       perPage: 10,
     };
-    const response = await subCategoryService.getSubCategoriesByFilters(
+    const response = await API.subCategory.getSubCategoriesByFilters(
       filterOptions
     );
     setSubCategories(response.data?.subCategories); //! vrf ?.sub...
@@ -137,11 +145,11 @@ const HeaderComponent = () => {
                 //! Nav me-auto (margin-end)
               }
               <Nav className="me-auto">
-                <Nav.Link as="div">
+                {/* <Nav.Link as="div">
                   <NavLink className={'nav-link'} to={'/promotion'}>
                     Khuyến mãi
                   </NavLink>
-                </Nav.Link>
+                </Nav.Link> */}
                 <Nav.Link as={'div'}>
                   <NavLink className={'nav-link'} to={'/shop'}>
                     Shop
@@ -149,7 +157,7 @@ const HeaderComponent = () => {
                 </Nav.Link>
                 <NavDropdown
                   className={'nav-link'}
-                  title="Sản phẩm"
+                  title="Kiểu sản phẩm"
                   id="collasible-nav-dropdown"
                 >
                   {renderCategoryHeader}
@@ -161,32 +169,23 @@ const HeaderComponent = () => {
                 >
                   {renderSubCategoryHeader}
                 </NavDropdown>
-                <NavDropdown
-                  className={'nav-link'}
-                  title="Bộ sưu tập"
-                  id="collasible-nav-dropdown"
-                >
-                  <NavDropdown.Item href="#action/3.1">Action</NavDropdown.Item>
-                  <NavDropdown.Item href="#action/3.2">
-                    Another action
-                  </NavDropdown.Item>
-                  <NavDropdown.Item href="#action/3.3">
-                    Something
-                  </NavDropdown.Item>
-                  <NavDropdown.Divider />
-                  <NavDropdown.Item href="#action/3.4">
-                    Separated link
-                  </NavDropdown.Item>
-                </NavDropdown>
               </Nav>
               {
                 //! Nav
               }
               <Nav className="justify-content-end flex-grow-1 pe-3">
                 {isAdmin ? (
-                  <NavLink className="nav-link" to={'/admin/products'}>
-                    Quản lý Sản phẩm
-                  </NavLink>
+                  <>
+                    <NavLink className="nav-link" to={'/admin/products'}>
+                      Quản lý Sản phẩm
+                    </NavLink>
+                    <NavLink className="nav-link" to={'/cart'}>
+                      <strong className="orders-badge" {...badgeProps}>
+                        {/* <Cartstrongcon size="1.5rem" /> */}
+                        Mua hộ
+                      </strong>
+                    </NavLink>
+                  </>
                 ) : (
                   <NavLink className={'nav-link'} to={`/cart`}>
                     <i className="orders-badge" {...badgeProps}>

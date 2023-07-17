@@ -1,76 +1,24 @@
-import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-//! imp services
-import cartService from './services/cartService';
-
-export const getCart = createAsyncThunk(
-  '/cart/getCart',
-  async (_, thunkAPI) => {
-    try {
-      const response = await cartService.getCart();
-      return thunkAPI.fulfillWithValue(response);
-    } catch (error) {
-      return thunkAPI.rejectWithValue({
-        message: error.message,
-        response: {
-          data: error.response.data,
-          status: error.response.status,
-          statusText: error.response.statusText,
-        },
-      });
-    }
-  }
-);
-
-export const postCart = createAsyncThunk(
-  '/cart/postCart',
-  async (_, thunkAPI) => {
-    try {
-      const cartItems = thunkAPI.getState().cart?.cartItems;
-      const response = await cartService.postCart({ cartItems });
-
-      return thunkAPI.fulfillWithValue(response);
-    } catch (error) {
-      return thunkAPI.rejectWithValue({
-        message: error.message,
-        response: {
-          data: error.response.data,
-          status: error.response.status,
-          statusText: error.response.statusText,
-        },
-      });
-    }
-  }
-);
+import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
+//! imp APIs
+import API from "../../API";
 
 const initialState = {
   cartItems: [],
   loading: false,
   error: null,
 };
-/*
-cartItems: [
-  {
-    producId: string,
-    quantity: number,
-    title,
-    image,
-    price
-  },
-  ...
-]
-*/
+
 const CartSlice = createSlice({
-  name: 'cart',
+  name: "cart",
   initialState: initialState,
   reducers: {
     addToCart: (state, action) => {
-      const cartItem = state.cartItems?.find(
+      const itemIndex = state.cartItems.findIndex(
         (item) => item.product === action.payload.product
       );
 
-      if (cartItem) {
-        //! cartItem --refer--> object
-        cartItem.quantity++;
+      if (itemIndex >= 0) {
+        state.cartItems[itemIndex].quantity++;
       } else {
         state.cartItems?.push({
           ...action.payload,
@@ -144,3 +92,43 @@ export const {
 const reducer = CartSlice.reducer;
 
 export default reducer;
+
+export const getCart = createAsyncThunk(
+  "/cart/getCart",
+  async (_, thunkAPI) => {
+    try {
+      const response = await API.cart.getCart();
+      return thunkAPI.fulfillWithValue(response);
+    } catch (error) {
+      return thunkAPI.rejectWithValue({
+        message: error.message,
+        response: {
+          data: error.response.data,
+          status: error.response.status,
+          statusText: error.response.statusText,
+        },
+      });
+    }
+  }
+);
+
+export const postCart = createAsyncThunk(
+  "/cart/postCart",
+  async (_, thunkAPI) => {
+    try {
+      const cartItems = thunkAPI.getState().cart?.cartItems;
+      const response = await API.cart.postCart({ cartItems });
+
+      return thunkAPI.fulfillWithValue(response);
+    } catch (error) {
+      return thunkAPI.rejectWithValue({
+        message: error.message,
+        response: {
+          data: error.response.data,
+          status: error.response.status,
+          statusText: error.response.statusText,
+        },
+      });
+    }
+  }
+);

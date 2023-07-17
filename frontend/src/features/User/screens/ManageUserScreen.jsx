@@ -6,7 +6,7 @@ import { toast } from 'react-toastify';
 import { useItemsPerPage } from '../../../hooks/itemsPerPage';
 import { useScrollPosition, scrollToTop } from '../../../hooks/scroll';
 //! imp Actions
-import { getUsersByFilters } from '../UserSlice';
+import { getUsersByFilters, clearNotification } from '../UserSlice';
 //! imp Services
 import userService from '../services/userService';
 import { DELETE_USERS, RESET_PASSWORDS } from '../services/actionTypes';
@@ -14,7 +14,7 @@ import { DELETE_USERS, RESET_PASSWORDS } from '../services/actionTypes';
 import BreadcrumbComponent from '../../../components/Breadcrumb/BreadcrumbComponent';
 import ConfirmationModalComponent from '../../../components/Modal/ConfirmationModalComponent';
 import PaginationComponent from '../../../components/Pagination/PaginationComponent';
-import ToolbarSearchComponent from '../../../components/Toolbars/ToolbarSearchComponent';
+import ToolbarSearchComponent from '../components/Toolbars/ToolbarSearchComponent';
 import AdminUserCard from '../components/Card/AdminUserCard';
 //! imp Comps/Modals
 import AlertDismissibleComponent from '../../../components/Alert/AlertDismissibleComponent';
@@ -38,13 +38,14 @@ const ManageUserScreen = () => {
   ];
 
   // rootState
-  const user = useSelector((state) => state.user);
+  const { users, usersCount, user, loading, success, message, error } =
+    useSelector((state) => state.user);
 
   const [actionType, setActionType] = React.useState('');
 
   //! localState: search/pagination
   const [search, setSearch] = React.useState({ keyword: '', age: '' });
-  const [sort, setSort] = React.useState('createdAt');
+  const [sort, setSort] = React.useState('updatedAt');
   const [order, setOrder] = React.useState(-1);
   const [currentPage, setCurrentPage] = React.useState(1);
 
@@ -53,14 +54,14 @@ const ManageUserScreen = () => {
 
   //! localState: Modal
   const [showModal, setShowModal] = React.useState(false);
-  const [modalOptions, setModalOptions] = React.useState({
+  const [modalOpts, setModalOpts] = React.useState({
     variant: '',
     title: '',
     message: '',
   });
   //! localState: Alert
   const [showAlert, setShowAlert] = React.useState(false);
-  const [alertOptions, setAlertOptions] = React.useState({
+  const [alertOpts, setAlertOpts] = React.useState({
     variant: 'success',
     title: '',
     message: '',
@@ -71,6 +72,30 @@ const ManageUserScreen = () => {
     //! effect
     loadUsersByFilters();
   }, [currentPage, itemsPerPage]);
+
+  React.useEffect(() => {
+    if (success && message) {
+      setAlertOpts({
+        variant: 'success',
+        title: 'Thông báo',
+        message: message,
+      });
+
+      handleShowAlert();
+    }
+    if (success === false && error) {
+      setAlertOpts({
+        variant: 'danger',
+        title: 'Lỗi hệ thống',
+        message: error,
+      });
+
+      handleShowAlert();
+    }
+    return () => {
+      dispatch(clearNotification());
+    };
+  }, [success, message, error]);
 
   const loadUsersByFilters = () => {
     dispatch(
@@ -89,14 +114,14 @@ const ManageUserScreen = () => {
     setActionType(actionType);
 
     const selectedUsers = ids?.map(
-      (id) => user.entities.find((entity) => entity._id === id) //! userObject
+      (id) => users.find((user) => user._id === id) //! userObject
     );
 
     switch (actionType) {
       /* REMOVE USER ACCOUNT */
       case DELETE_USERS:
         //! set Modal style Single or Multiple
-        setModalOptions({
+        setModalOpts({
           variant: 'danger',
           title: `Xác nhận xóa ${
             selectedUsers.length > 1 ? 'nhiều' : ''
@@ -117,7 +142,7 @@ const ManageUserScreen = () => {
       /* RESET PASSWORD */
       case RESET_PASSWORDS:
         //! set Modal style Single or Multiple
-        setModalOptions({
+        setModalOpts({
           variant: 'warning',
           title: `Xác nhận Reset password ${
             selectedUsers.length > 1 ? 'nhiều' : ''
@@ -153,7 +178,7 @@ const ManageUserScreen = () => {
         const response = await userService.deleteUsers(selectedIds);
         const results = response.data.results;
         //! set Alert style
-        setAlertOptions({
+        setAlertOpts({
           variant: 'success',
           title: response.message,
           message: `Bạn đã xóa ${
@@ -166,7 +191,7 @@ const ManageUserScreen = () => {
         var results = response.data.results;
 
         //! set Alert style
-        setAlertOptions({
+        setAlertOpts({
           variant: 'success',
           title: 'Reset password thành công',
           message: `Bạn đã reset password ${
@@ -184,13 +209,14 @@ const ManageUserScreen = () => {
       scrollToTop();
     } catch (error) {
       //! Error Handling Slice
-      setAlertOptions({
+      setAlertOpts({
         variant: 'danger',
         title: 'Lỗi hệ thống',
         message:
           error.response?.data?.message ||
           error.response?.message ||
-          error.message,
+          error.message ||
+          error,
       });
       setShowAlert(true);
       toast.error(error.response?.message || error.massage);
@@ -232,9 +258,9 @@ const ManageUserScreen = () => {
       <AlertDismissibleComponent
         handleHideAlert={handleHideAlert}
         show={showAlert}
-        variant={alertOptions.variant}
-        title={alertOptions.title}
-        message={alertOptions.message}
+        variant={alertOpts.variant}
+        title={alertOpts.title}
+        message={alertOpts.message}
         alwaysShown={true}
       />
 
@@ -250,14 +276,11 @@ const ManageUserScreen = () => {
         {
           //! Container that in main (App-index.js)
         }
-        {user.entities?.length > 0 &&
-          user.entities?.map((entity) => {
+        {users?.length > 0 &&
+          users?.map((user) => {
             return (
-              <Col key={entity._id} xs={6} sm={4} md={4} lg={3}>
-                <AdminUserCard
-                  entity={entity}
-                  handleOpenModal={handleOpenModal}
-                />
+              <Col key={user._id} xs={6} sm={4} md={4} lg={3}>
+                <AdminUserCard user={user} handleOpenModal={handleOpenModal} />
               </Col>
             );
           })}
@@ -265,17 +288,17 @@ const ManageUserScreen = () => {
       <div className="d-flex justify-content-center">
         <PaginationComponent
           currentPage={currentPage}
-          itemsCount={user.entitiesCount}
+          itemsCount={usersCount}
           itemsPerPage={itemsPerPage}
           setCurrentPage={setCurrentPage}
         />
       </div>
       <ConfirmationModalComponent
         showModal={showModal}
-        variant={modalOptions.variant}
-        title={modalOptions.title}
-        nameButton={modalOptions.nameButton}
-        message={modalOptions.message}
+        variant={modalOpts.variant}
+        title={modalOpts.title}
+        nameButton={modalOpts.nameButton}
+        message={modalOpts.message}
         handleHideModal={handleHideModal}
         handleSubmit={handleSubmit}
       />

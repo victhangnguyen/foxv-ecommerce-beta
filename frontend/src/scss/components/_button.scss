@@ -2,6 +2,11 @@
 .btn-EllipsisV {
   width: 2rem;
   height: 2rem;
+  border: solid white 3px;
+  &:hover {
+    border: solid white 1px;
+    background-color: white;
+  }
 }
 
 //! Back-To-Top Butotn
@@ -31,4 +36,13 @@
 
 .back-to-top-btn svg {
   font-size: 23px;
+}
+
+.control-quantity {
+  .btn:disabled,
+  .btn.disabled,
+  fieldset:disabled .btn {
+    cursor: pointer;
+    pointer-events: visible;
+  }
 }

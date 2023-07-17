@@ -1,30 +1,52 @@
-import slugify from 'slugify';
-import config from '../config/index.js';
-import path from 'path';
-import { validationResult } from 'express-validator';
+import _ from "lodash";
+import mongoose from "mongoose";
+import slugify from "slugify";
+import config from "../config/index.js";
+import path from "path";
 
 //! imp Library
-import Logging from '../library/Logging.js';
-
+import Logging from "../library/Logging.js";
 //! imp Utils
-import * as fileHelper from '../utils/file.js';
+import * as fileHelper from "../utils/file.js";
+import { execWithTransaction } from "../utils/transaction.js";
+import { getFileNameFromURL } from "../utils/url.js";
 
 //! imp Models
-import Product from '../models/Product.js';
+import Product from "../models/Product.js";
+//! imp Services
+import productService from "../services/productService.js";
 
 const baseURL = config.db.server.baseURL;
 const port = config.db.server.port;
 
-export const getProduct = async (req, res, next) => {
+export const getProductById = async (req, res, next) => {
   const productId = req.params.productId;
+  console.log(
+    "__Debugger__product\n__getProductById__productId: ",
+    productId,
+    "\n"
+  );
   try {
+    if (!mongoose.Types.ObjectId.isValid(productId)) {
+      throw new Error("Product does not exist!");
+    }
+
     const product = await Product.findById(productId)
-      .populate('category')
-      .populate('subCategories')
+      .populate("category")
+      .populate("subCategories")
       .exec();
-    res.status(200).json(product);
+
+    if (!product) {
+      throw new Error("Product does not exist!");
+    }
+
+    res.status(200).json({
+      success: true,
+      message: "Get a Product by id successful!",
+      data: { product },
+    });
   } catch (error) {
-    Logging.error('Error__ctrls__product: ' + error);
+    Logging.error("Error__ctrls__product: " + error);
     const err = new Error(error);
     err.statusCode = 400;
     return next(err);
@@ -35,19 +57,19 @@ export async function getProductBySlug(req, res, next) {
   const slug = req.params.slug;
   try {
     const product = await Product.findOne({ slug })
-      .populate('category')
-      .populate('subCategories')
+      .populate("category")
+      .populate("subCategories")
       .exec();
     if (!product) {
-      throw new Error('Product does not exist!');
+      throw new Error("Product does not exist!");
     }
     res.status(200).json({
       success: true,
-      message: 'Get Product by Slug successful!',
+      message: "Get Product by Slug successful!",
       data: { product },
     });
   } catch (error) {
-    Logging.error('Error__ctrls__product: ' + error);
+    Logging.error("Error__ctrls__product: " + error);
     const err = new Error(error);
     err.statusCode = 400;
     return next(err);
@@ -57,20 +79,7 @@ export async function getProductBySlug(req, res, next) {
 export const getProducts = async (req, res, next) => {
   try {
   } catch (error) {
-    Logging.error('Error__ctrls__product: ' + error);
-    const err = new Error(error);
-    err.statusCode = 400;
-    return next(err);
-  }
-};
-
-export const productsCount = async (req, res, next) => {
-  try {
-    const total = await Product.find({}).estimatedDocumentCount().exec();
-    console.log('__Debugger__ctrls/product/productsCount__total: ', total);
-    res.status(200).json(total);
-  } catch (error) {
-    Logging.error('Error__ctrls__product: ' + error);
+    Logging.error("Error__ctrls__product: " + error);
     const err = new Error(error);
     err.statusCode = 400;
     return next(err);
@@ -89,297 +98,7 @@ export const getProductList = async (req, res, next) => {
     const products = await Product.find({})
       .sort([
         [sort, order],
-        ['_id', 'desc'],
-      ])
-      .skip((page - 1) * perPage)
-      .limit(perPage)
-      .exec();
-
-    res.status(200).json(products);
-  } catch (error) {
-    Logging.error('Error__ctrls__product: ' + error);
-    const err = new Error(error);
-    err.statusCode = 400;
-    return next(err);
-  }
-};
-
-export const createProduct = async (req, res, next) => {
-  let images = req.files;
-  try {
-    //! Error Handling
-    const errors = validationResult(req);
-
-    if (!errors.isEmpty()) {
-      console.log(
-        '__Debugger__product\n__createProduct__errors: ',
-        errors,
-        '\n'
-      );
-      console.log(errors);
-      // throw new Error()
-    }
-
-    if (!req.body.category) req.body.category = null;
-    req.body.slug = slugify(req.body.name);
-
-    if (images.length < 1) {
-      throw new Error('Chưa đính kèm tập tin hình ảnh!');
-    }
-
-    images = images.map((img) => img.filename);
-
-    const product = await Product.create({
-      ...req.body,
-      images,
-      // creator: req.userId, //! creator nên tạo ở backend để bảo mật
-    });
-
-    return res.status(201).json(product);
-  } catch (error) {
-    Logging.error('Error__ctrls__product: ' + error);
-    const err = new Error(error);
-    err.statusCode = 400;
-    return next(err);
-  }
-};
-
-export const updateProduct = async (req, res, next) => {
-  //! Frontend put Empty Array or Image Array
-  const productId = req.params.productId;
-  let { images, ...otherProps } = req.body;
-
-  console.log('__Debugger__product\n__updateProduct__images: ', images, '\n');
-  try {
-    let newProduct;
-    req.body.slug = slugify(req.body.name);
-
-    const isExistImages = images.length;
-    if (isExistImages) {
-      images = images.map((img) => img.filename);
-      newProduct = { ...otherProps, images };
-      //! Delete old-images
-      const product = await Product.findById(productId);
-      if (!product) {
-        throw new Error('Product not found!');
-      }
-
-      const fileDir = path.join(fileHelper.rootDir, 'images', 'products');
-      const files = product.images;
-
-      const deletedFiles = await fileHelper.deleteFiles(fileDir, files);
-      Logging.info(deletedFiles);
-    } else {
-      newProduct = { ...otherProps };
-    }
-
-    const updatedProduct = await Product.findByIdAndUpdate(
-      productId,
-      newProduct,
-      {
-        new: true,
-      }
-    );
-
-    return res.status(201).json(updatedProduct);
-  } catch (error) {
-    Logging.error('Error__ctrls__product: ' + error);
-    const err = new Error(error);
-    err.statusCode = 400;
-    return next(err);
-  }
-};
-
-export const removeProduct = async (req, res, next) => {
-  const productId = req.params.productId;
-
-  try {
-    //! delete database -> delete Files
-    const product = await Product.findById(productId);
-    if (!product) {
-      throw new Error('Product not found!');
-    }
-
-    const fileDir = path.join(fileHelper.rootDir, 'images', 'products');
-    const files = product.images;
-
-    const deletedFiles = await fileHelper.deleteFiles(fileDir, files);
-    Logging.info(deletedFiles);
-
-    const response = await Product.findByIdAndRemove(productId).exec();
-
-    res.status(200).json(response);
-  } catch (error) {
-    Logging.error('Error__ctrls__product: ' + error);
-    const err = new Error(error);
-    err.statusCode = 400;
-    return next(err);
-  }
-};
-
-export const removeProducts = async (req, res, next) => {
-  const productIds = req.query.ids;
-  console.log('productIds: ', productIds);
-  try {
-    if (!productIds.length) return; //! exists productIds
-
-    const deletedProductQuene = productIds.map((productId) => {
-      return new Promise((resolve, reject) => {
-        Product.findById(productId).then((productDoc) => {
-          if (!productDoc) {
-            reject('Product not found!');
-          }
-          const fileDir = path.join(fileHelper.rootDir, 'images', 'products');
-          const files = productDoc.images;
-
-          fileHelper
-            .deleteFiles(fileDir, files)
-            .then((deletedFiles) => {
-              resolve(deletedFiles);
-            })
-            .catch((error) => {
-              console.log(error);
-            });
-        });
-      }).catch((error) => {
-        console.log(error);
-      });
-    });
-
-    await Promise.all(deletedProductQuene)
-      .then((deletedFile) => {
-        Logging.info(deletedFile);
-      })
-      .catch((error) => {
-        Logging.error(error);
-      });
-
-    const deletedProducts = await Product.deleteMany({
-      _id: { $in: productIds },
-    });
-
-    res.status(200).json(deletedProducts);
-  } catch (error) {
-    Logging.error('Error__ctrls__product: ' + error);
-    const err = new Error(error);
-    err.statusCode = 400;
-    return next(err);
-  }
-};
-
-//! Search: Query
-const handleSearchQuery = async (req, res, next) => {
-  const { search, sort, order, page, perPage } = req.body;
-  try {
-    const products = await Product.find({ $text: { $search: search.text } })
-      .populate('category', '_id name')
-      .populate('subCategories', '_id name')
-      .populate('creator', '_id name')
-      .sort([
-        [sort, order],
-        ['_id', 'desc'],
-      ])
-      .skip((page - 1) * perPage)
-      .limit(perPage)
-      .exec();
-
-    const productsCount = await Product.find({
-      $text: { $search: search.text },
-    }).count();
-
-    return res.status(200).json({ products, productsCount });
-  } catch (error) {
-    Logging.error('Error__ctrls__product: ' + error);
-    res.status(400).json({ message: error.message });
-  }
-};
-
-//! Search: Price
-const handleSearchPrice = async (req, res, next) => {
-  const { search, sort, order, page, perPage } = req.body;
-  try {
-    const priceGte = search.price.split('-')[0];
-    const priceLte = search.price.split('-')[1];
-
-    const products = await Product.find({
-      price: {
-        $gte: priceGte,
-        $lte: priceLte,
-      },
-    })
-      .populate('category', '_id name')
-      .populate('subCategories', '_id name')
-      .populate('creator', '_id name')
-      .sort([
-        [sort, order],
-        ['_id', 'desc'],
-      ])
-      .skip((page - 1) * perPage)
-      .limit(perPage)
-      .exec();
-
-    const productsCount = await Product.find({
-      price: {
-        $gte: priceGte,
-        $lte: priceLte,
-      },
-    }).count();
-
-    return res.status(200).json({ products, productsCount });
-  } catch (error) {
-    Logging.error('Error__ctrls__product: ' + error);
-    const err = new Error(error);
-    err.statusCode = 400;
-    return next(err);
-  }
-};
-
-//! Search: Category
-const handleSearchCategory = async (req, res, next) => {
-  const { search, sort, order, page, perPage } = req.body;
-  const categoryId = search.category;
-  try {
-    const products = await Product.find({ category: categoryId })
-      .populate('category', '_id name')
-      .populate('subCategories', '_id name')
-      .populate('creator', '_id name')
-      .sort([
-        [sort, order],
-        ['_id', 'desc'],
-      ])
-      .skip((page - 1) * perPage)
-      .limit(perPage)
-      .exec();
-
-    const productsCount = await Product.find({ category: categoryId }).count();
-
-    return res.status(200).json({ products, productsCount });
-  } catch (error) {
-    Logging.error('Error__ctrls__product: ' + error);
-    const err = new Error(error);
-    err.statusCode = 400;
-    return next(err);
-  }
-};
-
-export const getProductsByFilters = async (req, res, next) => {
-  const { search, sort, order, page, perPage } = req.body;
-  try {
-    if (search.text) {
-      return await handleSearchQuery(req, res, next);
-    }
-    if (search.price) {
-      return await handleSearchPrice(req, res, next);
-    }
-    if (search.category) {
-      return await handleSearchCategory(req, res, next);
-    }
-
-    //! default
-    let products = await Product.find()
-      .sort([
-        [sort, order],
-        ['_id', 'desc'],
+        ["_id", "desc"],
       ])
       .skip((page - 1) * perPage)
       .limit(perPage)
@@ -389,11 +108,351 @@ export const getProductsByFilters = async (req, res, next) => {
       .estimatedDocumentCount()
       .exec();
 
-    res.status(200).json({ products, productsCount });
+    return res.status(200).json({
+      success: true,
+      message: "Get Product List sucessful!",
+      data: { products, productsCount },
+    });
   } catch (error) {
-    Logging.error('Error__ctrls__product: ' + error);
+    Logging.error("Error__ctrls__product: " + error);
     const err = new Error(error);
     err.statusCode = 400;
     return next(err);
   }
 };
+
+export const createProduct = async (req, res, next) => {
+  const images = req.files;
+
+  try {
+    //! initialValues
+    if (!req.body.category) req.body.category = null;
+
+    if (images?.length < 1) {
+      throw new Error("Chưa đính kèm tập tin hình ảnh!");
+    }
+
+    const productData = {
+      ...req.body,
+      images: images?.map(
+        (img) => `${baseURL}:${port}/images/products/${img.filename}`
+      ),
+    };
+
+    const product = await execWithTransaction(async (session) => {
+      const result = await productService.createProduct(productData, session);
+
+      return result;
+    });
+
+    return res.status(201).json({
+      success: true,
+      messsage: "Create a new product successfull!",
+      data: { product },
+    });
+  } catch (error) {
+    Logging.error("Error__ctrls__product: " + error);
+    const err = new Error(error);
+    err.statusCode = 400;
+    return next(err);
+  }
+};
+
+//! @desc     Update One Product
+//! @route    PUT /api/products/:productId/update
+//! @access   Admin
+export const updateProductById = async (req, res, next) => {
+  //! Frontend put Empty Array or Image Array
+  const productId = req.params.productId;
+  let { images, imagesArray, ...otherProps } = req.body;
+  try {
+    const product = await Product.findById(productId);
+    if (!product) {
+      throw new Error("Product not found!");
+    }
+
+    const updatedProduct = await execWithTransaction(async (session) => {
+      const currentImagesArray = product.images;
+      const imageUrlsArray = imagesArray
+        .filter((imgObj) => imgObj.type?.includes("url"))
+        .map((imgObj) => imgObj.image);
+
+      const isDifferenceArray = _.difference(
+        currentImagesArray,
+        imageUrlsArray
+      ); // => Delete function
+
+      const isExistImages = images?.length; //! => Edit, Add function
+
+      let productData;
+      let fileDir, files;
+
+      if (isExistImages || isDifferenceArray) {
+        //! Update Information and Images
+        //! update images prop
+
+        const updatedImages = imagesArray.map((imageObj) => {
+          if (imageObj.type?.includes("image")) {
+            //! File => get image url
+            //! update File base on index of Arrray
+            const imgObsArray = imagesArray?.filter((imgObj) =>
+              imgObj.type?.includes("image")
+            );
+            const imageIndex = imgObsArray.findIndex(
+              (imgObj) => imageObj.lastModified === imgObj.lastModified
+            );
+            const imageName = images[imageIndex].filename;
+
+            return `${baseURL}:${port}/images/products/${imageName}`;
+          } else {
+            return imageObj.image;
+          }
+        });
+
+        productData = { ...otherProps, images: updatedImages };
+
+        //! Check images-link
+        fileDir = path.join(fileHelper.rootDir, "images", "products");
+        const currentImages = product.images;
+        //! get the Difference url
+        const deletedImages = _.difference(currentImages, updatedImages);
+        console.log(
+          "__Debugger__product\n__updateProductById__currentImages: ",
+          currentImages,
+          "\n"
+        );
+        console.log(
+          "__Debugger__product\n__updateProductById__updatedImages: ",
+          updatedImages,
+          "\n"
+        );
+        files = deletedImages.map((url) => getFileNameFromURL(url));
+
+        const isReadable = await fileHelper.checkFilesPermission(
+          fileDir,
+          files
+        );
+      } else {
+        //! only Update Infomation
+        productData = { ...otherProps };
+      }
+
+      const result = await productService.updateProductById(
+        productId,
+        productData,
+        session
+      );
+
+      if (isExistImages) {
+        //! Delete old-images after Check images-link
+        const deletedFiles = await fileHelper.deleteFiles(fileDir, files);
+        Logging.info(deletedFiles);
+      }
+
+      return result;
+    });
+
+    // const updatedProduct = await Product.findByIdAndUpdate(
+    //   productId,
+    //   productData,
+    //   {
+    //     new: true,
+    //   }
+    // );
+
+    return res.status(201).json(updatedProduct);
+  } catch (error) {
+    Logging.error("Error__ctrls__product: " + error);
+    const err = new Error(error);
+    err.statusCode = 400;
+    return next(err);
+  }
+};
+
+export const deleteProductById = async (req, res, next) => {
+  const productId = req.query.productId;
+  try {
+    const product = await Product.findById(productId);
+
+    if (!product) {
+      throw new Error("Product not found!");
+    }
+
+    const deletedProduct = await execWithTransaction(async (session) => {
+      //! Check images-link
+      const fileDir = path.join(fileHelper.rootDir, "images", "products");
+      const files = product.images.map((url) => getFileNameFromURL(url));
+
+      const isFilesPermission = await fileHelper.checkFilesPermission(
+        fileDir,
+        files
+      );
+
+      if (!isFilesPermission) {
+        throw new Error("The file or directory is corrupted and unreadable");
+      }
+
+      const result = await productService.deleteProductById(productId, session);
+
+      const deletedFiles = await fileHelper.deleteFiles(fileDir, files);
+      Logging.info(deletedFiles);
+
+      return result;
+    });
+
+    res.status(200).json({
+      success: true,
+      message: "Delete One Product successful!",
+      data: { deletedProduct },
+    });
+  } catch (error) {
+    Logging.error("Error__ctrls__product: " + error);
+    const err = new Error(error);
+    err.statusCode = 400;
+    return next(err);
+  }
+};
+
+export const deleteProductsByIds = async (req, res, next) => {
+  const productIds = req.query.productIds;
+  console.log("productIds: ", productIds);
+  try {
+    const deletedProducts = await execWithTransaction(async (session) => {
+      if (!productIds.length) return; //! exists productIds
+
+      //! checkDulicate
+      let imageFiles = [];
+
+      const productQuene = productIds.map(async (productId) => {
+        try {
+          const product = await Product.findById(productId);
+          const files = product.images.map((url) => getFileNameFromURL(url));
+
+          files.forEach((file) => {
+            const isExistItem = imageFiles.includes(file);
+            if (isExistItem) {
+              throw new Error("Cannot delete the duplicate images of products");
+            } else {
+              imageFiles.push(file);
+            }
+          });
+
+          //! Check images-link
+          const fileDir = path.join(fileHelper.rootDir, "images", "products");
+          const isFilesPermission = await fileHelper.checkFilesPermission(
+            fileDir,
+            files
+          );
+
+          if (!isFilesPermission) {
+            throw new Error(
+              "The file or directory is corrupted and unreadable"
+            );
+          }
+
+          const deletedProduct = await productService.deleteProductById(
+            productId,
+            session
+          );
+
+          const deletedFiles = await fileHelper.deleteFiles(fileDir, files);
+          Logging.info(deletedFiles);
+
+          return deletedProduct;
+        } catch (error) {
+          throw error;
+        }
+      });
+
+      const deletedProducts = await Promise.all(productQuene);
+
+      res.status(200).json({
+        success: true,
+        message: "Get many products successful!",
+        data: { deletedProducts },
+      });
+    });
+  } catch (error) {
+    Logging.error("Error__ctrls__product: " + error);
+    const err = new Error(error);
+    err.statusCode = 400;
+    return next(err);
+  }
+};
+
+export async function getProductsByFilters(req, res, next) {
+  const { sort, order, page, perPage, keyword, price, category } = req.query;
+
+  try {
+    let match = {};
+
+    //! filterOpt: keyword
+    if (keyword) {
+      match.$or = [
+        { name: new RegExp(keyword, "i") },
+        { status: new RegExp(keyword, "i") },
+        // { category: new RegExp(keyword, 'i') },
+      ];
+    }
+
+    //! filterOpt: price
+    if (price) {
+      const priceGte = price.split("-")[0];
+      const priceLte = price.split("-")[1];
+      match.price = {
+        $gte: +priceGte,
+        $lte: +priceLte,
+      };
+    }
+    //! filterOpt: category
+    if (category) {
+      match.category = mongoose.Types.ObjectId(category);
+    }
+
+    const result = await Product.aggregate([
+      { $match: match },
+      //! populate: category
+      {
+        $lookup: {
+          from: "categories",
+          localField: "category",
+          foreignField: "_id",
+          as: "category",
+        },
+      },
+      {
+        $unwind: "$category",
+      },
+      //! populate: subCategory
+      {
+        $lookup: {
+          from: "subcategories",
+          localField: "subCategories",
+          foreignField: "_id",
+          as: "subCategories",
+        },
+      },
+      { $sort: { [sort]: +order, _id: 1 } },
+      {
+        $facet: {
+          products: [{ $skip: (page - 1) * perPage }, { $limit: +perPage }],
+          productsCount: [{ $count: "count" }],
+        },
+      },
+    ]).exec();
+
+    const products = result[0].products;
+    const productsCount = result[0].productsCount[0]?.count || 0;
+
+    res.status(200).json({
+      success: true,
+      message: "Get many products successful!",
+      data: { products, productsCount },
+    });
+  } catch (error) {
+    Logging.error("Error__ctrls__product: " + error);
+    const err = new Error(error);
+    err.statusCode = 400;
+    return next(err);
+  }
+}

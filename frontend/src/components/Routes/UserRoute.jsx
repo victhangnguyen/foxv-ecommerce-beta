@@ -27,9 +27,11 @@ const UserRoute = ({ children, privateProtect }) => {
   }
 
   if (!isAllowed) {
-    if (dest === 'update') {
-      return <Navigate to={`/users/${user._id}/update`} replace />;
-    }
+    //! ##error: Xuat hien loi khong tim thay _id
+    // if (dest === 'update') { 
+    //   return <Navigate to={`/users/${user._id}/update`} replace />;
+    // }
+    
     //! defaults
     return <Navigate to="/" replace />;
   }
