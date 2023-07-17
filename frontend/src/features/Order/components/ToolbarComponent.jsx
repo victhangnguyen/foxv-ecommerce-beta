@@ -1,12 +1,12 @@
-import React from 'react';
-import _ from 'lodash';
-import { Row, Col, Form, Button } from 'react-bootstrap';
-import { useDispatch, useSelector } from 'react-redux';
-import { toast } from 'react-toastify';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import React from "react";
+import _ from "lodash";
+import { Row, Col, Form, Button } from "react-bootstrap";
+import { useDispatch, useSelector } from "react-redux";
+import { toast } from "react-toastify";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 //! imp Constants
-import constants from '../../../constants';
+import constants from "../../../constants";
 
 const ToolbarComponent = ({
   isCheckAll,
@@ -27,7 +27,7 @@ const ToolbarComponent = ({
   }
 
   function handleKeyDownSearch(event) {
-    if (event.key === 'Enter') {
+    if (event.key === "Enter") {
       handleClickSearch();
     }
   }
@@ -41,12 +41,15 @@ const ToolbarComponent = ({
               <input
                 className="form-check-input"
                 type="checkbox"
-                id="chkSelectAll"
+                id="chk-select-all-order"
                 checked={isCheckAll}
                 onChange={handleCheckAllChange}
               />
-              <label className="form-check-label" htmlFor="chkSelectAll">
-                {isCheckAll ? 'Bỏ chọn tất cả' : 'Chọn tất cả  '}
+              <label
+                className="form-check-label"
+                htmlFor="chk-select-all-order"
+              >
+                {isCheckAll ? "Bỏ chọn tất cả" : "Chọn tất cả  "}
               </label>
             </div>
           </div>
@@ -76,6 +79,7 @@ const ToolbarComponent = ({
       </Col>
       <Col xs={12} md={9} className="d-flex">
         <Form.Control
+          id={"form-control-order"}
           className="form-control me-1"
           type="search"
           placeholder="Tìm theo Họ và tên, Địa chỉ, Tình trạng..."

@@ -1,20 +1,25 @@
-import React from 'react';
-import _ from 'lodash';
-import { toast } from 'react-toastify';
-import { useDispatch, useSelector } from 'react-redux';
-import { useNavigate, useParams } from 'react-router-dom';
+import React from "react";
+import _ from "lodash";
+import { toast } from "react-toastify";
+import { useDispatch, useSelector } from "react-redux";
+import { useNavigate, useParams } from "react-router-dom";
 //! imp Utils
-import { parseIntlNumber } from '../../../utils/parse';
+import { parseIntlNumber } from "../../../utils/parse";
 //! imp Constants
-import constants from '../../../constants';
+import constants from "../../../constants";
 //! imp Comps
-import AlertDismissibleComponent from '../../../components/Alert/AlertDismissibleComponent';
-import OrderFormComponent from '../components/OrderFormComponent';
+import AlertDismissibleComponent from "../../../components/Alert/AlertDismissibleComponent";
+import OrderFormComponent from "../components/OrderFormComponent";
 //! imp Actions
-import { emptyCart } from '../../Cart/CartSlice';
-import { emptyNewOrder, getOrderById, updateOrder } from '../OrderSlice';
+import { emptyCart } from "../../Cart/CartSlice";
+import {
+  emptyNewOrder,
+  getOrderById,
+  updateOrder,
+  clearNotification,
+} from "../OrderSlice";
 //! imp API
-import API from '../../../API';
+import API from "../../../API";
 
 const AddEditOrderScreen = ({ entity }) => {
   const dispatch = useDispatch();
@@ -22,19 +27,42 @@ const AddEditOrderScreen = ({ entity }) => {
   const { orderId } = useParams();
 
   //! rootState
-  const order = useSelector((state) => state.order);
+  const { order, newOrder, loading, success, message, error } = useSelector(
+    (state) => state.order
+  );
 
   //! localState: alert
   const [showAlert, setShowAlert] = React.useState(false);
   const [alertOpts, setAlertOpts] = React.useState({
-    variant: '',
-    title: '',
-    message: '',
+    variant: "",
+    title: "",
+    message: "",
   });
 
   React.useEffect(() => {
     loadOrderById(orderId);
   }, [orderId]);
+
+  React.useEffect(() => {
+    if (success && message) {
+      setAlertOpts({
+        variant: "success",
+        title: "Thông báo",
+        message: message,
+      });
+    }
+    if (success === false && error) {
+      setAlertOpts({
+        variant: "danger",
+        title: "Lỗi hệ thống",
+        message: error,
+      });
+    }
+    handleShowAlert();
+    return () => {
+      dispatch(clearNotification());
+    };
+  }, [success, message, error]);
 
   //! handle newOrder (createdOrder)
   React.useLayoutEffect(() => {
@@ -63,7 +91,7 @@ const AddEditOrderScreen = ({ entity }) => {
             break;
         }
       } catch (error) {
-        console.log('Error: ', error);
+        console.log("Error: ", error);
       }
     }
 
@@ -74,7 +102,7 @@ const AddEditOrderScreen = ({ entity }) => {
     try {
       const response = await dispatch(getOrderById(orderId));
     } catch (error) {
-      console.log('Error: ', error);
+      console.log("Error: ", error);
     }
   }
 
@@ -82,7 +110,7 @@ const AddEditOrderScreen = ({ entity }) => {
     const isEqualData = _.isEqual(initialValues, data);
 
     if (isEqualData) {
-      return toast.error('Chưa có thông tin nào thay đổi.');
+      return toast.error("Chưa có thông tin nào thay đổi.");
     }
 
     try {
@@ -90,7 +118,7 @@ const AddEditOrderScreen = ({ entity }) => {
         updateOrder({ orderId, orderData: data })
       ).unwrap();
       if (response.success) {
-        navigate('/admin/orders', { replace: true });
+        navigate("/admin/orders", { replace: true });
       }
     } catch (error) {
       //! Error Handling 422
@@ -99,7 +127,7 @@ const AddEditOrderScreen = ({ entity }) => {
         if (!errors?.length) return;
         errors.forEach((error) => {
           methods.setError(error.param, {
-            type: 'server',
+            type: "server",
             message: error.msg,
           });
         });
@@ -109,8 +137,8 @@ const AddEditOrderScreen = ({ entity }) => {
 
       //! Error Handling Other
       setAlertOpts({
-        variant: 'danger',
-        title: 'Lỗi hệ thống',
+        variant: "danger",
+        title: "Lỗi hệ thống",
         message:
           error.response?.data?.message ||
           error.response?.message ||
@@ -123,7 +151,7 @@ const AddEditOrderScreen = ({ entity }) => {
   }
 
   function handleClickCancel() {
-    navigate('/admin/orders', { replace: true });
+    navigate("/admin/orders", { replace: true });
   }
 
   function handleShowAlert() {
@@ -135,14 +163,14 @@ const AddEditOrderScreen = ({ entity }) => {
   }
 
   const initialValues = {
-    orderId: order.order?._id,
-    userId: order.order?.user,
-    name: order.order?.name,
-    address: order.order?.address,
-    orderDate: order.order?.orderDate,
-    status: order.order?.status,
-    transactionNo: order.order?.transactionNo,
-    bankTranNo: order.order?.bankTranNo,
+    orderId: order?._id,
+    userId: order?.user,
+    name: order?.name,
+    address: order?.address,
+    orderDate: order?.orderDate,
+    status: order?.status,
+    transactionNo: order?.transactionNo,
+    bankTranNo: order?.bankTranNo,
   };
 
   return (
@@ -160,7 +188,7 @@ const AddEditOrderScreen = ({ entity }) => {
         <div className="col-md-5 col-lg-5 col-xl-4">
           <div className="p-3">
             <span className="fw-bold">Chi tiết đơn hàng</span>
-            {order.order?.items?.map((item) => (
+            {order?.items?.map((item) => (
               <div
                 key={item.product}
                 className="d-flex justify-content-between mt-2"
@@ -175,7 +203,7 @@ const AddEditOrderScreen = ({ entity }) => {
             <div className="d-flex justify-content-between mt-2">
               <span>Tổng cộng</span>
               <span className="text-success">
-                {parseIntlNumber(order.order?.total)}
+                {parseIntlNumber(order?.total)}
               </span>
             </div>
           </div>

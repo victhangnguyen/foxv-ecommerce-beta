@@ -104,7 +104,23 @@ export const createOrder = async (req, res, next) => {
   try {
     const order = await Order.create(orderData);
 
-    res.status(201).json({
+    if (!orderData.items.length) {
+      throw new Error(
+        "There are no products yet. Please select the product you want to buy."
+      );
+    }
+
+    //!
+    
+
+
+    console.log(
+      "__Debugger__order\n__createOrder__req.body: ",
+      req.body,
+      "\n"
+    );
+
+    return res.status(201).json({
       success: true,
       message: "Create an Order successful!",
       data: { order },
@@ -272,13 +288,12 @@ export async function getInvoice(req, res, next) {
     // Create a document
     const pdfDoc = new PDFDocument();
 
-    res.setHeader('Content-Type', 'application/pdf');
+    res.setHeader("Content-Type", "application/pdf");
     //! This allow us to define How this content should be served to the Cliend (inline or attachment)
     res.setHeader(
-      'Content-Disposition',
+      "Content-Disposition",
       'inline; filename="' + invoiceName + '"'
     );
-
 
     // Pipe its output somewhere, like to a file or HTTP response
     pdfDoc.pipe(fs.createWriteStream(invoicePath));

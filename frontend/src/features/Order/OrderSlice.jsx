@@ -37,16 +37,23 @@ const OrderSlice = createSlice({
           ...action.payload.data.order,
           paymentUrl: action.payload.data.paymentUrl,
         };
+        state.success = true;
       })
       .addCase(checkoutOrder.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload.message;
+        state.success = false;
       });
     builder
       .addCase(createOrder.pending, (state, action) => {
         state.loading = true;
       })
       .addCase(createOrder.fulfilled, (state, action) => {
+        console.log(
+          "__Debugger__OrderSlice\n__createOrder.fulfilled__action.payload: ",
+          action.payload,
+          "\n"
+        );
         state.loading = false;
         state.order = action.payload.data.order;
         state.success = action.payload.success;
@@ -54,7 +61,8 @@ const OrderSlice = createSlice({
       })
       .addCase(createOrder.rejected, (state, action) => {
         state.loading = false;
-        state.success = action.payload.success;
+        // state.success = false;
+        state.success = action.payload.response.data.success;
         state.error = action.payload.message;
       });
     builder
@@ -69,6 +77,7 @@ const OrderSlice = createSlice({
       .addCase(getOrdersByFilters.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload.message;
+        state.success = false;
       });
     builder
       .addCase(getOrderById.pending, (state, action) => {
@@ -81,6 +90,7 @@ const OrderSlice = createSlice({
       .addCase(getOrderById.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload.message;
+        state.success = false;
       });
     builder
       .addCase(deleteOrder.pending, (state, action) => {
@@ -108,7 +118,7 @@ const OrderSlice = createSlice({
       .addCase(deleteOrderByUserId.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload.message;
-        state.success = action.payload.success;
+        state.success = false;
       });
     builder
       .addCase(deleteOrders.pending, (state, action) => {
@@ -136,7 +146,7 @@ const OrderSlice = createSlice({
       .addCase(deleteOrdersByUserId.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload.message;
-        state.success = action.payload.success;
+        state.success = false;
       });
     builder
       .addCase(updateOrder.pending, (state, action) => {
@@ -151,6 +161,7 @@ const OrderSlice = createSlice({
         state.loading = false;
         state.success = action.payload.success;
         state.error = action.payload.message;
+        state.success = false;
       });
     builder
       .addCase(getInvoice.pending, (state, action) => {
@@ -163,8 +174,8 @@ const OrderSlice = createSlice({
       })
       .addCase(getInvoice.rejected, (state, action) => {
         state.loading = false;
-        state.success = action.payload?.success;
         state.error = action.payload?.message;
+        state.success = false;
       });
   },
 });
@@ -238,10 +249,26 @@ export const createOrder = createAsyncThunk(
         bankTranNo,
       });
 
+      console.log(
+        "__Debugger__OrderSlice\n__createOrder__response: ",
+        response,
+        "\n"
+      );
+
       return thunkAPI.fulfillWithValue(response);
     } catch (error) {
+      console.log(
+        "__Debugger__OrderSlice\n__createOrder__error: ",
+        error,
+        "\n"
+      );
+
       return thunkAPI.rejectWithValue({
-        message: error.message,
+        message:
+          error.response?.data?.message ||
+          error.response?.message ||
+          error.message ||
+          error,
         response: {
           data: error.response.data,
           status: error.response.status,

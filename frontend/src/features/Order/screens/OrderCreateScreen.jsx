@@ -1,20 +1,20 @@
-import React from 'react';
-import _ from 'lodash';
-import { toast } from 'react-toastify';
-import { useDispatch, useSelector } from 'react-redux';
-import { useNavigate, useParams } from 'react-router-dom';
+import React from "react";
+import _ from "lodash";
+import { toast } from "react-toastify";
+import { useDispatch, useSelector } from "react-redux";
+import { useNavigate, useParams } from "react-router-dom";
 //! imp Utils
-import { parseIntlNumber } from '../../../utils/parse';
+import { parseIntlNumber } from "../../../utils/parse";
 //! imp Constants
-import constants from '../../../constants';
+import constants from "../../../constants";
 //! imp Comps
-import AlertDismissibleComponent from '../../../components/Alert/AlertDismissibleComponent';
-import OrderFormComponent from '../components/OrderFormComponent';
+import AlertDismissibleComponent from "../../../components/Alert/AlertDismissibleComponent";
+import OrderFormComponent from "../components/OrderFormComponent";
 //! imp Actions
-import { emptyCart } from '../../Cart/CartSlice';
-import { createOrder } from '../OrderSlice';
+import { emptyCart } from "../../Cart/CartSlice";
+import { createOrder, clearNotification } from "../OrderSlice";
 //! imp API
-import API from '../../../API';
+import API from "../../../API";
 
 const OrderCreateScreen = () => {
   const dispatch = useDispatch();
@@ -24,7 +24,11 @@ const OrderCreateScreen = () => {
   const auth = useSelector((state) => state.auth);
   const isAdminController = auth.user?.roles
     ?.map((role) => role.name)
-    .includes('admin');
+    .includes("admin");
+
+  const { order, newOrder, loading, success, message, error } = useSelector(
+    (state) => state.order
+  );
 
   const { cartItems } = useSelector((state) => state.cart);
 
@@ -32,16 +36,36 @@ const OrderCreateScreen = () => {
     (acc, item) => acc + item.quantity * item.price,
     0
   );
-  //! localState: init
-  const [loading, setLoading] = React.useState(false);
 
   //! localState: alert
   const [showAlert, setShowAlert] = React.useState(false);
   const [alertOpts, setAlertOpts] = React.useState({
-    variant: '',
-    title: '',
-    message: '',
+    variant: "",
+    title: "",
+    message: "",
   });
+
+  React.useEffect(() => {
+    if (success && message) {
+      setAlertOpts({
+        variant: "success",
+        title: "Thông báo",
+        message: message,
+      });
+      handleShowAlert();
+    }
+    if (success === false && error) {
+      setAlertOpts({
+        variant: "danger",
+        title: "Lỗi hệ thống",
+        message: error,
+      });
+      handleShowAlert();
+    }
+    return () => {
+      dispatch(clearNotification());
+    };
+  }, [success, message, error]);
 
   async function handleCreateSubmit(data, e, methods) {
     const orderData = {
@@ -56,32 +80,34 @@ const OrderCreateScreen = () => {
     };
 
     try {
-      setLoading(true);
       await dispatch(createOrder(orderData)).unwrap();
 
       //! empty Cart
       dispatch(emptyCart());
-      navigate('/admin/orders', { replace: true });
-      setLoading(false);
+      navigate("/admin/orders", { replace: true });
     } catch (error) {
-      setLoading(false);
+      console.log(
+        "__Debugger__OrderCreateScreen\n__handleCreateSubmit__error: ",
+        error,
+        "\n"
+      );
     }
   }
 
   function handleClickCancel() {
     if (isAdminController) {
-      navigate('/admin/orders');
+      navigate("/admin/orders");
     } else {
-      navigate('/');
+      navigate("/");
     }
   }
 
   function handleShowAlert() {
-    showAlert(true);
+    setShowAlert(true);
   }
 
   function handleHideAlert() {
-    showAlert(false);
+    setShowAlert(false);
   }
 
   const initialValues = {
@@ -91,11 +117,11 @@ const OrderCreateScreen = () => {
   return (
     <div className="container">
       <AlertDismissibleComponent
+        show={showAlert}
+        handleHideAlert={handleHideAlert}
         variant={alertOpts.variant}
         title={alertOpts.title}
         message={alertOpts.message}
-        show={showAlert}
-        handleHideAlert={handleHideAlert}
         alwaysShown={true}
       />
 

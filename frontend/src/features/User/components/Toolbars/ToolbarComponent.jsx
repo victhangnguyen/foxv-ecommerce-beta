@@ -80,11 +80,11 @@ const ToolbarComponent = ({
               <input
                 className="form-check-input"
                 type="checkbox"
-                id="chkSelectAll"
+                id="chkSelectAllUser"
                 checked={isCheckAll}
                 onChange={handleCheckChange}
               />
-              <label className="form-check-label" htmlFor="chkSelectAll">
+              <label className="form-check-label" htmlFor="chkSelectAllUser">
                 {isCheckAll ? 'Bỏ chọn tất cả' : 'Chọn tất cả  '}
               </label>
             </div>
