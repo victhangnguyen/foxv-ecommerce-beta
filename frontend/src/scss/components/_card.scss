@@ -209,7 +209,7 @@ a {
     }
   }
   //! active with card when click addToCart
-  &.active {
+  &.sold {
     .product-links {
       opacity: 1;
       li {
@@ -218,6 +218,22 @@ a {
           animation: none;
           &.btn-disable {
             background-color: $color-secondary;
+          }
+        }
+      }
+    }
+  }
+  &.sold-out {
+    .product-links {
+      opacity: 1;
+      li {
+        button {
+          border: 3px solid #c60000;
+          color: #c60000;
+          background-color: #f4f4f4;
+          animation: none;
+          &.btn-buy-now {
+            opacity: 0;
           }
         }
       }

@@ -80,10 +80,14 @@ userSchema.methods.comparePassword = async function (password) {
 };
 
 userSchema.methods.resetPassword = async function (session) {
-  const newPassword = userService.generatePassword();
-  this.password = newPassword;
-  // this.password = new
-  await this.save({ session });
+  try {
+    const newPassword = userService.generatePassword();
+    this.password = newPassword;
+    // this.password = new
+    await this.save({ session });
+  } catch (error) {
+    throw error;
+  }
 
   return newPassword;
 };

@@ -179,7 +179,7 @@ const ProductDetailScreen = () => {
                     <div className="mb-4">
                       <Button
                         size="sm"
-                        className="me-2"
+                        className={`me-2 ${!product?.quantity ? "d-none" : null}`}
                         variant={isAddedToCard ? "warning" : "primary"}
                         onClick={handleClickBuyNow}
                       >
@@ -191,9 +191,18 @@ const ProductDetailScreen = () => {
                         disabled={!isPurchasePossible}
                         variant={"success"}
                         onClick={handleClickAddToCart}
+                        className={
+                          product?.quantity === 0
+                            ? "btn-sold-out"
+                            : isPurchasePossible
+                            ? null
+                            : "btn-disable"
+                        }
                       >
                         <i className="fa fa-shopping-bag"></i>{" "}
-                        {isPurchasePossible
+                        {product?.quantity === 0
+                          ? "Đã bán hết"
+                          : isPurchasePossible
                           ? "Thêm vào Giỏ"
                           : `Chỉ còn ${cartProductQuantity} SP`}
                       </Button>

@@ -1,18 +1,19 @@
-import React from 'react';
-import { useSelector } from 'react-redux';
-import _ from 'lodash';
-import * as yup from 'yup';
+import React from "react";
+import { useSelector } from "react-redux";
+import _ from "lodash";
+import * as yup from "yup";
 
 //! imp Components
-import { Button } from 'react-bootstrap';
-import FormComponent from '../../../components/Form/FormComponent';
-import InputComponent from '../../../components/Form/InputComponent';
-import SelectControllerComponent from '../../../components/Form/SelectControllerComponent';
+import { Button } from "react-bootstrap";
+import FormComponent from "../../../components/Form/FormComponent";
+import InputComponent from "../../../components/Form/InputComponent";
+import SelectControllerComponent from "../../../components/Form/SelectControllerComponent";
 
 //! imp Constants
-import constants from '../../../constants';
+import constants from "../../../constants";
 
 const OrderFormComponent = ({
+  order,
   orderId,
   initialValues,
   loading,
@@ -55,23 +56,31 @@ const OrderFormComponent = ({
     },
   ];
 
+  if (orderId) {
+    if (order?.status === constants.order.status.CANCELED) {
+      statusOptions.splice(0, 5);
+    }
+  } else {
+    statusOptions.splice(5, 1);
+  }
+
   const auth = useSelector((state) => state.auth);
   const isAdminController = auth.user?.roles
     ?.map((role) => role.name)
-    .includes('admin');
+    .includes("admin");
 
   const validationSchema = yup.object({
     name: yup
       .string()
-      .min(4, 'Ít nhất 4 ký tự.')
-      .max(64, 'Nhiều nhất 64 ký tự.')
-      .matches(unicodeLetters, 'Họ không hợp lệ, nên nhập ký tự (a-z)')
-      .required('Vui lòng nhập Họ và tên người nhận.'),
+      .min(4, "Ít nhất 4 ký tự.")
+      .max(64, "Nhiều nhất 64 ký tự.")
+      .matches(unicodeLetters, "Họ không hợp lệ, nên nhập ký tự (a-z)")
+      .required("Vui lòng nhập Họ và tên người nhận."),
     address: yup
       .string()
-      .max(256, 'Nhiều nhất 256 ký tự.')
-      .required('Vui lòng nhập Địa chỉ giao hàng.'),
-    status: yup.string().required('Vui lòng chọn Tình trạng đơn hàng.'),
+      .max(256, "Nhiều nhất 256 ký tự.")
+      .required("Vui lòng nhập Địa chỉ giao hàng."),
+    status: yup.string().required("Vui lòng chọn Tình trạng đơn hàng."),
   });
 
   return (
@@ -90,7 +99,7 @@ const OrderFormComponent = ({
             readOnly={isAdminController ? false : true}
             disabled={isAdminController ? false : true}
             name="orderId"
-            label={'Mã đơn hàng'}
+            label={"Mã đơn hàng"}
           />
         )}
         {
@@ -100,7 +109,7 @@ const OrderFormComponent = ({
           readOnly={isAdminController ? false : true}
           disabled={isAdminController ? false : true}
           name="userId"
-          label={isAdminController ? 'Mã người mua hộ' : 'Mã khách hàng'}
+          label={isAdminController ? "Mã người mua hộ" : "Mã khách hàng"}
         />
         {
           //! orderDate
@@ -110,7 +119,7 @@ const OrderFormComponent = ({
             readOnly
             disabled
             name="orderDate"
-            label={'Ngày lập đơn hàng'}
+            label={"Ngày lập đơn hàng"}
           />
         )}
         {
@@ -119,7 +128,7 @@ const OrderFormComponent = ({
         <InputComponent
           readOnly={isAdminController ? false : true}
           name="name"
-          label={'Họ và tên người nhận'}
+          label={"Họ và tên người nhận"}
           // placeholder={'Họ và tên của bạn'}
         />
         {
@@ -128,7 +137,7 @@ const OrderFormComponent = ({
         <InputComponent
           readOnly={isAdminController ? false : true}
           name="address"
-          label={'Địa chỉ giao hàng'}
+          label={"Địa chỉ giao hàng"}
           // placeholder={'Địa chỉ của bạn'}
         />
 
@@ -136,12 +145,12 @@ const OrderFormComponent = ({
           //! status
         }
         <SelectControllerComponent
-          className={'mb-4'}
+          className={"mb-4"}
           options={statusOptions}
           readOnly={isAdminController ? false : true}
           disabled={isAdminController ? false : true}
           name="status"
-          label={'Tình trạng đơn hàng'}
+          label={"Tình trạng đơn hàng"}
         />
         {
           //! transactionNo
@@ -150,7 +159,7 @@ const OrderFormComponent = ({
           readOnly={isAdminController ? false : true}
           disabled={isAdminController ? false : true}
           name="transactionNo"
-          label={'Mã giao dịch'}
+          label={"Mã giao dịch"}
         />
         {
           //! bankTranNo
@@ -159,7 +168,7 @@ const OrderFormComponent = ({
           readOnly={isAdminController ? false : true}
           disabled={isAdminController ? false : true}
           name="bankTranNo"
-          label={'Mã giao dịch ngân hàng'}
+          label={"Mã giao dịch ngân hàng"}
         />
         {
           //! Button
@@ -168,10 +177,10 @@ const OrderFormComponent = ({
           <div className="d-flex justify-content-center">
             <Button className="btn-submit" variant="primary" type="submit">
               {loading
-                ? 'Loading...'
+                ? "Loading..."
                 : orderId
-                ? 'Cập nhật đơn hàng'
-                : 'Tạo đơn hàng mới'}
+                ? "Cập nhật đơn hàng"
+                : "Tạo đơn hàng mới"}
             </Button>
             <Button
               className="btn ms-4"

@@ -6,12 +6,15 @@ import mongoose from "mongoose";
 import config from "../config/index.js";
 const baseURL = config.db.server.baseURL;
 const port = config.db.server.port;
+//! imp Constant
+import constants from "../constants/index.js";
 
 //! imp Libraries
 import Logging from "../library/Logging.js";
 
 //! imp Services
 import orderService from "../services/orderService.js";
+import productService from "../services/productService.js";
 import paymentService from "../services/paymentService.js";
 //! imp Utils
 import * as fileHelper from "../utils/file.js";
@@ -102,28 +105,22 @@ export const createOrder = async (req, res, next) => {
     bankTranNo: req.body.bankTranNo,
   };
   try {
-    const order = await Order.create(orderData);
-
     if (!orderData.items.length) {
       throw new Error(
         "There are no products yet. Please select the product you want to buy."
       );
     }
 
-    //!
-    
+    const createdOrder = await execWithTransaction(async (session) => {
+      const _results = await orderService.createOrder(orderData, session);
 
-
-    console.log(
-      "__Debugger__order\n__createOrder__req.body: ",
-      req.body,
-      "\n"
-    );
+      return _results;
+    });
 
     return res.status(201).json({
       success: true,
       message: "Create an Order successful!",
-      data: { order },
+      data: { order: createOrder },
     });
   } catch (error) {
     Logging.error("Error__ctrls__order: " + error);
@@ -216,24 +213,9 @@ export async function deleteOrdersByIds(req, res, next) {
       const orderQuene = orderIds.map(async (orderId) =>
         orderService.deleteOrderById(orderId, session)
       );
-      const results = await Promise.all(orderQuene);
+      const _results = await Promise.all(orderQuene);
 
-      // const results = await Promise.allSettled(promises);
-
-      // const hasRejected = results.some(
-      //   (result) => result.status === 'rejected'
-      // );
-
-      // if (hasRejected) {
-      //   throw new Error(
-      //     results
-      //       .find((result) => result.status === 'rejected')
-      //       ?.reason.toString()
-      //       .replace('Error: ', '')
-      //   );
-      // }
-
-      return results;
+      return _results;
     });
 
     return res.status(200).json({
@@ -251,10 +233,18 @@ export async function deleteOrdersByIds(req, res, next) {
 
 export async function updateOrder(req, res, next) {
   const orderId = req.params.orderId;
-  console.log("req.body: ", req.body);
   const orderData = { ...req.body };
+
   try {
-    const updatedOrder = await orderService.updateOrderById(orderId, orderData);
+    const updatedOrder = await execWithTransaction(async (session) => {
+      const _results = await orderService.updateOrderById(
+        orderId,
+        orderData,
+        session
+      );
+      return _results;
+    });
+
     return res.status(200).json({
       success: true,
       message: "Update One Order successful!",
