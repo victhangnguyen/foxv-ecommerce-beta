@@ -150,11 +150,11 @@ const HeaderComponent = () => {
                     Khuyến mãi
                   </NavLink>
                 </Nav.Link> */}
-                <Nav.Link as={'div'}>
+                {/* <Nav.Link as={'div'}>
                   <NavLink className={'nav-link'} to={'/shop'}>
                     Shop
                   </NavLink>
-                </Nav.Link>
+                </Nav.Link> */}
                 <NavDropdown
                   className={'nav-link'}
                   title="Kiểu sản phẩm"

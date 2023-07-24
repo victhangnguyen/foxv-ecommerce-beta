@@ -58,16 +58,11 @@ async function deleteProductById(productId, session) {
   return deletedProduct;
 }
 
-async function reserveProducts(items, session) {
+async function checkReserveProducts(items, session) {
   try {
     //! Handle Stock with session
     const products = await Promise.all(
       items.map(async (item) => {
-        console.log(
-          "__Debugger__productService\n:::item :::item: ",
-          item,
-          "\n"
-        );
         const product = await Product.findById(item.product);
 
         return {
@@ -97,5 +92,5 @@ export default {
   createProduct,
   updateProductById,
   deleteProductById,
-  reserveProducts,
+  checkReserveProducts,
 };

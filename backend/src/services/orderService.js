@@ -9,16 +9,11 @@ import Product from "../models/Product.js";
 import { execWithTransaction } from "../utils/transaction.js";
 // imp Services
 import productService from "../services/productService.js";
+import e from "express";
 
 async function createOrder(orderData, session) {
   try {
-    // const stock = await Product.find({
-    //   _id: { $in: items.map((item) => item.product) },
-    //   quantity: { $lt: item.quantity },
-    // });
-
-    productService.reserveProducts(orderData.items, session);
-    //! localFunction
+    await productService.checkReserveProducts(orderData.items, session);
 
     //createOrder
     const createdOrder = await Order.create(orderData);
@@ -40,10 +35,9 @@ async function createOrder(orderData, session) {
               quantity: item.quantity,
               productId: item.product,
             },
-            isEnoughStock: product.isEnoughStock(+item.quantity),
           },
         },
-        { session: session }
+        { session }
       );
     });
 
@@ -56,21 +50,107 @@ async function createOrder(orderData, session) {
   }
 }
 
-async function createOrUpdateOrderByUserId(userId, orderData) {
-  //! Check item's Quantity
-  if (!orderData.items || orderData.items.length === 0) {
-    throw new Error("Invalid order items");
-  }
+async function checkoutOrder(userId, orderData, session) {
+  /*
+  orderData:
+    orderId: req.body.orderId,
+    name: req.body.name,
+    address: req.body.address,
+    items: req.body.items,
+    bankCode: req.body.bankCode,
+    total: req.body.orderPayAmount,
+  */
+  const { orderId, ...otherData } = orderData;
+  console.log(
+    "__Debugger__orderService\n:::checkoutOrder :::orderData: ",
+    orderData,
+    "\n"
+  );
+  try {
+    const order = await Order.findOne({
+      _id: orderId,
+      user: userId,
+      status: "pending",
+    }).sort({ createdAt: -1 });
 
-  //! create or Update Order with Transaction
-  const order = await execWithTransaction(async () => {
-    const _order = await Order.createOrUpdateOrderByUserId(userId, {
-      ...orderData,
+    //! if order is updated items =>  re-reserved Products
+    if (order) {
+      // if (orderData.status === constants.order.STATUS.CANCELED) {
+      const updatedStockQuene = order.items.map(async (item) => {
+        const product = await Product.findById(item.product);
+
+        return await product.updateOne(
+          {
+            $inc: {
+              //! (in-de)crease
+              quantity: +Number(item.quantity),
+            },
+            $pull: {
+              //! giảm kho và thêm vào dữ liệu reservations
+              reservations: {
+                orderId: order._id,
+              },
+            },
+          },
+          { session: session }
+        );
+      });
+
+      const result = await Promise.all(updatedStockQuene);
+      console.log(
+        "__Debugger__orderService\n:::checkoutOrder :::result: ",
+        result,
+        "\n"
+      );
+      // }
+    }
+
+    await productService.checkReserveProducts(orderData.items, session);
+
+    let currentOrder;
+
+    if (order) {
+      //! updateOrder: items and total
+      currentOrder = await Order.findByIdAndUpdate(
+        order._id,
+        { items: orderData.items, total: orderData.total },
+        { session, new: true }
+      );
+      // return order;
+    } else {
+      //! createOrder
+      currentOrder = await Order.create({ ...otherData, user: userId });
+    }
+
+    const updatedStockQuene = orderData.items.map(async (item) => {
+      const product = await Product.findById(item.product);
+
+      return product.updateOne(
+        {
+          $inc: {
+            //! (in-de)crease
+            quantity: -Number(item.quantity),
+          },
+          $push: {
+            //! giảm kho và thêm vào dữ liệu reservations
+            reservations: {
+              orderId: currentOrder._id,
+              userId: userId,
+              quantity: item.quantity,
+              productId: item.product,
+            },
+          },
+        },
+        { session }
+      );
     });
-    return _order;
-  });
+    //! execute Promise Quene
+    await Promise.all(updatedStockQuene);
 
-  return order;
+    return currentOrder;
+  } catch (error) {
+    throw error;
+  }
 }
 
 /**
@@ -111,32 +191,35 @@ async function updateOrderById(orderId, orderData, session) {
     updateData = { ...orderData, status: constants.order.STATUS.CANCELED };
   }
 
-  const updatedOrder = await order.update(updateData, { session });
-
+  //! if order is cancelled  re-reserved Products
   //! if transaction is cancelled , return the product to the inventory
-  const updatedStockQuene = order.items.map(async (item) => {
-    const product = await Product.findById(item.product);
+  if (orderData.status === constants.order.STATUS.CANCELED) {
+    const updatedStockQuene = order.items.map(async (item) => {
+      const product = await Product.findById(item.product);
 
-    return product.updateOne(
-      {
-        $inc: {
-          //! (in-de)crease
-          quantity: +Number(item.quantity),
-        },
-        $pull: {
-          //! giảm kho và thêm vào dữ liệu reservations
-          reservations: {
-            orderId: order._id,
+      return product.updateOne(
+        {
+          $inc: {
+            //! (in-de)crease
+            quantity: +Number(item.quantity),
+          },
+          $pull: {
+            //! giảm kho và thêm vào dữ liệu reservations
+            reservations: {
+              orderId: order._id,
+            },
           },
         },
-      },
-      { session: session, lean: true }
-    );
-  });
+        { session: session, lean: true }
+      );
+    });
 
-  await Promise.all(updatedStockQuene);
+    await Promise.all(updatedStockQuene);
+  }
 
-  return order;
+  const updatedOrder = await order.update(updateData, { session });
+
+  return updatedOrder;
 }
 
 /**
@@ -148,7 +231,9 @@ async function updateOrderById(orderId, orderData, session) {
 
 export default {
   createOrder,
-  createOrUpdateOrderByUserId,
+  checkoutOrder,
   deleteOrderById,
   updateOrderById,
 };
+
+

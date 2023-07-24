@@ -45,29 +45,41 @@ export async function getOrderById(req, res, next) {
   }
 }
 
-export async function createOrderByUserId(req, res, next) {
-  const userId = req?.user?._id || null;
-  // const clientUrl = req.body?.clientUrl || req.headers.origin;
-
-  const { name, address, items, orderPayAmount, bankCode } = req.body;
+//! checkout an Order with createOrderByUserId
+export async function checkoutOrder(req, res, next) {
+  const userId = req.user?._id || null;
 
   const orderData = {
-    name,
-    address,
-    items,
-    bankCode,
-    total: orderPayAmount,
+    orderId: req.body.orderId,
+    name: req.body.name,
+    address: req.body.address,
+    items: req.body.items,
+    bankCode: req.body.bankCode,
+    total: req.body.orderPayAmount,
   };
 
   try {
-    const order = await orderService.createOrUpdateOrderByUserId(
-      userId,
-      orderData
-    );
-
-    if (!order) {
-      throw new Error("Create order fail!");
+    if (!orderData.items.length) {
+      throw new Error(
+        "There are no products yet. Please select the product you want to buy."
+      );
     }
+
+    const createdOrder = await execWithTransaction(async (session) => {
+      const _results = await orderService.checkoutOrder(
+        userId,
+        orderData,
+        session
+      );
+      return _results;
+    });
+
+    console.log('__Debugger__order\n:::checkoutOrder :::createdOrder: ', createdOrder, '\n');
+
+    /*
+      return createdOrder:
+      _id, items: [{...},...], total, status, name, address, transactionNo, bankTranNo, orderDate, createdAt, updatedAt
+    */
 
     const apiUrl = `${req.protocol}://${req.get("host")}`;
 
@@ -75,15 +87,16 @@ export async function createOrderByUserId(req, res, next) {
       req.ipv4,
       apiUrl,
       req.headers.origin,
-      order._id.toString(),
-      order.total,
-      bankCode // 'NCB'
+      // createdOrder._id.toString(),
+      createdOrder._id,
+      createdOrder.total,
+      createdOrder.bankCode // 'NCB'
     );
 
     res.status(201).json({
       success: true,
       message: "Create an Order successful!",
-      data: { order, paymentUrl },
+      data: { order: createdOrder, paymentUrl },
     });
   } catch (error) {
     Logging.error("Error__ctrls__order: " + error);
@@ -120,7 +133,7 @@ export const createOrder = async (req, res, next) => {
     return res.status(201).json({
       success: true,
       message: "Create an Order successful!",
-      data: { order: createOrder },
+      data: { order: createdOrder },
     });
   } catch (error) {
     Logging.error("Error__ctrls__order: " + error);

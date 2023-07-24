@@ -64,14 +64,14 @@ const AddEditOrderScreen = ({ entity }) => {
     };
   }, [success, message, error]);
 
-  //! handle newOrder (createdOrder)
+  //! automatically reset the Cart or NewOrder whenever the Customer paid or cancelled.
   React.useLayoutEffect(() => {
-    if (_.isEmpty(order?.newOrder)) return;
+    if (_.isEmpty(newOrder)) return;
 
     async function hanldeNewOrder() {
       try {
         //! update newOrder
-        const response = await API.order.getOrderById(order?.newOrder?._id);
+        const response = await API.order.getOrderById(newOrder?._id);
         switch (response.data.order.status) {
           case constants.order.status.CANCELED:
             // emptyNewOrder
@@ -91,7 +91,17 @@ const AddEditOrderScreen = ({ entity }) => {
             break;
         }
       } catch (error) {
-        console.log("Error: ", error);
+        setAlertOpts({
+          variant: "danger",
+          title: "Lỗi hệ thống",
+          message:
+            error.response?.data?.message ||
+            error.response?.message ||
+            error.message ||
+            error,
+        });
+
+        handleShowAlert();
       }
     }
 
@@ -148,7 +158,8 @@ const AddEditOrderScreen = ({ entity }) => {
           error.message ||
           error,
       });
-      setShowAlert(true);
+
+      handleShowAlert();
       toast.error(error.response?.message || error.massage);
     }
   }

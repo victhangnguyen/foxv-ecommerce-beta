@@ -77,9 +77,9 @@ const CartScreen = () => {
       const response = await API.product.getProductById(productId);
 
       cartItem = {
-        product: response.data.product._id,
+        product: response.data?.product._id,
         quantity: qty,
-        slug: response.data.product.slug,
+        slug: response.data?.product.slug,
         name: response.data.product.name,
         category: response.data.product.category,
         image: response.data.product.images[0],

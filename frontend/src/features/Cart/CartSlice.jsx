@@ -22,7 +22,8 @@ const CartSlice = createSlice({
       } else {
         state.cartItems?.push({
           ...action.payload,
-          quantity: action.payload.quantity,
+          quantity: +action.payload.quantity,
+          // quantity: 1,
         });
       }
     },

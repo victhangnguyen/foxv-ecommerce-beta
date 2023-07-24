@@ -1,17 +1,17 @@
-import mongoose from 'mongoose';
+import mongoose from "mongoose";
 
 // Define the [Order Schema]
 const orderSchema = new mongoose.Schema(
   {
-    user: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+    user: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
     items: [
       {
         _id: false,
-        product: { type: mongoose.Schema.Types.ObjectId, ref: 'Product' },
+        product: { type: mongoose.Schema.Types.ObjectId, ref: "Product" },
         quantity: mongoose.Schema.Types.Number,
         slug: String,
         name: String,
-        category: { type: mongoose.Schema.Types.ObjectId, ref: 'Category' },
+        category: { type: mongoose.Schema.Types.ObjectId, ref: "Category" },
         image: String,
         price: Number,
       },
@@ -23,14 +23,14 @@ const orderSchema = new mongoose.Schema(
     status: {
       type: String,
       enum: [
-        'pending',
-        'paid',
-        'shipped',
-        'delivered',
-        'completed',
-        'canceled',
+        "pending",
+        "paid",
+        "shipped",
+        "delivered",
+        "completed",
+        "canceled",
       ],
-      default: 'pending',
+      default: "pending",
     },
     name: {
       type: String,
@@ -53,11 +53,11 @@ const orderSchema = new mongoose.Schema(
     },
     transactionNo: {
       type: String,
-      default: '',
+      default: "",
     },
     bankTranNo: {
       type: String,
-      default: '',
+      default: "",
     },
   },
   {
@@ -69,16 +69,7 @@ orderSchema.statics.createOrUpdateOrderByUserId = async function (
   userId,
   orderData
 ) {
-  const order = await mongoose
-    .model('Order')
-    .findOne({ user: userId, status: 'pending' });
-
-  if (order) {
-    await order.updateOne(orderData);
-    return order;
-  }
-  return await mongoose.model('Order').create({ user: userId, ...orderData });
 };
 
-const Order = mongoose.model('Order', orderSchema);
+const Order = mongoose.model("Order", orderSchema);
 export default Order;
