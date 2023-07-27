@@ -1,22 +1,29 @@
-import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
+import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 
 //! imp APIs
-import API from '../../API';
+import API from "../../API";
 
 const initialState = {
   products: [],
   productsCount: 0,
   product: {},
   loading: false,
+  success: null,
+  message: null,
   error: null,
 };
 
 const productSlice = createSlice({
-  name: 'product',
+  name: "product",
   initialState: initialState,
   reducers: {
     emptyProduct: (state, action) => {
       state.product = initialState.product;
+    },
+    clearNotification: (state) => {
+      state.success = initialState.success;
+      state.error = initialState.error;
+      state.message = initialState.message;
     },
   },
   extraReducers: (builder) => {
@@ -92,14 +99,14 @@ const productSlice = createSlice({
   },
 });
 
-export const { emptyProduct } = productSlice.actions;
+export const { emptyProduct, clearNotification } = productSlice.actions;
 const reducer = productSlice.reducer;
 
 export default reducer;
 
 //! Async Thunk
 export const getProductById = createAsyncThunk(
-  'product/getProductById',
+  "product/getProductById",
   async (productId, thunkAPI) => {
     try {
       const response = await API.product.getProductById(productId);
@@ -115,7 +122,7 @@ export const getProductById = createAsyncThunk(
 );
 
 export const getProductsByFilters = createAsyncThunk(
-  'product/getProductsByFilters',
+  "product/getProductsByFilters",
   async ({ sort, order, page, perPage, filterOpts }, thunkAPI) => {
     try {
       const response = await API.product.getProductsByFilters(
@@ -140,7 +147,7 @@ export const getProductsByFilters = createAsyncThunk(
 );
 
 export const updateProductById = createAsyncThunk(
-  'product/updateProductById',
+  "product/updateProductById",
   async ({ productId, productData }, thunkAPI) => {
     try {
       const response = await API.product.updateProductById(
@@ -159,7 +166,7 @@ export const updateProductById = createAsyncThunk(
 );
 
 export const removeProduct = createAsyncThunk(
-  'product/removeProduct',
+  "product/removeProduct",
   async (productId, thunkAPI) => {
     try {
       const response = await API.product.removeProduct(productId);
@@ -177,7 +184,7 @@ export const removeProduct = createAsyncThunk(
 );
 
 export const removeProducts = createAsyncThunk(
-  'product/removeProducts',
+  "product/removeProducts",
   async (productIds, thunkAPI) => {
     try {
       const response = await API.product.removeProducts(productIds);

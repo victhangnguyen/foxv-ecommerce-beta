@@ -1,11 +1,18 @@
-import React from 'react';
-import { Row, Col, Form } from 'react-bootstrap';
+import React from "react";
+import { Row, Col, Form } from "react-bootstrap";
 
-const InputComponent = ({ methods, name, label, className, ...rest }) => {
+const InputComponent = ({
+  methods,
+  name,
+  label,
+  className,
+  handleKeyPress,
+  ...rest
+}) => {
   return (
     <Form.Group
       as={Row}
-      className={`mb-3 ${name ? 'form-group' + name : null}`}
+      className={`mb-3 ${name ? "form-group" + name : null}`}
       controlId={`ipt-${name}`}
     >
       {label && <Form.Label>{label}</Form.Label>}

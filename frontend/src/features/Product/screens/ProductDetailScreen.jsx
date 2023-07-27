@@ -114,11 +114,16 @@ const ProductDetailScreen = () => {
     { key: "breadcrumb-item-0", label: "Home", path: "/" },
     {
       key: "breadcrumb-item-1",
+      label: 'Shop',
+      path: `/shop`,
+    },
+    {
+      key: "breadcrumb-item-2",
       label: product.category?.name,
       path: `/collections/${product.category?.slug}`,
     },
     {
-      key: "breadcrumb-item-2",
+      key: "breadcrumb-item-3",
       label: product.name,
       path: `/products/${product.slug}`,
       active: true,

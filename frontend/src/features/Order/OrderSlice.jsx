@@ -32,7 +32,11 @@ const OrderSlice = createSlice({
         state.loading = true;
       })
       .addCase(checkoutOrder.fulfilled, (state, action) => {
-        console.log('__Debugger__OrderSlice\n:::checkoutOrder :::action.payload: ', action.payload, '\n');
+        console.log(
+          "__Debugger__OrderSlice\n:::checkoutOrder :::action.payload: ",
+          action.payload,
+          "\n"
+        );
         state.loading = false;
         state.newOrder = {
           ...action.payload?.data?.order,
@@ -50,11 +54,6 @@ const OrderSlice = createSlice({
         state.loading = true;
       })
       .addCase(createOrder.fulfilled, (state, action) => {
-        console.log(
-          "__Debugger__OrderSlice\n__createOrder.fulfilled__action.payload: ",
-          action.payload,
-          "\n"
-        );
         state.loading = false;
         state.order = action.payload.data.order;
         state.success = action.payload.success;
@@ -208,7 +207,10 @@ export const getOrderById = createAsyncThunk(
 
 export const checkoutOrder = createAsyncThunk(
   "order/checkoutOrder",
-  async ({ orderId, name, address, items, orderPayAmount, bankCode }, thunkAPI) => {
+  async (
+    { orderId, name, address, items, orderPayAmount, bankCode },
+    thunkAPI
+  ) => {
     try {
       const response = await API.order.checkoutOrder({
         orderId,

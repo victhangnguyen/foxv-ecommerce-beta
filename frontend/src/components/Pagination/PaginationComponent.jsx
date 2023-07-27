@@ -1,7 +1,9 @@
-import React from 'react';
-import Pagination from 'react-bootstrap/Pagination';
+import React from "react";
+import Pagination from "react-bootstrap/Pagination";
 // import { scrollToTop } from '../helpers/scroll';
-import PropTypes from 'prop-types';
+import PropTypes from "prop-types";
+//! imp Hooks
+import { scrollToTop } from "../../hooks/scroll";
 
 const PaginationComponent = ({
   itemsCount,
@@ -10,6 +12,7 @@ const PaginationComponent = ({
   setCurrentPage,
   setProductsCountPerPage,
   alwaysShown = true,
+  alwayScrollToTop = false,
 }) => {
   const pagesCount =
     itemsCount && itemsPerPage ? Math.ceil(itemsCount / itemsPerPage) : 1;
@@ -22,9 +25,13 @@ const PaginationComponent = ({
     setCurrentPage(number);
     const loadingProducts = itemsCount - (number - 1) * itemsPerPage;
     console.log(
-      '__Debugger__comps/Pagi__changePage__loadingProducts: ',
-      loadingProducts
+      "__Debugger__PaginationComponent\n:::*** :::loadingProducts: ",
+      loadingProducts,
+      "\n"
     );
+    if (alwayScrollToTop) {
+      scrollToTop();
+    }
   };
 
   const onPageNumberClick = (pageNumber) => {

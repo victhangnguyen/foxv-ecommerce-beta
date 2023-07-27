@@ -264,7 +264,7 @@ const ManageUserScreen = () => {
         alwaysShown={true}
       />
 
-      <form className="toolbar row" onSubmit={handleSearchSubmit}>
+      <form className="row" onSubmit={handleSearchSubmit}>
         <div className="col-10 col-md-11">
           <ToolbarSearchComponent search={search} setSearch={setSearch} />
         </div>

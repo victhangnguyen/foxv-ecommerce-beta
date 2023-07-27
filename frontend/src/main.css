@@ -729,6 +729,16 @@ a {
   border-radius: 50%;
 }
 
+.toolbar {
+  min-height: 100vh;
+  border-right: 2px solid #2c3e50;
+  padding: 25px;
+  background-color: #fff;
+  position: sticky;
+  position: -webkit-sticky; /* For macOS/iOS Safari */
+  top: 0; /* Sets the sticky toolbar to be on top */
+  z-index: 1000; /* Ensure that your app's content doesn't overlap the toolbar */
+}
 .btn-toolbar {
   width: 100%;
 }
