@@ -1,9 +1,9 @@
-import React from 'react';
-import { useForm, useWatch } from 'react-hook-form';
-import _ from 'lodash';
+import React from "react";
+import { useForm, useWatch } from "react-hook-form";
+import _ from "lodash";
 
 //! imp Hooks
-import { useYupValidationResolver } from '../../hooks/yupResolver';
+import { useYupValidationResolver } from "../../hooks/yupResolver";
 
 const FormComponent = ({
   initialValues,
@@ -17,13 +17,13 @@ const FormComponent = ({
 
   const methods = useForm({
     resolver,
-    mode: 'onTouched',
+    mode: "onTouched",
     criteriaMode: "all",
     // defaultValues: defaultValues,
   });
 
   const watchAllFields = useWatch({ control: methods.control });
-  // console.log('watchAllFields: ', watchAllFields);
+  console.log("watchAllFields: ", watchAllFields);
 
   const fields = children.map((child) => child?.props?.name);
 
@@ -41,8 +41,8 @@ const FormComponent = ({
   // }, [initialValues]);
 
   const checkKeyDown = (e) => {
-    if (e.code === 'Enter') {
-      if (e.target.nodeName !== 'TEXTAREA') {
+    if (e.code === "Enter") {
+      if (e.target.nodeName !== "TEXTAREA") {
         e.preventDefault();
       }
     }

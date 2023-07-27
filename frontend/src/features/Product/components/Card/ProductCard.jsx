@@ -67,7 +67,11 @@ const ProductCard = ({ product }) => {
   }
 
   return (
-    <Card className={`product-card mb-4 ${`${isAddedToCard ? "active" : ""}`}`}>
+    <Card
+      className={`product-card mb-4 ${`${
+        !product.quantity ? "sold-out" : isAddedToCard ? "sold" : ""
+      }`}`}
+    >
       <div className="product-image">
         <Link to={`/products/${product.slug}`} className="image">
           <img className="img-1" src={mainImageUrl} />
@@ -75,19 +79,29 @@ const ProductCard = ({ product }) => {
 
         <ul className="product-links">
           <li className={""}>
-            <button onClick={handleClickBuyNow}>
+            <button className={"btn-buy-now"} onClick={handleClickBuyNow}>
               <i className="fa fa-shopping-bag"></i>{" "}
               {isAddedToCard ? "Xem giỏ" : "Mua ngay"}
             </button>
           </li>
           <li>
             <button
-              className={isPurchasePossible ? null : `btn-disable`}
+              className={
+                product?.quantity === 0
+                  ? "btn-sold-out"
+                  : isPurchasePossible
+                  ? null
+                  : `btn-disable`
+              }
               disabled={!isPurchasePossible}
               onClick={handleClickAddToCart}
             >
               <i className="fa fa-shopping-bag"></i>{" "}
-              {isPurchasePossible ? "Thêm vào Giỏ" : `Chỉ còn ${cartProductQuantity} SP` }
+              {product?.quantity === 0
+                ? "Đã bán hết"
+                : isPurchasePossible
+                ? "Thêm vào Giỏ"
+                : `Chỉ còn ${cartProductQuantity} SP`}
             </button>
           </li>
         </ul>

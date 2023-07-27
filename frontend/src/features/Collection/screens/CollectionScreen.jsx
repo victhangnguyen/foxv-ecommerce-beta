@@ -91,7 +91,7 @@ const CollectionScreen = () => {
             {
               //! Container that in main (App-index.js)
             }
-            {products.length > 0 &&
+            {products?.length > 0 &&
               products.map((product) => {
                 return (
                   <Col key={product._id} xs={6} md={4} lg={3}>

@@ -126,26 +126,6 @@ const ManageProductScreen = () => {
     //! localFunction
   }
 
-  // const deleteProduct = async (productId) => {
-  //   try {
-  //     const deletedProduct = await dispatch(removeProduct(productId)).unwrap();
-  //     toast.success(`Sản phẩm ${deletedProduct.name} đã được xóa`);
-  //   } catch (error) {
-  //     toast.error(error);
-  //   }
-  // };
-
-  // const deleteProducts = (productIds) => {
-  //   dispatch(removeProducts(productIds))
-  //     .unwrap()
-  //     .then((result) => {
-  //       setCheckedProductIds([]);
-  //     })
-  //     .catch((error) => {
-  //       toast.error(error);
-  //     });
-  // };
-
   function handleCheckAllChange() {
     setIsCheckAll(!isCheckAll);
     if (!isCheckAll) {
@@ -287,57 +267,6 @@ const ManageProductScreen = () => {
     }
   }
 
-  //! DeleteConfirmationModal
-  // const handleShowDeleteModal = (type, productIds) => {
-  //   setDeleteIds(productIds); //! string or array
-  //   setDeleteType(type); //! single or multiple
-  //   setSingleMessage(null);
-  //   setMultipleMessage(null);
-
-  //   if (type === 'single') {
-  //     setDeleteMessage(
-  //       // fruits.find((x) => x.id === id).name
-  //       `Bạn có muốn xóa sản phẩm [${
-  //         products.find((product) => product._id === productIds).name
-  //       }] này không?`
-  //     );
-  //     setSingleMessage(
-  //       // fruits.find((x) => x.id === id).name
-  //       `Bạn đã xóa sản phẩm [${
-  //         products.find((product) => product._id === productIds).name
-  //       }] thành công.`
-  //     );
-  //   } else if (type === 'multiple') {
-  //     setDeleteMessage(
-  //       `Có ${productIds.length} sản phẩm chờ được xóa. Bạn muốn xóa không?`
-  //     );
-  //     setMultipleMessage(
-  //       `Bạn đã xóa ${productIds.length} sản phẩm thành công.`
-  //     );
-  //   }
-  //   //! show Modal
-  //   setShowConfirmationModal(true);
-  // };
-
-  // const handleSubmitDelete = async () => {
-  //   if (deleteType === 'single') {
-  //     //! single Id
-  //     await deleteProduct(deleteIds);
-  //   } else if (deleteType === 'multiple') {
-  //     //! multiple Ids
-  //     await deleteProducts(deleteIds);
-  //   }
-  //   loadAllProducts();
-  //   handleHideModal();
-  //   setShowAlert(true);
-  //   // clearMessage();
-  // };
-
-  // const clearAlertMessage = () => {
-  //   setDeleteMessage('');
-  //   setMultipleMessage('');
-  //   setSingleMessage('');
-  // };
 
   function resetCheckAll() {
     //! reset CheckAll

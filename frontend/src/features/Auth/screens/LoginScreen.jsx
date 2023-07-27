@@ -27,7 +27,7 @@ const LoginScreen = () => {
 
   const handleLoginSubmit = async (data, e, methods) => {
     const { username, password } = data;
-    console.log('__Debugger__LoginScreen\n__***__data: ', data, '\n');
+
     try {
       const response = await dispatch(signin({ username, password })).unwrap();
 

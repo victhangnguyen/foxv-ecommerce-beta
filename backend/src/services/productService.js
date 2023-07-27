@@ -58,8 +58,39 @@ async function deleteProductById(productId, session) {
   return deletedProduct;
 }
 
+async function checkReserveProducts(items, session) {
+  try {
+    //! Handle Stock with session
+    const products = await Promise.all(
+      items.map(async (item) => {
+        const product = await Product.findById(item.product);
+
+        return {
+          ...product._doc,
+          isEnoughStock: product.isEnoughStock(+item.quantity),
+        };
+      })
+    );
+
+    const insufficientStockArray = products.filter(
+      (product) => !product.isEnoughStock
+    );
+
+    if (insufficientStockArray.length) {
+      throw new Error(
+        `${insufficientStockArray[0].name} does not have enough products, just has: ${insufficientStockArray[0].quantity} products!`
+      );
+    }
+
+    return true;
+  } catch (error) {
+    throw error;
+  }
+}
+
 export default {
   createProduct,
   updateProductById,
   deleteProductById,
+  checkReserveProducts,
 };

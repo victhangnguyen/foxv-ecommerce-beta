@@ -64,14 +64,14 @@ const AddEditOrderScreen = ({ entity }) => {
     };
   }, [success, message, error]);
 
-  //! handle newOrder (createdOrder)
+  //! automatically reset the Cart or NewOrder whenever the Customer paid or cancelled.
   React.useLayoutEffect(() => {
-    if (_.isEmpty(order.newOrder)) return;
+    if (_.isEmpty(newOrder)) return;
 
     async function hanldeNewOrder() {
       try {
         //! update newOrder
-        const response = await API.order.getOrderById(order.newOrder?._id);
+        const response = await API.order.getOrderById(newOrder?._id);
         switch (response.data.order.status) {
           case constants.order.status.CANCELED:
             // emptyNewOrder
@@ -91,12 +91,22 @@ const AddEditOrderScreen = ({ entity }) => {
             break;
         }
       } catch (error) {
-        console.log("Error: ", error);
+        setAlertOpts({
+          variant: "danger",
+          title: "Lỗi hệ thống",
+          message:
+            error.response?.data?.message ||
+            error.response?.message ||
+            error.message ||
+            error,
+        });
+
+        handleShowAlert();
       }
     }
 
     hanldeNewOrder();
-  }, [order.newOrder?.status]);
+  }, [newOrder?.status]);
 
   async function loadOrderById(orderId) {
     try {
@@ -107,7 +117,10 @@ const AddEditOrderScreen = ({ entity }) => {
   }
 
   async function handleUpdateSubmit(data, e, methods) {
-    const isEqualData = _.isEqual(initialValues, data);
+    const { orderDate, orderId, ...otherData } = initialValues;
+    const comparedInitialValues = { ...otherData };
+
+    const isEqualData = _.isEqual(comparedInitialValues, data);
 
     if (isEqualData) {
       return toast.error("Chưa có thông tin nào thay đổi.");
@@ -145,7 +158,8 @@ const AddEditOrderScreen = ({ entity }) => {
           error.message ||
           error,
       });
-      setShowAlert(true);
+
+      handleShowAlert();
       toast.error(error.response?.message || error.massage);
     }
   }
@@ -210,6 +224,7 @@ const AddEditOrderScreen = ({ entity }) => {
         </div>
         <div className="col-md-6 col-lg-6 col-xl-7 offset-md-1">
           <OrderFormComponent
+            order={order}
             orderId={orderId}
             initialValues={initialValues}
             onSubmit={handleUpdateSubmit}

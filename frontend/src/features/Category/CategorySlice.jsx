@@ -1,7 +1,7 @@
-import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
+import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 
 //! imp APIs
-import API from '../../API';
+import API from "../../API";
 
 const initialState = {
   categories: [],
@@ -11,11 +11,15 @@ const initialState = {
 };
 
 const categorySlice = createSlice({
-  name: 'category',
+  name: "category",
   initialState: initialState,
   reducers: {
     emptyCategory: (state, action) => {
       state.category = initialState.category;
+    },
+    setErrorMessage: (state, action) => {
+      state.error = action.payload;
+      state.success = false;
     },
   },
   extraReducers: (builder) => {
@@ -35,7 +39,7 @@ const categorySlice = createSlice({
     builder
       .addCase(getCategoryById.pending, (state, action) => {
         state.loading = true;
-      state.error = initialState.error;
+        state.error = initialState.error;
       })
       .addCase(getCategoryById.fulfilled, (state, action) => {
         state.loading = false;
@@ -63,13 +67,13 @@ const categorySlice = createSlice({
 
 //! Async Thunk Function
 
-export const { emptyCategory } = categorySlice.actions;
+export const { emptyCategory, setErrorMessage } = categorySlice.actions;
 const reducer = categorySlice.reducer;
 
 export default reducer;
 
 export const getCategories = createAsyncThunk(
-  'category/getCategories',
+  "category/getCategories",
   async (_, thunkAPI) => {
     try {
       const response = await API.category.getCategories();
@@ -89,7 +93,7 @@ export const getCategories = createAsyncThunk(
 );
 
 export const getCategoryById = createAsyncThunk(
-  'category/getCategoryById',
+  "category/getCategoryById",
   async (categoryId, thunkAPI) => {
     try {
       const response = await API.category.getCategoryById(categoryId);
@@ -108,7 +112,7 @@ export const getCategoryById = createAsyncThunk(
 );
 
 export const updateCategoryById = createAsyncThunk(
-  'category/updateCategoryById',
+  "category/updateCategoryById",
   async ({ categoryId, categoryData }, thunkAPI) => {
     try {
       const response = await API.category.updateCategoryById(

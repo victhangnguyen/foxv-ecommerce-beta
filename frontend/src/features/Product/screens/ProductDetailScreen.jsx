@@ -114,11 +114,16 @@ const ProductDetailScreen = () => {
     { key: "breadcrumb-item-0", label: "Home", path: "/" },
     {
       key: "breadcrumb-item-1",
+      label: 'Shop',
+      path: `/shop`,
+    },
+    {
+      key: "breadcrumb-item-2",
       label: product.category?.name,
       path: `/collections/${product.category?.slug}`,
     },
     {
-      key: "breadcrumb-item-2",
+      key: "breadcrumb-item-3",
       label: product.name,
       path: `/products/${product.slug}`,
       active: true,
@@ -179,7 +184,7 @@ const ProductDetailScreen = () => {
                     <div className="mb-4">
                       <Button
                         size="sm"
-                        className="me-2"
+                        className={`me-2 ${!product?.quantity ? "d-none" : null}`}
                         variant={isAddedToCard ? "warning" : "primary"}
                         onClick={handleClickBuyNow}
                       >
@@ -191,9 +196,18 @@ const ProductDetailScreen = () => {
                         disabled={!isPurchasePossible}
                         variant={"success"}
                         onClick={handleClickAddToCart}
+                        className={
+                          product?.quantity === 0
+                            ? "btn-sold-out"
+                            : isPurchasePossible
+                            ? null
+                            : "btn-disable"
+                        }
                       >
                         <i className="fa fa-shopping-bag"></i>{" "}
-                        {isPurchasePossible
+                        {product?.quantity === 0
+                          ? "Đã bán hết"
+                          : isPurchasePossible
                           ? "Thêm vào Giỏ"
                           : `Chỉ còn ${cartProductQuantity} SP`}
                       </Button>

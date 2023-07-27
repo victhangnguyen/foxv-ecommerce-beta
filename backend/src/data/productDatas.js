@@ -390,7 +390,7 @@ const productDatas = [
     category: "63de367504d8c040c2f6e311",
     subCategories: ["63de84e901db977b12121dd5"],
     sold: 130,
-    quantity: 4,
+    quantity: 10,
     creator: "63ddf086f48acedfbe5db53e",
     images: [
       "chan-vay-jean-dai-nang-dong_trang_00.jpg",

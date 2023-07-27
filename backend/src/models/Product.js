@@ -1,9 +1,9 @@
-import mongoose from 'mongoose';
+import mongoose from "mongoose";
 //! StatusSchema
 const statusSchema = new mongoose.Schema({
   value: {
     type: String,
-    enum: ['none', 'new', 'trend', 'sale', 'event', 'freeship'],
+    enum: ["none", "new", "trend", "sale", "event", "freeship"],
   },
 });
 
@@ -40,12 +40,12 @@ const productSchema = new mongoose.Schema(
     },
     category: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: 'Category',
+      ref: "Category",
     },
     subCategories: [
       {
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'SubCategory',
+        ref: "SubCategory",
       },
     ],
     sold: { type: Number, default: 0 },
@@ -59,7 +59,7 @@ const productSchema = new mongoose.Schema(
     },
     creator: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: 'User',
+      ref: "User",
     },
     images: [{ type: String }],
     color: {
@@ -78,13 +78,20 @@ const productSchema = new mongoose.Schema(
     },
     status: {
       type: [statusSchema],
-      default: { value: 'new' },
+      default: { value: "new" },
       refs: statusSchema,
+    },
+    reservations: {
+      type: Array,
     },
   },
   { timestamps: true }
 );
 
-const Product = mongoose.model('Product', productSchema);
+productSchema.methods.isEnoughStock = function (qty) {
+  return this.quantity >= qty;
+};
+
+const Product = mongoose.model("Product", productSchema);
 
 export default Product;

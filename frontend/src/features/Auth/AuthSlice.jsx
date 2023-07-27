@@ -138,11 +138,6 @@ const authSlice = createSlice({
         state.error = initialState.error;
       })
       .addCase(signin.fulfilled, (state, action) => {
-        console.log(
-          "__Debugger__AuthSlice\n__signin.fullfilled__action.payload: ",
-          action.payload,
-          "\n"
-        );
         state.loading = false;
         state.success = action.payload?.success;
         state.user = action.payload?.data?.user; //! verify

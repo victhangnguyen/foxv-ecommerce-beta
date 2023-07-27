@@ -6,6 +6,7 @@ import axios from "axios";
  * checkoutOrder
  */
 export function checkoutOrder({
+  orderId,
   name,
   address,
   items,
@@ -14,6 +15,7 @@ export function checkoutOrder({
 }) {
   const url = `/orders/checkout`;
   return axiosInstance.post(url, {
+    orderId,
     name,
     address,
     items,

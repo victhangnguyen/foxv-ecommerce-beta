@@ -24,7 +24,7 @@ router.get("/orders/search/filters", orderController.getOrdersByFilters);
 router.post(
   "/orders/checkout",
   authenticate,
-  orderController.createOrderByUserId
+  orderController.checkoutOrder
 );
 
 //! @desc     Create a new Order

@@ -1,4 +1,20 @@
-//! Toolbars
+//! Toolbar
+.toolbar {
+  min-height: 100vh;
+  border-right: 2px solid $color-secondary;
+  padding: 25px;
+  background-color: $color-primary;
+  
+  position:sticky;
+  position:-webkit-sticky; /* For macOS/iOS Safari */;
+  top: 0; /* Sets the sticky toolbar to be on top */
+  z-index: 1000; /* Ensure that your app's content doesn't overlap the toolbar */
+    // margin: 5px;
+  .search-filters {
+  }
+}
+
+//! Toolbar Buttons
 .btn-toolbar {
   width: 100%;
   &__group {
