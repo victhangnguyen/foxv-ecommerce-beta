@@ -1,16 +1,18 @@
 //! imp Library
-import Logging from '../library/Logging.js';
-import mongoose from 'mongoose';
+import Logging from "../library/Logging.js";
+import mongoose from "mongoose";
 
-import dotenv from 'dotenv';
+import dotenv from "dotenv";
 
 dotenv.config();
-const BASE_URL = process.env.BASE_URL || 'http://127.0.0.1';
-const MONGO_CLUSTER = process.env.MONGO_CLUSTER || '';
-const MONGO_USERNAME = process.env.MONGO_USERNAME || '';
-const MONGO_PASSWORD = process.env.MONGO_PASSWORD || '';
-const MONGO_DATABASE = process.env.MONGO_DATABASE || '';
+const BASE_URL = process.env.BASE_URL || "http://127.0.0.1";
+const MONGO_CLUSTER = process.env.MONGO_CLUSTER || "";
+const MONGO_USERNAME = process.env.MONGO_USERNAME || "";
+const MONGO_PASSWORD = process.env.MONGO_PASSWORD || "";
+const MONGO_DATABASE = process.env.MONGO_DATABASE || "";
 const MONGO_URL = `mongodb+srv://${MONGO_USERNAME}:${MONGO_PASSWORD}@${MONGO_CLUSTER}.mongodb.net/${MONGO_DATABASE}`;
+//! SEEDER
+const IS_SEEDER = process.env.IS_SEEDER || false;
 
 const SERVER_PORT = process.env.SERVER_PORT
   ? Number(process.env.SERVER_PORT)
@@ -25,6 +27,9 @@ const config = {
   server: {
     port: SERVER_PORT,
     baseURL: BASE_URL,
+  },
+  data: {
+    isSeeder: IS_SEEDER,
   },
   //!
   connectMongoDB: async () => {
