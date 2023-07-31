@@ -114,33 +114,38 @@ export const deleteUsers = async (req, res, next) => {
 };
 
 export const resetPasswords = async (req, res, next) => {
+  console.log(
+    "__Debugger__user\n:::resetPassword :::req.query: ",
+    req.query,
+    "\n"
+  );
   const userIds = req.query.ids;
 
   try {
     await execWithTransaction(async (session) => {
-      const promises = userIds.map(async (id) =>
+      const resetPasswordQuene = userIds.map(async (id) =>
         userService.resetPasswordAndSendEmail(id, session)
       );
 
-      const results = await Promise.allSettled(promises);
+      const _results = await Promise.allSettled(resetPasswordQuene);
 
-      const hasRejected = results.some(
+      const hasRejected = _results.some(
         (result) => result.status === "rejected"
       );
 
       if (hasRejected) {
         throw new Error(
-          results
-            .find((result) => result.status === "rejected")
-            ?.reason.toString()
-            .replace("Error: ", "")
+          _results.find((result) => result.status === "rejected")?.reason
         );
       }
 
-      return res.status(200).json({ success: true, data: { ...results } });
+      return res.status(200).json({ success: true, data: { ..._results } });
     });
   } catch (error) {
-    console.log("Error: ", error);
+    Logging.error("Error__ctrls__product: " + error);
+    const err = new Error(error);
+    err.statusCode = 400;
+    return next(err);
   }
 };
 

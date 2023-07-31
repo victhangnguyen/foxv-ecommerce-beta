@@ -21,6 +21,9 @@ import AlertDismissibleComponent from '../../../components/Alert/AlertDismissibl
 //! imp Comps/Button
 import GoToButtonComponent from '../../../components/Button/GoToButtonComponent';
 
+//! imp API
+import API from '../../../API';
+
 const ManageUserScreen = () => {
   const dispatch = useDispatch();
   const scrollPosition = useScrollPosition();
@@ -175,8 +178,8 @@ const ManageUserScreen = () => {
     try {
       if (actionType === DELETE_USERS) {
         /* REMOVE USER ACCOUNT */
-        const response = await userService.deleteUsers(selectedIds);
-        const results = response.data.results;
+        const response = await API.user.deleteUsers(selectedIds);
+        const results = response?.data?.results;
         //! set Alert style
         setAlertOpts({
           variant: 'success',
@@ -187,8 +190,8 @@ const ManageUserScreen = () => {
         });
       } else if (actionType === RESET_PASSWORDS) {
         /* RESET PASSWORD */
-        var response = await userService.resetPasswords(selectedIds);
-        var results = response.data.results;
+        var response = await API.user.resetPasswords(selectedIds);
+        var results = response?.data?.results;
 
         //! set Alert style
         setAlertOpts({

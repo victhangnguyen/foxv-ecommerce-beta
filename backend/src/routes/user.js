@@ -79,7 +79,7 @@ router.put(
 //! @route    PUT /api/amin/users/password/reset-multiple
 //! @access   Private: Admin
 router.put(
-  "/users/password/reset-multiple",
+  "/admin/users/password/reset-multiple",
   authenticate,
   isAdmin,
   userController.resetPasswords
