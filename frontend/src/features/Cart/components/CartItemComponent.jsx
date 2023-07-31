@@ -27,7 +27,7 @@ const CartItemComponent = ({
   React.useEffect(() => {
     async function loadProduct() {
       const response = await API.product.getProductById(cartItem.product);
-      setProduct(response.data?.product);
+      setProduct(response?.data?.product);
     }
 
     loadProduct();

@@ -1,5 +1,5 @@
-import React from 'react';
 import _ from 'lodash';
+import React from 'react';
 import { Link } from 'react-router-dom';
 import { toast } from 'react-toastify';
 
@@ -10,9 +10,9 @@ import API from '../../../API';
 import { Button, Card, Col, Row } from 'react-bootstrap';
 import AlertDismissibleComponent from '../../../components/Alert/AlertDismissibleComponent';
 import BreadcrumbComponent from '../../../components/Breadcrumb/BreadcrumbComponent';
+import GoToButtonComponent from '../../../components/Button/GoToButtonComponent';
 import ConfirmationModalComponent from '../../../components/Modal/ConfirmationModalComponent';
 import SubCategoryFormComponent from '../components/Form/SubCategoryFormComponent';
-import GoToButtonComponent from '../../../components/Button/GoToButtonComponent';
 
 //! components/icons
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -22,11 +22,9 @@ import constants from '../../../constants';
 
 //! imp Hooks
 import { useDispatch, useSelector } from 'react-redux';
-import { scrollToTop, useScrollPosition } from '../../../hooks/scroll';
+import { useScrollPosition } from '../../../hooks/scroll';
 
 //! imp Services
-import categoryService from '../../Category/services/categoryService';
-import subCategoryService from '../services/subCategoryService';
 
 //! imp Actions
 import {

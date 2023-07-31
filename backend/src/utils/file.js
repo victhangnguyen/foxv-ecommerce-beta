@@ -1,5 +1,5 @@
 import fs from "fs";
-import fsExtra from 'fs-extra';
+import fsExtra from "fs-extra";
 import url from "url";
 import path from "path";
 import { error } from "console";
@@ -63,10 +63,9 @@ export function checkFilesPermission(dir, files = []) {
       const path = `${dir}/${file}`;
       fs.access(
         path,
-        fs.constants.F_OK |
-          fs.constants.R_OK |
-          fs.constants.W_OK |
-          fs.constants.X_OK,
+        // fs.constants.F_OK |
+        fs.constants.R_OK | fs.constants.W_OK,
+        // fs.constants.X_OK,
         (error) => {
           if (error) return reject(error);
 
@@ -92,7 +91,6 @@ export const deleteAndCopyFolder = async (sourceFolder, targetFolder) => {
   try {
     await fsExtra.remove(targetFolder);
     await fsExtra.copy(sourceFolder, targetFolder);
-
   } catch (error) {
     throw error;
   }
