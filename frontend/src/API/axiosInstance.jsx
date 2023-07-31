@@ -1,11 +1,13 @@
 import axios from "axios";
 import Qs from "qs";
+//! imp Config
+import config from '../config';
 
 //! imp Actions
 import { refreshToken, signout } from "../features/Auth/AuthSlice";
 
 const axiosInstance = axios.create({
-  baseURL: "http://127.0.0.1:5000/api",
+  baseURL: `${config.react_app_db.databaseURL}/api`,
   headers: {
     "Content-Type": "application/json",
   },

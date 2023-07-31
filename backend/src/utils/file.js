@@ -25,7 +25,7 @@ export const deleteFiles = (dir, files) => {
   //! localFunction
   const unlinkQueue = files.map(function (file) {
     return new Promise(function (resolve, reject) {
-      const path = `${dir}\\${file}`;
+      const path = `${dir}/${file}`;
       fs.unlink(path, (err) => {
         if (err) return reject(err);
         return resolve(path + " was deleted!");
@@ -60,7 +60,7 @@ export async function checkFilePermission(path) {
 export function checkFilesPermission(dir, files = []) {
   const filesPermission = files.map((file) => {
     return new Promise(function (resolve, reject) {
-      const path = `${dir}\\${file}`;
+      const path = `${dir}/${file}`;
       fs.access(
         path,
         fs.constants.F_OK |
