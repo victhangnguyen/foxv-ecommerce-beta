@@ -1,8 +1,7 @@
 import _ from "lodash";
 import mongoose from "mongoose";
-import slugify from "slugify";
-import config from "../config/index.js";
 import path from "path";
+import config from "../config/index.js";
 
 //! imp Library
 import Logging from "../library/Logging.js";
@@ -15,9 +14,6 @@ import { getFileNameFromURL } from "../utils/url.js";
 import Product from "../models/Product.js";
 //! imp Services
 import productService from "../services/productService.js";
-
-const baseURL = config.db.server.baseURL;
-const port = config.db.server.port;
 
 export const getProductById = async (req, res, next) => {
   const productId = req.params.productId;
@@ -135,7 +131,7 @@ export const createProduct = async (req, res, next) => {
     const productData = {
       ...req.body,
       images: images?.map(
-        (img) => `${baseURL}:${port}/images/products/${img.filename}`
+        (img) => `${config.db.server.baseURL}/images/products/${img.filename}`
       ),
     };
 
@@ -203,7 +199,7 @@ export const updateProductById = async (req, res, next) => {
             );
             const imageName = images[imageIndex].filename;
 
-            return `${baseURL}:${port}/images/products/${imageName}`;
+            return `${config.db.server.baseURL}/images/products/${imageName}`;
           } else {
             return imageObj.image;
           }
