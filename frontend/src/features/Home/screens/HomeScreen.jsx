@@ -1,7 +1,7 @@
+import config from '../../../config';
 import React from 'react';
 //! imp RTK-Actions
-
-import { Container, Row } from 'react-bootstrap';
+import { Row } from 'react-bootstrap';
 
 //! imp helpers
 import { useScrollPosition } from '../../../hooks/scroll';
@@ -19,19 +19,19 @@ const HomeScreen = () => {
       key: 'slide-01',
       label: '',
       content: '',
-      src: 'http://localhost:5000/images/slides/slide-01.jpg',
+      src: `${config.react_app_db.databaseURL}/images/slides/slide-01.jpg`,
     },
     {
       key: 'slide-02',
       label: '',
       content: '',
-      src: 'http://localhost:5000/images/slides/slide-02.jpg',
+      src: `${config.react_app_db.databaseURL}/images/slides/slide-02.jpg`,
     },
     {
       key: 'slide-03',
       label: '',
       content: '',
-      src: 'http://localhost:5000/images/slides/slide-03.jpg',
+      src: `${config.react_app_db.databaseURL}/images/slides/slide-02.jpg`,
     },
   ];
 

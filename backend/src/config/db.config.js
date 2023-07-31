@@ -5,7 +5,15 @@ import mongoose from "mongoose";
 import dotenv from "dotenv";
 
 dotenv.config();
-const BASE_URL = process.env.BASE_URL || "http://127.0.0.1";
+
+const DB_PORT = process.env.DB_PORT || 5000;
+const DB_HOST = process.env.DB_HOST || "http://127.0.0.1";
+const DB_URL = process.env.DB_URL || `${DB_HOST}:${DB_PORT}`;
+
+const CLIENT_PORT = process.env.CLIENT_PORT || 3000;
+const CLIENT_HOST = process.env.CLIENT_HOST || "http://127.0.0.1";
+const CLIENT_URL = process.env.CLIENT_URL || `${CLIENT_HOST}:${CLIENT_PORT}`;
+
 const MONGO_CLUSTER = process.env.MONGO_CLUSTER || "";
 const MONGO_USERNAME = process.env.MONGO_USERNAME || "";
 const MONGO_PASSWORD = process.env.MONGO_PASSWORD || "";
@@ -24,9 +32,15 @@ const config = {
     password: MONGO_PASSWORD,
     url: MONGO_URL,
   },
+  client: {
+    port: CLIENT_PORT,
+    host: CLIENT_HOST,
+    baseURL: CLIENT_URL,
+  },
   server: {
-    port: SERVER_PORT,
-    baseURL: BASE_URL,
+    port: DB_PORT,
+    host: DB_HOST,
+    baseURL: DB_URL,
   },
   data: {
     isSeeder: IS_SEEDER,

@@ -65,7 +65,7 @@ export const signup = async (req, res, next) => {
       text: "Please click on the following link to login your email address:",
       html: `
       <div>
-        <p>Please click <a href="http://localhost:3000/auth/login">here</a> to login</p>
+        <p>Please click <a href="${config.db.client.baseURL}/auth/login">here</a> to login</p>
         <p>Username: ${username}</p>
         <p>Password: ${password}</p>
       </div>

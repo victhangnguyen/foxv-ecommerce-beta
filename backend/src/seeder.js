@@ -67,7 +67,7 @@ const importData = async () => {
       slug: slugify(product.name),
       images: product.images.map(
         (image) =>
-          `${config.db.server.baseURL}:${config.db.server.port}/images/products/${image}`
+          `${config.db.server.baseURL}/images/products/${image}`
       ),
     }));
 

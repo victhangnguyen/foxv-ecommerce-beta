@@ -14,8 +14,9 @@ import Role from "../models/Role.js";
 //! imp Services
 import userService from "../services/userService.js";
 
-//! custom Connection
+//! imp Configs
 import config from "../config/index.js";
+
 //! database
 const db = mongoose.connection;
 
@@ -215,8 +216,8 @@ export const createUser = async (req, res, next) => {
       text: "Please click on the following link to login your email address:",
       html: `
       <div>
-        <p>Please click <a href="http://localhost:3000/auth/login">here</a> to login</p>
-        <p>Username: ${userData.username}</p>
+      <p>Please click <a href="${config.db.client.baseURL}/auth/login">here</a> to login</p>
+      <p>Username: ${userData.username}</p>
         <p>Password: ${password}</p>
       </div>
       `,
