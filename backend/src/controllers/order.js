@@ -273,6 +273,7 @@ export async function updateOrder(req, res, next) {
 
 export async function getInvoice(req, res, next) {
   const orderId = req.params.orderId;
+  console.log('__Debugger__order\n:::getInvoice :::orderId: ', orderId, '\n');
   try {
     const order = await Order.findById(orderId);
 

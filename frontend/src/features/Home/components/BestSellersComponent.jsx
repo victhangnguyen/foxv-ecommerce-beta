@@ -33,8 +33,8 @@ const BestSellersComponent = ({ title }) => {
       perPage: itemsPerPage,
     });
 
-    setProducts(response.data?.products);
-    setProductsCount(response.data?.productsCount);
+    setProducts(response?.data?.products);
+    setProductsCount(response?.data?.productsCount);
   }
 
   return (

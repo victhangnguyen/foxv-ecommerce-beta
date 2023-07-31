@@ -94,13 +94,7 @@ const CheckoutPaymentScreen = ({ entity }) => {
                 orderPayAmount: total,
               })
             ).unwrap();
-
-            console.log(
-              "__Debugger__CheckoutPaymentScreen\n:::dispatch >> checkoutOrder :::response: ",
-              response,
-              "\n"
-            );
-
+            
             // window.open(redirect, "_self");
           }
         }
@@ -129,7 +123,6 @@ const CheckoutPaymentScreen = ({ entity }) => {
     const { name, address, bankCode } = data;
     const orderId = order.newOrder?._id || null;
     dispatch(
-      //! checkout Order with createOrderByUserId
       checkoutOrder({
         orderId,
         name,

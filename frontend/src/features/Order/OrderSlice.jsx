@@ -32,11 +32,6 @@ const OrderSlice = createSlice({
         state.loading = true;
       })
       .addCase(checkoutOrder.fulfilled, (state, action) => {
-        console.log(
-          "__Debugger__OrderSlice\n:::checkoutOrder :::action.payload: ",
-          action.payload,
-          "\n"
-        );
         state.loading = false;
         state.newOrder = {
           ...action.payload?.data?.order,
