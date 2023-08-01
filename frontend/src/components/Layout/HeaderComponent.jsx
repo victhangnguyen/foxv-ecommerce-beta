@@ -55,7 +55,7 @@ const HeaderComponent = () => {
       //! if no Token then signout
       if (token) {
         //! save Cart to database
-        await dispatch(postCart()).unwrap(); //! not authenticated
+        // await dispatch(postCart()).unwrap(); //! not authenticated
       }
 
       //! logout

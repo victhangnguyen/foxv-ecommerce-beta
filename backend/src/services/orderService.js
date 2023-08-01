@@ -61,11 +61,7 @@ async function checkoutOrder(userId, orderData, session) {
     total: req.body.orderPayAmount,
   */
   const { orderId, ...otherData } = orderData;
-  console.log(
-    "__Debugger__orderService\n:::checkoutOrder :::orderData: ",
-    orderData,
-    "\n"
-  );
+
   try {
     const order = await Order.findOne({
       _id: orderId,
@@ -110,6 +106,7 @@ async function checkoutOrder(userId, orderData, session) {
     let currentOrder;
 
     if (order) {
+      console.log('checkoutOrder - UPDATE')
       //! updateOrder: items and total
       currentOrder = await Order.findByIdAndUpdate(
         order._id,
@@ -120,6 +117,8 @@ async function checkoutOrder(userId, orderData, session) {
     } else {
       //! createOrder
       currentOrder = await Order.create({ ...otherData, user: userId });
+      console.log('checkoutOrder - CREATE NEW')
+
     }
 
     const updatedStockQuene = orderData.items.map(async (item) => {

@@ -17,11 +17,7 @@ import productService from "../services/productService.js";
 
 export const getProductById = async (req, res, next) => {
   const productId = req.params.productId;
-  console.log(
-    "__Debugger__product\n__getProductById__productId: ",
-    productId,
-    "\n"
-  );
+
   try {
     if (!mongoose.Types.ObjectId.isValid(productId)) {
       throw new Error("Product does not exist!");

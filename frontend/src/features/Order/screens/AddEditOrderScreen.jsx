@@ -27,6 +27,11 @@ const AddEditOrderScreen = ({ entity }) => {
   const { orderId } = useParams();
 
   //! rootState
+  const auth = useSelector((state) => state.auth);
+  const isAdminController = auth.user?.roles
+    ?.map((role) => role.name)
+    .includes("admin");
+
   const { order, newOrder, loading, success, message, error } = useSelector(
     (state) => state.order
   );
@@ -224,6 +229,7 @@ const AddEditOrderScreen = ({ entity }) => {
         </div>
         <div className="col-md-6 col-lg-6 col-xl-7 offset-md-1">
           <OrderFormComponent
+            isAdminController={isAdminController}
             order={order}
             orderId={orderId}
             initialValues={initialValues}

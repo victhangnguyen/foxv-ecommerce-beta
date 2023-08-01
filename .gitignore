@@ -4,6 +4,7 @@ node_modules
 .pnp.js
 package-lock.json
 backend/images
+backend/data/
 
 ##### Reactjs
 # dependencies

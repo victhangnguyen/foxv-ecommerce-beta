@@ -53,6 +53,8 @@ const CheckoutPaymentScreen = ({ entity }) => {
     };
   }, [order.success, order.message, order.error]);
 
+  //! Handling Timeout 
+
   React.useLayoutEffect(() => {
     // let redirect = `/order/${order.newOrder?._id}`;
     async function handleCheckoutOrder() {

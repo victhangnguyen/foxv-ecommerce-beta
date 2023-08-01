@@ -2,10 +2,7 @@ import path from "path";
 import fs from "fs";
 import PDFDocument from "pdfkit";
 import mongoose from "mongoose";
-//! imp Config
-import config from "../config/index.js";
-const baseURL = config.db.server.baseURL;
-const port = config.db.server.port;
+
 //! imp Constant
 import constants from "../constants/index.js";
 
@@ -22,6 +19,9 @@ import { parseIntlNumber } from "../utils/parse.js";
 import { execWithTransaction } from "../utils/transaction.js";
 //! imp Models
 import Order from "../models/Order.js";
+
+//! imp Config
+import config from "../config/index.js";
 
 export async function getOrderById(req, res, next) {
   const orderId = req.params.orderId;
@@ -47,7 +47,7 @@ export async function getOrderById(req, res, next) {
 
 //! checkout an Order with createOrderByUserId
 export async function checkoutOrder(req, res, next) {
-  const userId = req.user?._id || null;
+  const userId = req.user?._id;
 
   const orderData = {
     orderId: req.body.orderId,
@@ -74,8 +74,6 @@ export async function checkoutOrder(req, res, next) {
       return _results;
     });
 
-    console.log('__Debugger__order\n:::checkoutOrder :::createdOrder: ', createdOrder, '\n');
-
     /*
       return createdOrder:
       _id, items: [{...},...], total, status, name, address, transactionNo, bankTranNo, orderDate, createdAt, updatedAt
@@ -92,6 +90,13 @@ export async function checkoutOrder(req, res, next) {
       createdOrder.total,
       createdOrder.bankCode // 'NCB'
     );
+
+    console.log(
+      "__Debugger__order\n:::checkoutOrder :::createdOrder: ",
+      createdOrder,
+      "\n"
+    );
+
 
     res.status(201).json({
       success: true,
@@ -144,15 +149,15 @@ export const createOrder = async (req, res, next) => {
 };
 
 export const getOrdersByFilters = async (req, res, next) => {
-  const { sort, order, page, perPage, keyword, status, userId } = req.query;
-  console.log("search.userId: ", userId);
+  const { sort, order, page, perPage, keyword, status, user } = req.query;
+  console.log("search.user: ", user);
   let match = {};
   // if (status) {
   //   match.$and = [{ status }];
   // }
 
-  if (userId) {
-    match.user = mongoose.Types.ObjectId(userId);
+  if (user) {
+    match.user = mongoose.Types.ObjectId(user);
   }
 
   if (status) {
@@ -273,7 +278,6 @@ export async function updateOrder(req, res, next) {
 
 export async function getInvoice(req, res, next) {
   const orderId = req.params.orderId;
-  console.log('__Debugger__order\n:::getInvoice :::orderId: ', orderId, '\n');
   try {
     const order = await Order.findById(orderId);
 
@@ -323,7 +327,7 @@ export async function getInvoice(req, res, next) {
 
     const filePath = path.join("data", "invoices", invoiceName);
 
-    const invoiceUrl = `${baseURL}:${port}/${filePath}`;
+    const invoiceUrl = `${config.db.server.baseURL}/${filePath}`;
 
     return res.status(200).json({
       success: true,

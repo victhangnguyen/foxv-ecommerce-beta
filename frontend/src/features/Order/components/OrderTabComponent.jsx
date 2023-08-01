@@ -1,8 +1,8 @@
-import React from 'react';
-import { Form, Button, FormCheck } from 'react-bootstrap';
+import React from "react";
+import { Form, Button, FormCheck } from "react-bootstrap";
 //! imp Comps
-import OrderItemComponent from './OrderItemComponent';
-import ToolbarComponent from '../components/ToolbarComponent';
+import OrderItemComponent from "./OrderItemComponent";
+import ToolbarComponent from "../components/ToolbarComponent";
 
 const OrderTabComponent = ({
   orders,
@@ -18,6 +18,7 @@ const OrderTabComponent = ({
   const renderOrderItems = orders?.map((order) => {
     return (
       <OrderItemComponent
+        isAdmin={true}
         key={order._id}
         order={order}
         selectedIds={selectedIds}

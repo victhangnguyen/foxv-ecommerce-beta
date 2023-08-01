@@ -1,7 +1,7 @@
 import axios from "axios";
 import Qs from "qs";
 //! imp Config
-import config from '../config';
+import config from "../config";
 
 //! imp Actions
 import { refreshToken, signout } from "../features/Auth/AuthSlice";
@@ -66,7 +66,7 @@ export const interceptor = (store) => {
         // error instanceof jwt.TokenExpiredError
         //! 403
         if (
-          error.response.status === FORBIDDEN &&
+          error.response?.status === FORBIDDEN &&
           error.response?.data?.message ===
             "Your session has expired. Please log in again to continue using our service."
         ) {
@@ -98,7 +98,12 @@ export const interceptor = (store) => {
             return axiosInstance(originalConfig);
           } catch (error) {
             // If Promise.reject(err) -> throw this error to handleSubmit
-            Promise.reject(error.message);
+            Promise.reject(
+              error.response?.data?.message ||
+                error.response?.message ||
+                error?.message ||
+                error
+            );
           }
         }
       }
