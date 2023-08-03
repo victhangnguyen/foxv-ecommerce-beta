@@ -1,4 +1,3 @@
-import _ from 'lodash';
 import React from 'react';
 import * as yup from 'yup';
 
@@ -20,7 +19,7 @@ const validationSchema = yup.object({
   description: yup
     .string()
     .min(4, 'Ít nhất 4 ký tự.')
-    .max(1000, 'Nhiều nhất 1024 ký tự.'),
+    .max(1024, 'Nhiều nhất 1024 ký tự.'),
   category: yup.string().required('Yêu cầu chọn Kiểu sản phẩm.'),
   //   .string()
   //   .min(24, 'Category không hợp lệ')

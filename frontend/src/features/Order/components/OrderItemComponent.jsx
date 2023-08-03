@@ -11,7 +11,7 @@ const OrderItemComponent = ({
   handleCheckChange,
   handleOpenModal,
   isAdmin = false,
-  userId
+  userId,
 }) => {
   const menuItems = [
     {
@@ -35,7 +35,7 @@ const OrderItemComponent = ({
         <td className="py-1 px-3">
           <FormCheck
             inline
-            id={`chk-${order._id}`}
+            id={order._id}
             checked={selectedIds?.includes(order._id)}
             onChange={handleCheckChange}
           />

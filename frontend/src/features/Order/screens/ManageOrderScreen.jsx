@@ -227,18 +227,18 @@ const ManageOrderScreen = () => {
         });
 
         checkSelectedIds();
-} else if (actionType === constants.order.actionTypes.DELETE_ORDERS) {
-  /* RESET PASSWORD */
-  const response = await dispatch(deleteOrders(selectedIds)).unwrap();
+      } else if (actionType === constants.order.actionTypes.DELETE_ORDERS) {
+        /* RESET PASSWORD */
+        const response = await dispatch(deleteOrders(selectedIds)).unwrap();
 
-  setAlertOpts({
-    variant: response.success ? "success" : "danger",
-    title: `Xóa nhiều hóa đơn thành công`,
-    message: `Xoá nhiều hóa đơn [Người nhận: ${response.data.deletedOrders[0].name}, số tiền:  ${response.data.deletedOrders[0].total}đ, ...] thành công!`,
-  });
+        setAlertOpts({
+          variant: response.success ? "success" : "danger",
+          title: `Xóa nhiều hóa đơn thành công`,
+          message: `Xoá nhiều hóa đơn [Người nhận: ${response.data.deletedOrders[0].name}, số tiền:  ${response.data.deletedOrders[0].total}đ, ...] thành công!`,
+        });
 
-  resetCheckAll();
-}
+        resetCheckAll();
+      }
 
       handleHideModal();
       handleShowAlert();
@@ -284,10 +284,12 @@ const ManageOrderScreen = () => {
     const { id, checked } = e.target;
 
     if (!checked) {
+      //! un-check
       setSelectedIds((prevState) =>
         prevState.filter((orderId) => orderId !== id)
       );
     } else {
+      //! checked
       setSelectedIds((prevState) => [...prevState, id]);
     }
     //! reset isCheckAll
@@ -463,6 +465,7 @@ const ManageOrderScreen = () => {
           itemsPerPage={itemsPerPage}
           setCurrentPage={setCurrentPage}
           alwaysShown={false}
+          alwayScrollToTop={true}
         />
       </div>
       <ConfirmationModalComponent

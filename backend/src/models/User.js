@@ -21,6 +21,8 @@ const userSchema = new mongoose.Schema(
     },
     username: {
       type: String,
+      minLength: [8, "Thấp nhất 8 ký tự"],
+      maxLength: [64, "Nhiều nhất 64 ký tự"],
       required: true,
       unique: true,
     },
