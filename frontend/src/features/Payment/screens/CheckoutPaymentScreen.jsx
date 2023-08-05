@@ -107,7 +107,6 @@ const CheckoutPaymentScreen = ({ entity }) => {
 
     handleCheckoutOrder();
   }, [order.newOrder?._id, order.newOrder?.items, isMounted]);
-  // }, []);
 
   const initialValues = {
     bankCode: "",

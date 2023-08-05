@@ -78,7 +78,7 @@ export const interceptor = (store) => {
           }
         }
         //! 401
-        if (error.response.status === UNAUTHORIZED && !originalConfig._retry) {
+        if (error.response?.status === UNAUTHORIZED && !originalConfig._retry) {
           //! toggle flag: true
           originalConfig._retry = true;
           try {

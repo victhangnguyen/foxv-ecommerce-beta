@@ -11,7 +11,8 @@ import Order from '../models/Order.js';
   vnpayReturn
 */
 export async function getVnpayReturn(req, res, next) {
-  try {
+
+try {
     const result = await paymentService.checkPaymentStatus(req.query);
 
     console.log('__Debugger__payment\n:::getVnpayReturn :::result: ', result, '\n');
@@ -73,13 +74,11 @@ export async function getVnpayReturn(req, res, next) {
     //   message = 'Thanh toán thất bại';
     // }
 
-    //
-
     console.log('__Debugger__payment\n:::getVnpayReturn :::order: ', order, '\n');
     res.send(`
       <script>
         alert('${message}');
-      window.open('${result.data.clientUrl}/users/${order.user._id}/orders/${result.data.orderId}', '_self', '')
+        window.open('${result.data.clientUrl}/users/${order.user._id}/orders/${result.data.orderId}/update', '_self', '')
       </script>
     `);
   } catch (error) {
