@@ -39,6 +39,7 @@ const CheckoutPaymentScreen = ({ entity }) => {
         title: "Thông báo",
         message: order.message,
       });
+      handleShowAlert();
     }
     if (order.success === false && order.error) {
       setAlertOpts({
@@ -46,14 +47,14 @@ const CheckoutPaymentScreen = ({ entity }) => {
         title: "Lỗi hệ thống",
         message: order.error,
       });
+      handleShowAlert();
     }
-    handleShowAlert();
     return () => {
       dispatch(clearNotification());
     };
   }, [order.success, order.message, order.error]);
 
-  //! Handling Timeout 
+  //! Handling Timeout
 
   React.useLayoutEffect(() => {
     // let redirect = `/order/${order.newOrder?._id}`;
@@ -96,7 +97,7 @@ const CheckoutPaymentScreen = ({ entity }) => {
                 orderPayAmount: total,
               })
             ).unwrap();
-            
+
             // window.open(redirect, "_self");
           }
         }

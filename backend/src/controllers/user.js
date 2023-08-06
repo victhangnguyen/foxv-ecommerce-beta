@@ -21,7 +21,11 @@ import config from "../config/index.js";
 const db = mongoose.connection;
 
 export const getUsersByFilters = async (req, res, next) => {
-  const { keyword, sort, order, page, perPage } = req.query;
+  const { keyword, age } = req.query;
+  const sort = req.query.sort !== "underfined" ? req.query.sort : "createdAt";
+  const order = +req.query.order || 1;
+  const page = +req.query.page || 1;
+  const perPage = +req.query.perPage || 1;
 
   let match = {};
 
@@ -39,7 +43,7 @@ export const getUsersByFilters = async (req, res, next) => {
 
     const result = await User.aggregate([
       { $match: match },
-      { $sort: { [sort]: +order, _id: 1 } },
+      { $sort: { [sort]: order, _id: 1 } },
       {
         //! populate
         $lookup: {
@@ -51,7 +55,7 @@ export const getUsersByFilters = async (req, res, next) => {
       },
       {
         $facet: {
-          users: [{ $skip: skip }, { $limit: +perPage }],
+          users: [{ $skip: skip }, { $limit: perPage }],
           usersCount: [{ $count: "count" }],
         },
       },

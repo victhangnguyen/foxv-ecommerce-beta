@@ -45,7 +45,7 @@ const ManageProductScreen = () => {
     category: '',
   });
 
-  const [sort, setSort] = React.useState('createdAt');
+  const [sort, setSort] = React.useState('updatedAt');
   const [order, setOrder] = React.useState(-1);
   const [currentPage, setCurrentPage] = React.useState(1);
 

@@ -6,9 +6,15 @@ export function getUserById(userId) {
   return axiosInstance.get(url);
 }
 
-export function getUsersByFilters(params) {
+export function getUsersByFilters(sort, order, page, perPage, filterOpts) {
   const url = `/users/search/filters`;
-  const urlQueryParams = urlHandling.serializeQueryParams(url, params);
+  const urlQueryParams = urlHandling.serializeQueryParams(url, {
+    sort,
+    order,
+    page,
+    perPage,
+    ...filterOpts,
+  });
   return axiosInstance.get(urlQueryParams);
 }
 

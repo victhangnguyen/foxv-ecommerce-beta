@@ -11,6 +11,7 @@ import userReducer from '../features/User/UserSlice';
 import searchReducer from '../features/Search/SearchSlice';
 import cartReducer from '../features/Cart/CartSlice';
 import orderReducer from '../features/Order/OrderSlice';
+import dashboardReducer from '../features/Admin/dashboardSlice';
 
 const rootPersistConfig = {
   key: 'root',
@@ -60,6 +61,11 @@ const userPersistConfig = {
   storage: storage,
   blacklist: ['loading', 'error', 'success'],
 };
+const dashboardPersistConfig = {
+  key: 'dashboard',
+  storage: storage,
+  blacklist: ['loading', 'error', 'success'],
+};
 
 const rootReducer = combineReducers({
   auth: persistReducer(authPersistConfig, authReducer),
@@ -70,6 +76,7 @@ const rootReducer = combineReducers({
   order: persistReducer(orderPersistConfig, orderReducer),
   user: persistReducer(userPersistConfig, userReducer),
   search: searchReducer,
+  dashboard: persistReducer(dashboardPersistConfig, dashboardReducer),
 });
 
 export default persistReducer(rootPersistConfig, rootReducer);

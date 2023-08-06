@@ -32,7 +32,7 @@ const AddEditOrderScreen = ({ entity }) => {
     ?.map((role) => role.name)
     .includes("admin");
 
-  const { order, newOrder, loading, success, message, error } = useSelector(
+  const { order, newOrder, success, message, error } = useSelector(
     (state) => state.order
   );
 
@@ -55,6 +55,7 @@ const AddEditOrderScreen = ({ entity }) => {
         title: "Thông báo",
         message: message,
       });
+      handleShowAlert();
     }
     if (success === false && error) {
       setAlertOpts({
@@ -62,8 +63,8 @@ const AddEditOrderScreen = ({ entity }) => {
         title: "Lỗi hệ thống",
         message: error,
       });
+      handleShowAlert();
     }
-    handleShowAlert();
     return () => {
       dispatch(clearNotification());
     };
@@ -115,7 +116,7 @@ const AddEditOrderScreen = ({ entity }) => {
 
   async function loadOrderById(orderId) {
     try {
-      const response = await dispatch(getOrderById(orderId));
+      await dispatch(getOrderById(orderId));
     } catch (error) {
       console.log("Error: ", error);
     }

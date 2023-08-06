@@ -97,7 +97,6 @@ export async function checkoutOrder(req, res, next) {
       "\n"
     );
 
-
     res.status(201).json({
       success: true,
       message: "Create an Order successful!",
@@ -149,12 +148,29 @@ export const createOrder = async (req, res, next) => {
 };
 
 export const getOrdersByFilters = async (req, res, next) => {
-  const { sort, order, page, perPage, keyword, status, user } = req.query;
+  const { keyword, status, user } = req.query;
+  const sort = req.query.sort !== "underfined" ? req.query.sort : "createdAt";
+  const order = +req.query.order || 1;
+  const page = +req.query.page || 1;
+  const perPage = +req.query.perPage || 1;
   console.log("search.user: ", user);
   let match = {};
   // if (status) {
   //   match.$and = [{ status }];
   // }
+
+  // console.log("__Debugger__order\n:::getOrdersByFilters :::sort: ", sort, "\n");
+  // console.log(
+  //   "__Debugger__order\n:::getOrdersByFilters :::order: ",
+  //   order,
+  //   "\n"
+  // );
+  // console.log("__Debugger__order\n:::getOrdersByFilters :::page: ", page, "\n");
+  // console.log(
+  //   "__Debugger__order\n:::getOrdersByFilters :::perPage: ",
+  //   perPage,
+  //   "\n"
+  // );
 
   if (user) {
     match.user = mongoose.Types.ObjectId(user);
@@ -177,10 +193,10 @@ export const getOrdersByFilters = async (req, res, next) => {
 
     const result = await Order.aggregate([
       { $match: match },
-      { $sort: { [sort]: +order, _id: 1 } },
+      { $sort: { [sort]: order, _id: 1 } },
       {
         $facet: {
-          orders: [{ $skip: skip }, { $limit: +perPage }],
+          orders: [{ $skip: skip }, { $limit: perPage }],
           ordersCount: [{ $count: "count" }],
         },
       },
@@ -189,7 +205,11 @@ export const getOrdersByFilters = async (req, res, next) => {
     const orders = result[0].orders;
     const ordersCount = result[0].ordersCount[0]?.count || 0;
 
-    res.status(200).json({ orders, ordersCount });
+    res.status(200).json({
+      success: true,
+      message: "Get many orders successful!",
+      data: { orders, ordersCount },
+    });
   } catch (error) {
     Logging.error("Error__ctrls__Order: " + error);
     const err = new Error(error);

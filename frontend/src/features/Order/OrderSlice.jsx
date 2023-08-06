@@ -66,13 +66,14 @@ const OrderSlice = createSlice({
       })
       .addCase(getOrdersByFilters.fulfilled, (state, action) => {
         state.loading = false;
-        state.orders = action.payload.orders;
-        state.ordersCount = action.payload.ordersCount;
+        state.success = action.payload.success;
+        state.orders = action.payload.data.orders;
+        state.ordersCount = action.payload.data.ordersCount;
       })
       .addCase(getOrdersByFilters.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.payload.message;
         state.success = false;
+        state.error = action.payload.message;
       });
     builder
       .addCase(getOrderById.pending, (state, action) => {
@@ -252,20 +253,8 @@ export const createOrder = createAsyncThunk(
         bankTranNo,
       });
 
-      console.log(
-        "__Debugger__OrderSlice\n__createOrder__response: ",
-        response,
-        "\n"
-      );
-
       return thunkAPI.fulfillWithValue(response);
     } catch (error) {
-      console.log(
-        "__Debugger__OrderSlice\n__createOrder__error: ",
-        error,
-        "\n"
-      );
-
       return thunkAPI.rejectWithValue({
         message:
           error.response?.data?.message ||
@@ -284,15 +273,15 @@ export const createOrder = createAsyncThunk(
 
 export const getOrdersByFilters = createAsyncThunk(
   "order/getOrdersByFilters",
-  async ({ sort, order, page, perPage, search }, thunkAPI) => {
+  async ({ sort, order, page, perPage, filterOpts }, thunkAPI) => {
     try {
-      const response = await API.order.getOrdersByFilters({
+      const response = await API.order.getOrdersByFilters(
         sort,
         order,
         page,
         perPage,
-        search,
-      });
+        filterOpts
+      );
       return thunkAPI.fulfillWithValue(response);
     } catch (error) {
       return thunkAPI.rejectWithValue({

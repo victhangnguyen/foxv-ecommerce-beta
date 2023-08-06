@@ -82,7 +82,6 @@ const userSlice = createSlice({
         state.message = action.payload.message;
       })
       .addCase(updateUserInfoById.rejected, (state, action) => {
-        
         state.loading = false;
         state.success = action.payload.success;
         state.error = action.payload.message;
@@ -145,15 +144,15 @@ export const getUserById = createAsyncThunk(
 
 export const getUsersByFilters = createAsyncThunk(
   "/user/getUsersByFilters",
-  async ({ sort, order, page, perPage, search }, thunkAPI) => {
+  async ({ sort, order, page, perPage, filterOpts }, thunkAPI) => {
     try {
-      const response = await API.user.getUsersByFilters({
+      const response = await API.user.getUsersByFilters(
         sort,
         order,
         page,
         perPage,
-        ...search,
-      });
+        filterOpts
+      );
 
       return thunkAPI.fulfillWithValue(response);
     } catch (error) {

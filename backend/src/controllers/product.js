@@ -373,7 +373,11 @@ export const deleteProductsByIds = async (req, res, next) => {
 };
 
 export async function getProductsByFilters(req, res, next) {
-  const { sort, order, page, perPage, keyword, price, category } = req.query;
+  const { keyword, price, category } = req.query;
+  const sort = req.query.sort !== "underfined" ? req.query.sort : "createdAt";
+  const order = +req.query.order || 1;
+  const page = +req.query.page || 1;
+  const perPage = +req.query.perPage || 1;
 
   try {
     let match = {};
@@ -424,10 +428,10 @@ export async function getProductsByFilters(req, res, next) {
           as: "subCategories",
         },
       },
-      { $sort: { [sort]: +order, _id: 1 } },
+      { $sort: { [sort]: order, _id: 1 } },
       {
         $facet: {
-          products: [{ $skip: (page - 1) * perPage }, { $limit: +perPage }],
+          products: [{ $skip: (page - 1) * perPage }, { $limit: perPage }],
           productsCount: [{ $count: "count" }],
         },
       },

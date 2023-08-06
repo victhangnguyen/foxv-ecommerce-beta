@@ -137,7 +137,7 @@ const ManageOrderScreen = () => {
           order: order,
           page: currentPage,
           perPage: itemsPerPage,
-          search: search,
+          filterOpts: search,
         })
       ).unwrap();
       setLoading(false);
