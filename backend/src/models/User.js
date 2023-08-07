@@ -1,5 +1,7 @@
 import mongoose from "mongoose";
 import bcrypt from "bcryptjs";
+//! imp Models
+import Role from "../models/Role.js";
 
 //! imp Services
 import userService from "../services/userService.js";
@@ -67,11 +69,8 @@ const userSchema = new mongoose.Schema(
 
 // Hash the password before saving it to the database
 userSchema.pre("save", async function (next) {
-  const userRole = await mongoose.model("Role").findOne({ name: "user" });
   if (this.isModified("password")) {
     this.password = await bcrypt.hash(this.password, 10);
-    //! active Account
-    this.roles = [userRole._id];
   }
   next();
 });

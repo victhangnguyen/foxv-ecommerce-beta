@@ -1,30 +1,27 @@
-import React from 'react';
-import { Card, Col, Row } from 'react-bootstrap';
-import { Link } from 'react-router-dom';
-import { toast } from 'react-toastify';
+import React from "react";
+import { Card, Col, Row } from "react-bootstrap";
+import { Link } from "react-router-dom";
 //! Hooks
-import { useDispatch, useSelector } from 'react-redux';
-import { scrollToTop } from '../../../hooks/scroll';
+import { useDispatch, useSelector } from "react-redux";
+import { scrollToTop } from "../../../hooks/scroll";
 
 //! imp Actions
-import { signup } from '../AuthSlice';
+import { signup } from "../AuthSlice";
 
 //! imp Comps
-import AlertDismissibleComponent from '../../../components/Alert/AlertDismissibleComponent';
-import RegisterFormComponent from '../components/RegisterFormComponent';
+import AlertDismissibleComponent from "../../../components/Alert/AlertDismissibleComponent";
+import RegisterFormComponent from "../components/RegisterFormComponent";
 
 const RegisterScreen = () => {
   const dispatch = useDispatch();
   const auth = useSelector((state) => state.auth);
 
-  const [newUser, setNewUser] = React.useState({});
-
   //! localState: Alert
   const [showAlert, setShowAlert] = React.useState(false);
   const [alertOpts, setAlertOpts] = React.useState({
-    variant: '',
-    title: '',
-    message: '',
+    variant: "",
+    title: "",
+    message: "",
   });
 
   const handleSignupSubmit = async (data, e, methods) => {
@@ -51,15 +48,16 @@ const RegisterScreen = () => {
       ).unwrap();
 
       if (response.success) {
+        //! make Form clear
+        methods.reset();
+        //! goto Top
         scrollToTop();
+
         setAlertOpts({
-          variant: 'success',
-          title: 'Đăng ký tài khoản thành công',
+          variant: "success",
+          title: "Đăng ký tài khoản thành công",
           message: `Bạn đã đăng ký thành công tài khoản [${response.data.user.email}].`,
         });
-
-        setNewUser(response.data.user);
-        toast.success(response.message);
         setShowAlert(true);
       }
     } catch (error) {
@@ -69,7 +67,7 @@ const RegisterScreen = () => {
         if (!errors?.length) return;
         errors.forEach((error) => {
           methods.setError(error.param, {
-            type: 'server',
+            type: "server",
             message: error.msg,
           });
         });
@@ -78,8 +76,8 @@ const RegisterScreen = () => {
       }
 
       setAlertOpts({
-        variant: 'danger',
-        title: 'Lỗi hệ thống',
+        variant: "danger",
+        title: "Lỗi hệ thống",
         message:
           error.response?.data?.message ||
           error.response?.message ||
@@ -126,12 +124,15 @@ const RegisterScreen = () => {
                   //! RegisterFormComponent
                 }
                 <div className="my-4">
-                  <RegisterFormComponent onSubmit={handleSignupSubmit} />
+                  <RegisterFormComponent
+                    loading={auth?.loading}
+                    onSubmit={handleSignupSubmit}
+                  />
                 </div>
                 <div className="mt-3">
                   <p className="mb-0  text-center">
-                    Bạn đã có tài khoản?{' '}
-                    <Link to={'/auth/login'} className="text-primary fw-bold">
+                    Bạn đã có tài khoản?{" "}
+                    <Link to={"/auth/login"} className="text-primary fw-bold">
                       Đăng nhập
                     </Link>
                   </p>

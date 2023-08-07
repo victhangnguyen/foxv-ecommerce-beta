@@ -96,7 +96,7 @@ const ManageOrderScreen = () => {
     return () => {
       dispatch(clearNotification());
     };
-  }, [success, error]);
+  }, [success, error, message]);
 
   React.useEffect(() => {
     const load = async () => {

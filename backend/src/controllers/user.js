@@ -118,11 +118,6 @@ export const deleteUsers = async (req, res, next) => {
 };
 
 export const resetPasswords = async (req, res, next) => {
-  console.log(
-    "__Debugger__user\n:::resetPassword :::req.query: ",
-    req.query,
-    "\n"
-  );
   const userIds = req.query.ids;
 
   try {
@@ -179,6 +174,7 @@ export const createUser = async (req, res, next) => {
     email: req.body.email,
     phoneNumber: req.body.phoneNumber,
   };
+
   try {
     // Check if username or email already exists
     const existingUser = await User.findOne().or([
@@ -192,12 +188,15 @@ export const createUser = async (req, res, next) => {
         .json({ message: "Username or email already exists." });
     }
 
+    const userRole = await Role.findOne({ name: "user" });
     //! generatePassword and hash password
     const password = userService.generatePassword(12);
 
     // create newUser with hashed password
     const newUser = new User({
       ...userData,
+      //! active Account
+      roles: [userRole._id],
       password,
     });
 
