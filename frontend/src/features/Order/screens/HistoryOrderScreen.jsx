@@ -119,7 +119,7 @@ const HistoryOrderScreen = () => {
           search: {
             keyword: search.keyword,
             status: search.status,
-            userId: userId,
+            user: userId,
           },
         })
       ).unwrap();
@@ -326,6 +326,7 @@ const HistoryOrderScreen = () => {
     return (
       <OrderItemComponent
         key={order._id}
+        userId={userId}
         order={order}
         selectedIds={selectedIds}
         handleOpenModal={handleOpenModal}

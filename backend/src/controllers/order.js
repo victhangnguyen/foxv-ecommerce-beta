@@ -2,10 +2,7 @@ import path from "path";
 import fs from "fs";
 import PDFDocument from "pdfkit";
 import mongoose from "mongoose";
-//! imp Config
-import config from "../config/index.js";
-const baseURL = config.db.server.baseURL;
-const port = config.db.server.port;
+
 //! imp Constant
 import constants from "../constants/index.js";
 
@@ -22,6 +19,9 @@ import { parseIntlNumber } from "../utils/parse.js";
 import { execWithTransaction } from "../utils/transaction.js";
 //! imp Models
 import Order from "../models/Order.js";
+
+//! imp Config
+import config from "../config/index.js";
 
 export async function getOrderById(req, res, next) {
   const orderId = req.params.orderId;
@@ -47,7 +47,7 @@ export async function getOrderById(req, res, next) {
 
 //! checkout an Order with createOrderByUserId
 export async function checkoutOrder(req, res, next) {
-  const userId = req.user?._id || null;
+  const userId = req.user?._id;
 
   const orderData = {
     orderId: req.body.orderId,
@@ -74,8 +74,6 @@ export async function checkoutOrder(req, res, next) {
       return _results;
     });
 
-    console.log('__Debugger__order\n:::checkoutOrder :::createdOrder: ', createdOrder, '\n');
-
     /*
       return createdOrder:
       _id, items: [{...},...], total, status, name, address, transactionNo, bankTranNo, orderDate, createdAt, updatedAt
@@ -91,6 +89,12 @@ export async function checkoutOrder(req, res, next) {
       createdOrder._id,
       createdOrder.total,
       createdOrder.bankCode // 'NCB'
+    );
+
+    console.log(
+      "__Debugger__order\n:::checkoutOrder :::createdOrder: ",
+      createdOrder,
+      "\n"
     );
 
     res.status(201).json({
@@ -144,15 +148,32 @@ export const createOrder = async (req, res, next) => {
 };
 
 export const getOrdersByFilters = async (req, res, next) => {
-  const { sort, order, page, perPage, keyword, status, userId } = req.query;
-  console.log("search.userId: ", userId);
+  const { keyword, status, user } = req.query;
+  const sort = req.query.sort !== "underfined" ? req.query.sort : "createdAt";
+  const order = +req.query.order || 1;
+  const page = +req.query.page || 1;
+  const perPage = +req.query.perPage || 1;
+  console.log("search.user: ", user);
   let match = {};
   // if (status) {
   //   match.$and = [{ status }];
   // }
 
-  if (userId) {
-    match.user = mongoose.Types.ObjectId(userId);
+  // console.log("__Debugger__order\n:::getOrdersByFilters :::sort: ", sort, "\n");
+  // console.log(
+  //   "__Debugger__order\n:::getOrdersByFilters :::order: ",
+  //   order,
+  //   "\n"
+  // );
+  // console.log("__Debugger__order\n:::getOrdersByFilters :::page: ", page, "\n");
+  // console.log(
+  //   "__Debugger__order\n:::getOrdersByFilters :::perPage: ",
+  //   perPage,
+  //   "\n"
+  // );
+
+  if (user) {
+    match.user = mongoose.Types.ObjectId(user);
   }
 
   if (status) {
@@ -172,10 +193,10 @@ export const getOrdersByFilters = async (req, res, next) => {
 
     const result = await Order.aggregate([
       { $match: match },
-      { $sort: { [sort]: +order, _id: 1 } },
+      { $sort: { [sort]: order, _id: 1 } },
       {
         $facet: {
-          orders: [{ $skip: skip }, { $limit: +perPage }],
+          orders: [{ $skip: skip }, { $limit: perPage }],
           ordersCount: [{ $count: "count" }],
         },
       },
@@ -184,7 +205,11 @@ export const getOrdersByFilters = async (req, res, next) => {
     const orders = result[0].orders;
     const ordersCount = result[0].ordersCount[0]?.count || 0;
 
-    res.status(200).json({ orders, ordersCount });
+    res.status(200).json({
+      success: true,
+      message: "Get many orders successful!",
+      data: { orders, ordersCount },
+    });
   } catch (error) {
     Logging.error("Error__ctrls__Order: " + error);
     const err = new Error(error);
@@ -322,7 +347,7 @@ export async function getInvoice(req, res, next) {
 
     const filePath = path.join("data", "invoices", invoiceName);
 
-    const invoiceUrl = `${baseURL}:${port}/${filePath}`;
+    const invoiceUrl = `${config.db.server.baseURL}/${filePath}`;
 
     return res.status(200).json({
       success: true,

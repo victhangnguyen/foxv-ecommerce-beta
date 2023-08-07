@@ -107,7 +107,7 @@ const AddEditProductScreen = () => {
       setLoading(true);
       const response = await API.category.getCategories();
       setLoading(false);
-      setCategories(response.data.categories);
+      setCategories(response?.data?.categories);
     } catch (error) {
       setLoading(false);
       throw error;

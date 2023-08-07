@@ -29,6 +29,7 @@ import AddEditUserScreen from "../features/User/screens/AddEditUserScreen";
 import CheckoutPaymentScreen from "../features/Payment/screens/CheckoutPaymentScreen";
 //! imp Comps/Private: Admin
 import AdminDashboardScreen from "../features/Admin/screens/AdminDashboardScreen";
+import AdminDashboardContentScreen from "../features/Admin/screens/AdminDashboardContentScreen";
 import AddEditProductScreen from "../features/Product/screens/AddEditProductScreen";
 import ManageProductScreen from "../features/Product/screens/ManageProductScreen";
 import ManageUserScreen from "../features/User/screens/ManageUserScreen";
@@ -85,7 +86,10 @@ const router = createBrowserRouter([
             path: "users/:userId",
             children: [
               { path: "checkout", element: <CheckoutPaymentScreen /> },
-              { path: "orders/:orderId", element: <AddEditOrderScreen /> },
+              {
+                path: "orders/:orderId/update",
+                element: <AddEditOrderScreen />,
+              },
             ],
           },
         ],
@@ -101,6 +105,8 @@ const router = createBrowserRouter([
             path: "admin",
             element: <AdminDashboardScreen />,
             children: [
+              //! dash-content
+              { path: "", element: <AdminDashboardContentScreen /> },
               //! /admin/users
               { path: "users", element: <ManageUserScreen /> }, //! users management
               { path: "users/create", element: <AddEditUserScreen /> },

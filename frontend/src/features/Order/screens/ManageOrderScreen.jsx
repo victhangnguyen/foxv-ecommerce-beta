@@ -1,20 +1,20 @@
-import _ from 'lodash';
-import React from 'react';
-import { Row } from 'react-bootstrap';
-import { useDispatch, useSelector } from 'react-redux';
+import _ from "lodash";
+import React from "react";
+import { Row } from "react-bootstrap";
+import { useDispatch, useSelector } from "react-redux";
 
 //! imp Comps
-import AlertDismissibleComponent from '../../../components/Alert/AlertDismissibleComponent';
-import BreadcrumbComponent from '../../../components/Breadcrumb/BreadcrumbComponent';
-import GoToButtonComponent from '../../../components/Button/GoToButtonComponent';
-import ControlledtabsComponent from '../../../components/Form/ControlledTabsComponent';
-import ConfirmationModalComponent from '../../../components/Modal/ConfirmationModalComponent';
-import PaginationComponent from '../../../components/Pagination/PaginationComponent';
+import AlertDismissibleComponent from "../../../components/Alert/AlertDismissibleComponent";
+import BreadcrumbComponent from "../../../components/Breadcrumb/BreadcrumbComponent";
+import GoToButtonComponent from "../../../components/Button/GoToButtonComponent";
+import ControlledtabsComponent from "../../../components/Form/ControlledTabsComponent";
+import ConfirmationModalComponent from "../../../components/Modal/ConfirmationModalComponent";
+import PaginationComponent from "../../../components/Pagination/PaginationComponent";
 //! imp Comps:tabs
-import OrderTabComponent from '../components/OrderTabComponent';
+import OrderTabComponent from "../components/OrderTabComponent";
 //! imp Hooks
-import { useItemsPerPage } from '../../../hooks/itemsPerPage';
-import { scrollToTop, useScrollPosition } from '../../../hooks/scroll';
+import { useItemsPerPage } from "../../../hooks/itemsPerPage";
+import { scrollToTop, useScrollPosition } from "../../../hooks/scroll";
 //! imp Actions
 import {
   deleteOrder,
@@ -22,9 +22,9 @@ import {
   getOrdersByFilters,
   getInvoice,
   clearNotification,
-} from '../OrderSlice';
+} from "../OrderSlice";
 //! imps Constants
-import constants from '../../../constants';
+import constants from "../../../constants";
 
 const ManageOrderScreen = () => {
   const dispatch = useDispatch();
@@ -37,48 +37,48 @@ const ManageOrderScreen = () => {
 
   //! localState: Search/Pagination
   const [search, setSearch] = React.useState({
-    keyword: '',
-    status: '',
+    keyword: "",
+    status: "",
   }); //! search orderId, status, name, address...
-  const [keyword, setKeyword] = React.useState('');
+  const [keyword, setKeyword] = React.useState("");
 
   //! localState: init
   const [loading, setLoading] = React.useState();
-  const [sort, setSort] = React.useState('updatedAt');
+  const [sort, setSort] = React.useState("updatedAt");
   const [order, setOrder] = React.useState(-1);
   const [currentPage, setCurrentPage] = React.useState(1);
 
   //! localState: Select Ids
   const [isCheckAll, setIsCheckAll] = React.useState(false);
   const [selectedIds, setSelectedIds] = React.useState([]);
-  const [selectedId, setSelectedId] = React.useState('');
+  const [selectedId, setSelectedId] = React.useState("");
 
   //! localState: actionType
-  const [actionType, setActionType] = React.useState('');
+  const [actionType, setActionType] = React.useState("");
 
   //! localState: Modal
   const [showModal, setShowModal] = React.useState(false);
   const [modalOpts, setModalOpts] = React.useState({
-    variant: '',
-    title: '',
-    message: '',
+    variant: "",
+    title: "",
+    message: "",
   });
 
   //! localState: Alert
   const [showAlert, setShowAlert] = React.useState(false);
   const [alertOpts, setAlertOpts] = React.useState({
-    variant: 'success',
-    title: '',
-    message: '',
-    button: '',
+    variant: "success",
+    title: "",
+    message: "",
+    button: "",
   });
 
   //! notice when navigate
   React.useEffect(() => {
     if (success && message) {
       setAlertOpts({
-        variant: 'success',
-        title: 'Thông báo',
+        variant: "success",
+        title: "Thông báo",
         message: message,
       });
 
@@ -86,8 +86,8 @@ const ManageOrderScreen = () => {
     }
     if (error) {
       setAlertOpts({
-        variant: 'danger',
-        title: 'Lỗi hệ thống',
+        variant: "danger",
+        title: "Lỗi hệ thống",
         message: error,
       });
 
@@ -106,8 +106,8 @@ const ManageOrderScreen = () => {
         handleShowAlert();
 
         setAlertOpts({
-          variant: 'danger',
-          title: 'Lỗi hệ thống',
+          variant: "danger",
+          title: "Lỗi hệ thống",
           message:
             error.response?.data?.message ||
             error.response?.message ||
@@ -137,7 +137,7 @@ const ManageOrderScreen = () => {
           order: order,
           page: currentPage,
           perPage: itemsPerPage,
-          search: search,
+          filterOpts: search,
         })
       ).unwrap();
       setLoading(false);
@@ -171,35 +171,35 @@ const ManageOrderScreen = () => {
       /* DELETE ONE ORDER */
       case constants.order.actionTypes.DELETE_ORDER:
         setModalOpts({
-          variant: 'warning',
+          variant: "warning",
           title: `Xác nhận xóa hóa đơn`,
           message: `Bạn có muốn xóa hóa đơn này không? [Người nhận: ${selectedOrders[0]?.name}, Tình trạng: ${selectedOrders[0]?.status}]`,
-          nameButton: 'Xác nhận xóa',
+          nameButton: "Xác nhận xóa",
         });
 
         break;
       /* DELETE_ORDERS */
       case constants.order.actionTypes.DELETE_ORDERS:
         setModalOpts({
-          variant: 'warning',
+          variant: "warning",
           title: `Xác nhận xóa nhiều hóa đơn`,
           message: `Bạn có muốn xóa những hóa đơn này không? [Người nhận: ${selectedOrders[0]?.name}, Tình trạng: ${selectedOrders[0]?.status}, ...]`,
-          nameButton: 'Xác nhận xóa nhiều',
+          nameButton: "Xác nhận xóa nhiều",
         });
         break;
 
-        case constants.order.actionTypes.DOWNLOAD_INVOICE:
-          try {
-            const response = await dispatch(getInvoice(ids)).unwrap();
-            window.open(response.data.invoiceUrl);
-          } catch (error) {
-            console.log("Error: ", error);
-          }
-          return;
+      case constants.order.actionTypes.DOWNLOAD_INVOICE:
+        try {
+          const response = await dispatch(getInvoice(ids)).unwrap();
+          window.open(response.data.invoiceUrl);
+        } catch (error) {
+          console.log("Error: ", error);
+        }
+        return;
 
       default:
         setAlertOpts({
-          variant: 'danger',
+          variant: "danger",
           title: `Hệ thống đang phát triển chức năng`,
           message: `Chức năng này đang được phát triển hoặc nâng cấp. Xin vui lòng xử dụng chức năng này sau!`,
         });
@@ -213,7 +213,7 @@ const ManageOrderScreen = () => {
   }
 
   async function handleConfirmationSubmit() {
-    console.log('handleSubmit');
+    console.log("handleSubmit");
     try {
       //! single Ids
       if (actionType === constants.order.actionTypes.DELETE_ORDER) {
@@ -221,7 +221,7 @@ const ManageOrderScreen = () => {
         const response = await dispatch(deleteOrder(selectedId)).unwrap();
 
         setAlertOpts({
-          variant: response.success ? 'success' : 'danger',
+          variant: response.success ? "success" : "danger",
           title: `Xóa hóa đơn thành công`,
           message: `Xoá hóa đơn [Người nhận: ${response.data.deletedOrder.name}, số tiền:  ${response.data.deletedOrder.total}đ] thành công!`,
         });
@@ -232,7 +232,7 @@ const ManageOrderScreen = () => {
         const response = await dispatch(deleteOrders(selectedIds)).unwrap();
 
         setAlertOpts({
-          variant: response.success ? 'success' : 'danger',
+          variant: response.success ? "success" : "danger",
           title: `Xóa nhiều hóa đơn thành công`,
           message: `Xoá nhiều hóa đơn [Người nhận: ${response.data.deletedOrders[0].name}, số tiền:  ${response.data.deletedOrders[0].total}đ, ...] thành công!`,
         });
@@ -253,8 +253,8 @@ const ManageOrderScreen = () => {
       handleShowAlert();
 
       setAlertOpts({
-        variant: 'danger',
-        title: 'Lỗi hệ thống',
+        variant: "danger",
+        title: "Lỗi hệ thống",
         message:
           error.response?.data?.message ||
           error.response?.message ||
@@ -284,10 +284,12 @@ const ManageOrderScreen = () => {
     const { id, checked } = e.target;
 
     if (!checked) {
+      //! un-check
       setSelectedIds((prevState) =>
         prevState.filter((orderId) => orderId !== id)
       );
     } else {
+      //! checked
       setSelectedIds((prevState) => [...prevState, id]);
     }
     //! reset isCheckAll
@@ -307,11 +309,11 @@ const ManageOrderScreen = () => {
 
   function triggerSelectChange(eventKey) {
     if (eventKey === constants.order.tabs.ALL_ORDERS) {
-      setSearch((prevState) => ({ ...prevState, keyword: '', status: '' }));
+      setSearch((prevState) => ({ ...prevState, keyword: "", status: "" }));
     } else {
       setSearch((prevState) => ({
         ...prevState,
-        keyword: '',
+        keyword: "",
         status: eventKey,
       }));
     }
@@ -322,7 +324,7 @@ const ManageOrderScreen = () => {
 
   function resetCheckAll() {
     //! reset CheckAll
-    setSelectedId('');
+    setSelectedId("");
     setSelectedIds([]);
     setIsCheckAll(false);
   }
@@ -335,7 +337,7 @@ const ManageOrderScreen = () => {
   const tabItems = [
     {
       eventKey: constants.order.tabs.ALL_ORDERS,
-      title: 'All Orders',
+      title: "All Orders",
       element: (
         <OrderTabComponent
           orders={orders}
@@ -353,7 +355,7 @@ const ManageOrderScreen = () => {
     },
     {
       eventKey: constants.order.tabs.PENDING,
-      title: 'Pending',
+      title: "Pending",
       element: (
         <OrderTabComponent
           orders={orders}
@@ -371,7 +373,7 @@ const ManageOrderScreen = () => {
     },
     {
       eventKey: constants.order.tabs.PAID,
-      title: 'Paid',
+      title: "Paid",
       element: (
         <OrderTabComponent
           orders={orders}
@@ -389,7 +391,7 @@ const ManageOrderScreen = () => {
     },
     {
       eventKey: constants.order.tabs.COMPLETED,
-      title: 'Completed',
+      title: "Completed",
       element: (
         <OrderTabComponent
           orders={orders}
@@ -407,7 +409,7 @@ const ManageOrderScreen = () => {
     },
     {
       eventKey: constants.order.tabs.CANCELED,
-      title: 'Canceled',
+      title: "Canceled",
       element: (
         <OrderTabComponent
           keyword={keyword}
@@ -426,12 +428,12 @@ const ManageOrderScreen = () => {
   ];
 
   const breadcrumbItems = [
-    { key: 'breadcrumb-item-0', label: 'Home', path: '/' },
-    { key: 'breadcrumb-item-1', label: 'Dashboard', path: '/admin' },
+    { key: "breadcrumb-item-0", label: "Home", path: "/" },
+    { key: "breadcrumb-item-1", label: "Dashboard", path: "/admin" },
     {
-      key: 'breadcrumb-item-2',
-      label: 'Quản lý Mua hàng',
-      path: '/admin/orders',
+      key: "breadcrumb-item-2",
+      label: "Quản lý Mua hàng",
+      path: "/admin/orders",
       active: true,
     },
   ];
@@ -463,6 +465,7 @@ const ManageOrderScreen = () => {
           itemsPerPage={itemsPerPage}
           setCurrentPage={setCurrentPage}
           alwaysShown={false}
+          alwayScrollToTop={true}
         />
       </div>
       <ConfirmationModalComponent

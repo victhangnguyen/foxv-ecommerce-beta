@@ -194,7 +194,7 @@ const AddEditUserScreen = () => {
               confirmPassword,
             },
           })
-        ).unwrap();
+        )
       } else {
         await dispatch(
           updatePasswordByUser({
@@ -331,15 +331,17 @@ const AddEditUserScreen = () => {
             user={user}
             onSubmit={handleSubmitChangeInformation}
           />
-          <>
-            <hr />
-            <h2>Bảo mật - Thay đổi mật khẩu</h2>
-            <UserFormPasswordComponent
-              initialValues={initialPasswordValues}
-              isAdminController={isAdminController}
-              onSubmit={handleSubmitChangePassword}
-            />
-          </>
+          {userId && (
+            <>
+              <hr />
+              <h2>Bảo mật - Thay đổi mật khẩu</h2>
+              <UserFormPasswordComponent
+                initialValues={initialPasswordValues}
+                isAdminController={isAdminController}
+                onSubmit={handleSubmitChangePassword}
+              />
+            </>
+          )}
         </Col>
         {isAdminController && userId && (
           <Col md={{ span: 3, offset: 1 }} lg={{ span: 5, offset: 1 }}>

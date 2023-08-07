@@ -23,7 +23,7 @@ router.get("/orders/search/filters", orderController.getOrdersByFilters);
 //! @access   Private: User
 router.post(
   "/orders/checkout",
-  authenticate,
+  authenticate, //! => provide req.user._id for createOrder
   orderController.checkoutOrder
 );
 

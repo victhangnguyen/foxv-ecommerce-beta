@@ -1,8 +1,7 @@
 import _ from "lodash";
 import mongoose from "mongoose";
-import slugify from "slugify";
-import config from "../config/index.js";
 import path from "path";
+import config from "../config/index.js";
 
 //! imp Library
 import Logging from "../library/Logging.js";
@@ -16,16 +15,9 @@ import Product from "../models/Product.js";
 //! imp Services
 import productService from "../services/productService.js";
 
-const baseURL = config.db.server.baseURL;
-const port = config.db.server.port;
-
 export const getProductById = async (req, res, next) => {
   const productId = req.params.productId;
-  console.log(
-    "__Debugger__product\n__getProductById__productId: ",
-    productId,
-    "\n"
-  );
+
   try {
     if (!mongoose.Types.ObjectId.isValid(productId)) {
       throw new Error("Product does not exist!");
@@ -135,7 +127,7 @@ export const createProduct = async (req, res, next) => {
     const productData = {
       ...req.body,
       images: images?.map(
-        (img) => `${baseURL}:${port}/images/products/${img.filename}`
+        (img) => `${config.db.server.baseURL}/images/products/${img.filename}`
       ),
     };
 
@@ -203,7 +195,7 @@ export const updateProductById = async (req, res, next) => {
             );
             const imageName = images[imageIndex].filename;
 
-            return `${baseURL}:${port}/images/products/${imageName}`;
+            return `${config.db.server.baseURL}/images/products/${imageName}`;
           } else {
             return imageObj.image;
           }
@@ -381,7 +373,11 @@ export const deleteProductsByIds = async (req, res, next) => {
 };
 
 export async function getProductsByFilters(req, res, next) {
-  const { sort, order, page, perPage, keyword, price, category } = req.query;
+  const { keyword, price, category } = req.query;
+  const sort = req.query.sort !== "underfined" ? req.query.sort : "createdAt";
+  const order = +req.query.order || 1;
+  const page = +req.query.page || 1;
+  const perPage = +req.query.perPage || 1;
 
   try {
     let match = {};
@@ -432,10 +428,10 @@ export async function getProductsByFilters(req, res, next) {
           as: "subCategories",
         },
       },
-      { $sort: { [sort]: +order, _id: 1 } },
+      { $sort: { [sort]: order, _id: 1 } },
       {
         $facet: {
-          products: [{ $skip: (page - 1) * perPage }, { $limit: +perPage }],
+          products: [{ $skip: (page - 1) * perPage }, { $limit: perPage }],
           productsCount: [{ $count: "count" }],
         },
       },

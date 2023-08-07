@@ -55,7 +55,7 @@ const HeaderComponent = () => {
       //! if no Token then signout
       if (token) {
         //! save Cart to database
-        await dispatch(postCart()).unwrap(); //! not authenticated
+        // await dispatch(postCart()).unwrap(); //! not authenticated
       }
 
       //! logout
@@ -85,7 +85,7 @@ const HeaderComponent = () => {
     };
     const response = await API.category.getCategoriesByFilters(filterOptions);
 
-    setCategories(response.data?.categories); //! vrf ?.cate..
+    setCategories(response?.data?.categories); //! vrf ?.cate..
   };
 
   const loadSubCategories = async () => {
@@ -98,7 +98,7 @@ const HeaderComponent = () => {
     const response = await API.subCategory.getSubCategoriesByFilters(
       filterOptions
     );
-    setSubCategories(response.data?.subCategories); //! vrf ?.sub...
+    setSubCategories(response?.data?.subCategories); //! vrf ?.sub...
   };
 
   const renderCategoryHeader = categories?.map((category) => (

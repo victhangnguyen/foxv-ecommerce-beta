@@ -59,14 +59,14 @@ export function getOrderById(orderId) {
   return axiosInstance.get(url);
 }
 
-export function getOrdersByFilters({ sort, order, page, perPage, search }) {
+export function getOrdersByFilters(sort, order, page, perPage, filterOpts) {
   const url = `/orders/search/filters`;
   const urlQueryParams = urlHandling.serializeQueryParams(url, {
     sort,
     order,
     page,
     perPage,
-    ...search,
+    ...filterOpts,
   });
   return axiosInstance.get(urlQueryParams);
 }

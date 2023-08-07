@@ -47,11 +47,6 @@ const LoginScreen = () => {
 
       toast.success(response.message);
     } catch (error) {
-      console.log(
-        "__Debugger__LoginScreen\n__handleLoginSubmit__error: ",
-        error,
-        "\n"
-      );
       //! Error Handling
       if (error.response?.status === 422) {
         const errors = error.response.data.errors;

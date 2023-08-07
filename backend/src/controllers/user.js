@@ -14,13 +14,18 @@ import Role from "../models/Role.js";
 //! imp Services
 import userService from "../services/userService.js";
 
-//! custom Connection
+//! imp Configs
 import config from "../config/index.js";
+
 //! database
 const db = mongoose.connection;
 
 export const getUsersByFilters = async (req, res, next) => {
-  const { keyword, sort, order, page, perPage } = req.query;
+  const { keyword, age } = req.query;
+  const sort = req.query.sort !== "underfined" ? req.query.sort : "createdAt";
+  const order = +req.query.order || 1;
+  const page = +req.query.page || 1;
+  const perPage = +req.query.perPage || 1;
 
   let match = {};
 
@@ -38,7 +43,7 @@ export const getUsersByFilters = async (req, res, next) => {
 
     const result = await User.aggregate([
       { $match: match },
-      { $sort: { [sort]: +order, _id: 1 } },
+      { $sort: { [sort]: order, _id: 1 } },
       {
         //! populate
         $lookup: {
@@ -50,7 +55,7 @@ export const getUsersByFilters = async (req, res, next) => {
       },
       {
         $facet: {
-          users: [{ $skip: skip }, { $limit: +perPage }],
+          users: [{ $skip: skip }, { $limit: perPage }],
           usersCount: [{ $count: "count" }],
         },
       },
@@ -113,33 +118,38 @@ export const deleteUsers = async (req, res, next) => {
 };
 
 export const resetPasswords = async (req, res, next) => {
+  console.log(
+    "__Debugger__user\n:::resetPassword :::req.query: ",
+    req.query,
+    "\n"
+  );
   const userIds = req.query.ids;
 
   try {
     await execWithTransaction(async (session) => {
-      const promises = userIds.map(async (id) =>
+      const resetPasswordQuene = userIds.map(async (id) =>
         userService.resetPasswordAndSendEmail(id, session)
       );
 
-      const results = await Promise.allSettled(promises);
+      const _results = await Promise.allSettled(resetPasswordQuene);
 
-      const hasRejected = results.some(
+      const hasRejected = _results.some(
         (result) => result.status === "rejected"
       );
 
       if (hasRejected) {
         throw new Error(
-          results
-            .find((result) => result.status === "rejected")
-            ?.reason.toString()
-            .replace("Error: ", "")
+          _results.find((result) => result.status === "rejected")?.reason
         );
       }
 
-      return res.status(200).json({ success: true, data: { ...results } });
+      return res.status(200).json({ success: true, data: { ..._results } });
     });
   } catch (error) {
-    console.log("Error: ", error);
+    Logging.error("Error__ctrls__product: " + error);
+    const err = new Error(error);
+    err.statusCode = 400;
+    return next(err);
   }
 };
 
@@ -215,8 +225,8 @@ export const createUser = async (req, res, next) => {
       text: "Please click on the following link to login your email address:",
       html: `
       <div>
-        <p>Please click <a href="http://localhost:3000/auth/login">here</a> to login</p>
-        <p>Username: ${userData.username}</p>
+      <p>Please click <a href="${config.db.client.baseURL}/auth/login">here</a> to login</p>
+      <p>Username: ${userData.username}</p>
         <p>Password: ${password}</p>
       </div>
       `,

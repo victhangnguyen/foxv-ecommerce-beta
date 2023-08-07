@@ -27,7 +27,12 @@ const AddEditOrderScreen = ({ entity }) => {
   const { orderId } = useParams();
 
   //! rootState
-  const { order, newOrder, loading, success, message, error } = useSelector(
+  const auth = useSelector((state) => state.auth);
+  const isAdminController = auth.user?.roles
+    ?.map((role) => role.name)
+    .includes("admin");
+
+  const { order, newOrder, success, message, error } = useSelector(
     (state) => state.order
   );
 
@@ -50,6 +55,7 @@ const AddEditOrderScreen = ({ entity }) => {
         title: "Thông báo",
         message: message,
       });
+      handleShowAlert();
     }
     if (success === false && error) {
       setAlertOpts({
@@ -57,8 +63,8 @@ const AddEditOrderScreen = ({ entity }) => {
         title: "Lỗi hệ thống",
         message: error,
       });
+      handleShowAlert();
     }
-    handleShowAlert();
     return () => {
       dispatch(clearNotification());
     };
@@ -110,7 +116,7 @@ const AddEditOrderScreen = ({ entity }) => {
 
   async function loadOrderById(orderId) {
     try {
-      const response = await dispatch(getOrderById(orderId));
+      await dispatch(getOrderById(orderId));
     } catch (error) {
       console.log("Error: ", error);
     }
@@ -224,6 +230,7 @@ const AddEditOrderScreen = ({ entity }) => {
         </div>
         <div className="col-md-6 col-lg-6 col-xl-7 offset-md-1">
           <OrderFormComponent
+            isAdminController={isAdminController}
             order={order}
             orderId={orderId}
             initialValues={initialValues}

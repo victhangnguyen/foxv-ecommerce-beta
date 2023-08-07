@@ -8,7 +8,7 @@ const router = express.Router();
 //! @desc     Get Vnpay Return
 //! @route    GET /api/payment/vnpay/vnpay-return
 //! @access   Vnpay access Server
-router.get('/payment/vnpay/vnpay-return', paymentController.getVnpayReturn);
+router.get('/payment/vnpay/vnpay-return', paymentController.getVnpayReturn); //! không sử dụng authenticate về đây là của bank
 
 //! @desc     Get Vnpay Ipn
 //! @route    GET /api/payment/vnpay/vnpay-ipn

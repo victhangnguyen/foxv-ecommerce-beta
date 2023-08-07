@@ -1,17 +1,23 @@
-import React from 'react';
-import * as yup from 'yup';
+import React from "react";
+import * as yup from "yup";
 //! imp Comps
-import { Button } from 'react-bootstrap';
-import FormComponent from '../../../components/Form/FormComponent';
-import InputComponent from '../../../components/Form/InputComponent';
+import { Button } from "react-bootstrap";
+import FormComponent from "../../../components/Form/FormComponent";
+import InputComponent from "../../../components/Form/InputComponent";
+import FormInputComponent from "../../../components/Form/FormInputComponent";
 
 const ForgotPasswordFormScreen = ({ onSubmit }) => {
   const validationSchema = yup.object({
     email: yup
       .string()
-      .email('Email không hợp lệ')
-      .required('Yêu cầu nhập email của bạn'),
+      .email("Email không hợp lệ")
+      .required("Yêu cầu nhập email của bạn"),
   });
+
+  function handleChangeEmail(e, registeredInput, methods) {
+    e.target.value = e?.target?.value?.toLowerCase();
+    registeredInput.onChange(e);
+  }
 
   return (
     <FormComponent
@@ -22,11 +28,12 @@ const ForgotPasswordFormScreen = ({ onSubmit }) => {
       {
         //! email
       }
-      <InputComponent
-        type={'email'}
+      <FormInputComponent
+        type={"email"}
         name="email"
-        label={'Email'}
-        placeholder={'Nhập email của bạn'}
+        label={"Email"}
+        placeholder={"Nhập email của bạn"}
+        handleChange={handleChangeEmail}
       />
       <div className="d-flex justify-content-center">
         <Button className="btn-submit w-100" variant="primary" type="submit">

@@ -19,6 +19,7 @@ const OrderFormComponent = ({
   loading,
   onSubmit,
   handleClickCancel,
+  isAdminController
 }) => {
   const phoneNumerRegExp = /^[+]*[(]{0,1}[0-9]{1,4}[)]{0,1}[-\s\./0-9]*$/;
   const unicodeLetters = /^[A-Za-z\u00C0-\u024F\u1E00-\u1EFF ]+$/;
@@ -58,16 +59,13 @@ const OrderFormComponent = ({
 
   if (orderId) {
     if (order?.status === constants.order.status.CANCELED) {
-      statusOptions.splice(0, 5);
+      statusOptions.splice(0, 5); //! opts just have canceled
     }
   } else {
     statusOptions.splice(5, 1);
   }
 
-  const auth = useSelector((state) => state.auth);
-  const isAdminController = auth.user?.roles
-    ?.map((role) => role.name)
-    .includes("admin");
+  
 
   const validationSchema = yup.object({
     name: yup

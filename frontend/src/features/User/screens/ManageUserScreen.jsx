@@ -1,25 +1,28 @@
-import React from 'react';
-import { Col, Row } from 'react-bootstrap';
-import { useDispatch, useSelector } from 'react-redux';
-import { toast } from 'react-toastify';
+import React from "react";
+import { Col, Row } from "react-bootstrap";
+import { useDispatch, useSelector } from "react-redux";
+import { toast } from "react-toastify";
 //! imp Hooks
-import { useItemsPerPage } from '../../../hooks/itemsPerPage';
-import { useScrollPosition, scrollToTop } from '../../../hooks/scroll';
+import { useItemsPerPage } from "../../../hooks/itemsPerPage";
+import { useScrollPosition, scrollToTop } from "../../../hooks/scroll";
 //! imp Actions
-import { getUsersByFilters, clearNotification } from '../UserSlice';
+import { getUsersByFilters, clearNotification } from "../UserSlice";
 //! imp Services
-import userService from '../services/userService';
-import { DELETE_USERS, RESET_PASSWORDS } from '../services/actionTypes';
+import userService from "../services/userService";
+import { DELETE_USERS, RESET_PASSWORDS } from "../services/actionTypes";
 //! imp Comps
-import BreadcrumbComponent from '../../../components/Breadcrumb/BreadcrumbComponent';
-import ConfirmationModalComponent from '../../../components/Modal/ConfirmationModalComponent';
-import PaginationComponent from '../../../components/Pagination/PaginationComponent';
-import ToolbarSearchComponent from '../components/Toolbars/ToolbarSearchComponent';
-import AdminUserCard from '../components/Card/AdminUserCard';
+import BreadcrumbComponent from "../../../components/Breadcrumb/BreadcrumbComponent";
+import ConfirmationModalComponent from "../../../components/Modal/ConfirmationModalComponent";
+import PaginationComponent from "../../../components/Pagination/PaginationComponent";
+import ToolbarSearchComponent from "../components/Toolbars/ToolbarSearchComponent";
+import AdminUserCard from "../components/Card/AdminUserCard";
 //! imp Comps/Modals
-import AlertDismissibleComponent from '../../../components/Alert/AlertDismissibleComponent';
+import AlertDismissibleComponent from "../../../components/Alert/AlertDismissibleComponent";
 //! imp Comps/Button
-import GoToButtonComponent from '../../../components/Button/GoToButtonComponent';
+import GoToButtonComponent from "../../../components/Button/GoToButtonComponent";
+
+//! imp API
+import API from "../../../API";
 
 const ManageUserScreen = () => {
   const dispatch = useDispatch();
@@ -27,12 +30,12 @@ const ManageUserScreen = () => {
   const itemsPerPage = useItemsPerPage(10, 15, 15, 20);
 
   const breadcrumbItems = [
-    { key: 'breadcrumb-item-0', label: 'Home', path: '/' },
-    { key: 'breadcrumb-item-1', label: 'Dashboard', path: '/admin' },
+    { key: "breadcrumb-item-0", label: "Home", path: "/" },
+    { key: "breadcrumb-item-1", label: "Dashboard", path: "/admin" },
     {
-      key: 'breadcrumb-item-2',
-      label: 'Quản lý Tài khoản',
-      path: '/admin/users',
+      key: "breadcrumb-item-2",
+      label: "Quản lý Tài khoản",
+      path: "/admin/users",
       active: true,
     },
   ];
@@ -41,11 +44,11 @@ const ManageUserScreen = () => {
   const { users, usersCount, user, loading, success, message, error } =
     useSelector((state) => state.user);
 
-  const [actionType, setActionType] = React.useState('');
+  const [actionType, setActionType] = React.useState("");
 
   //! localState: search/pagination
-  const [search, setSearch] = React.useState({ keyword: '', age: '' });
-  const [sort, setSort] = React.useState('updatedAt');
+  const [search, setSearch] = React.useState({ keyword: "", age: "" });
+  const [sort, setSort] = React.useState("updatedAt");
   const [order, setOrder] = React.useState(-1);
   const [currentPage, setCurrentPage] = React.useState(1);
 
@@ -55,29 +58,29 @@ const ManageUserScreen = () => {
   //! localState: Modal
   const [showModal, setShowModal] = React.useState(false);
   const [modalOpts, setModalOpts] = React.useState({
-    variant: '',
-    title: '',
-    message: '',
+    variant: "",
+    title: "",
+    message: "",
   });
   //! localState: Alert
   const [showAlert, setShowAlert] = React.useState(false);
   const [alertOpts, setAlertOpts] = React.useState({
-    variant: 'success',
-    title: '',
-    message: '',
-    button: '',
+    variant: "success",
+    title: "",
+    message: "",
+    button: "",
   });
 
   React.useEffect(() => {
     //! effect
     loadUsersByFilters();
-  }, [currentPage, itemsPerPage]);
+  }, [sort, order, currentPage, itemsPerPage, search]);
 
   React.useEffect(() => {
     if (success && message) {
       setAlertOpts({
-        variant: 'success',
-        title: 'Thông báo',
+        variant: "success",
+        title: "Thông báo",
         message: message,
       });
 
@@ -85,8 +88,8 @@ const ManageUserScreen = () => {
     }
     if (success === false && error) {
       setAlertOpts({
-        variant: 'danger',
-        title: 'Lỗi hệ thống',
+        variant: "danger",
+        title: "Lỗi hệ thống",
         message: error,
       });
 
@@ -100,11 +103,11 @@ const ManageUserScreen = () => {
   const loadUsersByFilters = () => {
     dispatch(
       getUsersByFilters({
-        search: search,
         sort: sort,
         order: order,
         page: currentPage,
         perPage: itemsPerPage,
+        filterOpts: search,
       })
     );
   };
@@ -122,20 +125,20 @@ const ManageUserScreen = () => {
       case DELETE_USERS:
         //! set Modal style Single or Multiple
         setModalOpts({
-          variant: 'danger',
+          variant: "danger",
           title: `Xác nhận xóa ${
-            selectedUsers.length > 1 ? 'nhiều' : ''
+            selectedUsers.length > 1 ? "nhiều" : ""
           } tài khoản`,
           message: `Bạn có muốn xóa ${
-            selectedUsers.length > 1 ? 'những' : ''
+            selectedUsers.length > 1 ? "những" : ""
           } tài khoản này không?
           [${selectedUsers[0].email}${
             selectedUsers.length > 1
-              ? ', ' + selectedUsers[1].email + '...'
-              : ''
+              ? ", " + selectedUsers[1].email + "..."
+              : ""
           }]
           `,
-          nameButton: 'Xác nhận xóa',
+          nameButton: "Xác nhận xóa",
         });
 
         break;
@@ -143,20 +146,20 @@ const ManageUserScreen = () => {
       case RESET_PASSWORDS:
         //! set Modal style Single or Multiple
         setModalOpts({
-          variant: 'warning',
+          variant: "warning",
           title: `Xác nhận Reset password ${
-            selectedUsers.length > 1 ? 'nhiều' : ''
+            selectedUsers.length > 1 ? "nhiều" : ""
           } tài khoản`,
           message: `Bạn có muốn Reset password ${
-            selectedUsers.length > 1 ? 'những' : ''
+            selectedUsers.length > 1 ? "những" : ""
           } tài khoản này không?
           [${selectedUsers[0].email}${
             selectedUsers.length > 1
-              ? ', ' + selectedUsers[1].email + '...'
-              : ''
+              ? ", " + selectedUsers[1].email + "..."
+              : ""
           }]
           `,
-          nameButton: 'Xác nhận reset password',
+          nameButton: "Xác nhận reset password",
         });
 
         break;
@@ -171,35 +174,35 @@ const ManageUserScreen = () => {
   }
 
   const handleSubmit = async () => {
-    console.log('handleSubmit');
+    console.log("handleSubmit");
     try {
       if (actionType === DELETE_USERS) {
         /* REMOVE USER ACCOUNT */
-        const response = await userService.deleteUsers(selectedIds);
-        const results = response.data.results;
+        const response = await API.user.deleteUsers(selectedIds);
+        const results = response?.data?.results;
         //! set Alert style
         setAlertOpts({
-          variant: 'success',
+          variant: "success",
           title: response.message,
           message: `Bạn đã xóa ${
-            results?.length > 1 ? 'nhiều' : ''
+            results?.length > 1 ? "nhiều" : ""
           } tài khoản thành công.`,
         });
       } else if (actionType === RESET_PASSWORDS) {
         /* RESET PASSWORD */
-        var response = await userService.resetPasswords(selectedIds);
-        var results = response.data.results;
+        var response = await API.user.resetPasswords(selectedIds);
+        var results = response?.data?.results;
 
         //! set Alert style
         setAlertOpts({
-          variant: 'success',
-          title: 'Reset password thành công',
+          variant: "success",
+          title: "Reset password thành công",
           message: `Bạn đã reset password ${
-            results?.length > 1 ? 'nhiều' : ''
+            results?.length > 1 ? "nhiều" : ""
           } tài khoản thành công.`,
         });
       } else {
-        throw new Error('Action not found. Functionality is being improved!');
+        throw new Error("Action not found. Functionality is being improved!");
       }
 
       handleHideModal();
@@ -210,8 +213,8 @@ const ManageUserScreen = () => {
     } catch (error) {
       //! Error Handling Slice
       setAlertOpts({
-        variant: 'danger',
-        title: 'Lỗi hệ thống',
+        variant: "danger",
+        title: "Lỗi hệ thống",
         message:
           error.response?.data?.message ||
           error.response?.message ||

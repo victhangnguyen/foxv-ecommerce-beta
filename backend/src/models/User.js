@@ -21,6 +21,8 @@ const userSchema = new mongoose.Schema(
     },
     username: {
       type: String,
+      minLength: [8, "Thấp nhất 8 ký tự"],
+      maxLength: [64, "Nhiều nhất 64 ký tự"],
       required: true,
       unique: true,
     },
@@ -82,14 +84,14 @@ userSchema.methods.comparePassword = async function (password) {
 userSchema.methods.resetPassword = async function (session) {
   try {
     const newPassword = userService.generatePassword();
+
     this.password = newPassword;
-    // this.password = new
     await this.save({ session });
+
+    return newPassword;
   } catch (error) {
     throw error;
   }
-
-  return newPassword;
 };
 
 const User = mongoose.model("User", userSchema);

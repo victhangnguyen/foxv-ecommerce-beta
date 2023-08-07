@@ -3,13 +3,21 @@ import _ from "lodash";
 import useIsMounted from "../../../hooks/useIsMounted";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
+//! imp Configs
+import config from "../../../config";
+//! utilities
+import { getMinutesFromNowToTimestamp } from "../../../utils/parse";
 
 //! imp Comps
 import AlertDismissibleComponent from "../../../components/Alert/AlertDismissibleComponent";
 import CheckoutPaymentFormComponent from "../components/CheckoutPaymentFormComponent";
 
 //! imp Actions
-import { checkoutOrder, clearNotification } from "../../Order/OrderSlice";
+import {
+  checkoutOrder,
+  clearNotification,
+  emptyNewOrder,
+} from "../../Order/OrderSlice";
 
 const CheckoutPaymentScreen = ({ entity }) => {
   const dispatch = useDispatch();
@@ -39,6 +47,7 @@ const CheckoutPaymentScreen = ({ entity }) => {
         title: "Thông báo",
         message: order.message,
       });
+      handleShowAlert();
     }
     if (order.success === false && order.error) {
       setAlertOpts({
@@ -46,23 +55,31 @@ const CheckoutPaymentScreen = ({ entity }) => {
         title: "Lỗi hệ thống",
         message: order.error,
       });
+      handleShowAlert();
     }
-    handleShowAlert();
     return () => {
       dispatch(clearNotification());
     };
   }, [order.success, order.message, order.error]);
 
-  React.useLayoutEffect(() => {
+  //! Handling Timeout
+  React.useEffect(() => {
     // let redirect = `/order/${order.newOrder?._id}`;
+    //! check order experion
+
     async function handleCheckoutOrder() {
       try {
-        //! check Expired Order 15 minunes => delete newOrder
+        //! check Order Expireation Time
+        if (
+          getMinutesFromNowToTimestamp(order?.newOrder?.updatedAt) >
+          config.react_app_general.reactAppOrderExpirationTime
+        ) {
+          return dispatch(emptyNewOrder());
+        }
 
         if (order.newOrder?.paymentUrl) {
           let redirect = order.newOrder.paymentUrl;
 
-          console.log("Layout Effect -> order.newOrder?.paymentUrl");
           const cartItems = cart.cartItems.map((item) => {
             return {
               category: item.category?._id || item.category,
@@ -80,11 +97,10 @@ const CheckoutPaymentScreen = ({ entity }) => {
           if (isMounted && _.isEqual(newOrderItems, cartItems)) {
             window.open(redirect, "_self");
           } else {
-            // console.log('asdjflasdlflsajflsldfjljsladfldsjkf')
             //! MODE: items are changed
             //! update current Order
             const orderId = order.newOrder?._id || null;
-            const response = await dispatch(
+            await dispatch(
               checkoutOrder({
                 orderId,
                 name: order.newOrder.name,
@@ -94,14 +110,6 @@ const CheckoutPaymentScreen = ({ entity }) => {
                 orderPayAmount: total,
               })
             ).unwrap();
-
-            console.log(
-              "__Debugger__CheckoutPaymentScreen\n:::dispatch >> checkoutOrder :::response: ",
-              response,
-              "\n"
-            );
-
-            // window.open(redirect, "_self");
           }
         }
       } catch (error) {
@@ -111,7 +119,6 @@ const CheckoutPaymentScreen = ({ entity }) => {
 
     handleCheckoutOrder();
   }, [order.newOrder?._id, order.newOrder?.items, isMounted]);
-  // }, []);
 
   const initialValues = {
     bankCode: "",
@@ -129,7 +136,6 @@ const CheckoutPaymentScreen = ({ entity }) => {
     const { name, address, bankCode } = data;
     const orderId = order.newOrder?._id || null;
     dispatch(
-      //! checkout Order with createOrderByUserId
       checkoutOrder({
         orderId,
         name,

@@ -10,6 +10,8 @@ const OrderItemComponent = ({
   selectedIds,
   handleCheckChange,
   handleOpenModal,
+  isAdmin = false,
+  userId,
 }) => {
   const menuItems = [
     {
@@ -33,7 +35,7 @@ const OrderItemComponent = ({
         <td className="py-1 px-3">
           <FormCheck
             inline
-            id={`chk-${order._id}`}
+            id={order._id}
             checked={selectedIds?.includes(order._id)}
             onChange={handleCheckChange}
           />
@@ -42,7 +44,13 @@ const OrderItemComponent = ({
           //! _id
         }
         <td className="py-1 px-3 tab__id">
-          <Link to={`/admin/orders/${order._id}/update`}>
+          <Link
+            to={
+              isAdmin
+                ? `/admin/orders/${order._id}/update`
+                : `/users/${userId}/orders/${order._id}/update`
+            }
+          >
             <strong>{order._id}</strong>
           </Link>
         </td>

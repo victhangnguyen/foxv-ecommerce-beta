@@ -34,11 +34,11 @@ const productSlice = createSlice({
       })
       .addCase(getProductById.fulfilled, (state, action) => {
         state.loading = false;
-        state.product = action.payload.data.product;
+        state.product = action.payload?.data?.product;
       })
       .addCase(getProductById.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.payload.message;
+        state.error = action.payload?.message;
       });
     builder
       .addCase(getProductsByFilters.pending, (state, action) => {
@@ -48,12 +48,12 @@ const productSlice = createSlice({
       .addCase(getProductsByFilters.fulfilled, (state, action) => {
         //! action.payload = {products, productsCount}
         state.loading = false;
-        state.products = action.payload.data.products;
-        state.productsCount = action.payload.data.productsCount;
+        state.products = action.payload?.data?.products;
+        state.productsCount = action.payload?.data?.productsCount;
       })
       .addCase(getProductsByFilters.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.payload.message;
+        state.error = action.payload?.message;
       });
     builder
       .addCase(updateProductById.pending, (state, action) => {
@@ -62,11 +62,11 @@ const productSlice = createSlice({
       })
       .addCase(updateProductById.fulfilled, (state, action) => {
         state.loading = false;
-        state.product = action.payload.data.product;
+        state.product = action.payload?.data?.product;
       })
       .addCase(updateProductById.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.payload.message;
+        state.error = action.payload?.message;
       });
     builder
       .addCase(removeProduct.pending, (state, action) => {

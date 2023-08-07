@@ -16,13 +16,6 @@ const ProductCard = ({ product }) => {
   const cart = useSelector((state) => state.cart);
 
   const mainImageUrl = product.images[0];
-  // if (product.images[0].type?.includes("image/")) {
-  //   //! imageFile
-  //   mainImageUrl = URL.createObjectURL(product.images[0]);
-  // } else {
-  //   //! Url
-  //   mainImageUrl = product.images[0];
-  // }
 
   const isAddedToCard = cart.cartItems
     ?.map((item) => item.product)
@@ -33,11 +26,9 @@ const ProductCard = ({ product }) => {
 
   const isPurchasePossible = cartProductQuantity < product.quantity;
 
-  //! localState
   const [qty, setQty] = React.useState(1);
 
   function handleClickAddToCart() {
-    // action.payload ~ { _id, title, image, price}
     const cartItem = {
       product: product._id,
       quantity: 1,
@@ -48,13 +39,6 @@ const ProductCard = ({ product }) => {
       price: product.price,
     };
 
-    // console.log('__Debugger__ProductCard\n__handleClickAddToCart__cart: ', cart, '\n');
-
-    // console.log(
-    //   "__Debugger__ProductCard\n__handleClickAddToCart__product.quantity: ",
-    //   product.quantity,
-    //   "\n"
-    // );
     if (isPurchasePossible) {
       dispatch(addToCart(cartItem));
     }

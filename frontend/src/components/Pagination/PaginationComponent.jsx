@@ -24,11 +24,11 @@ const PaginationComponent = ({
     if (currentPage === number) return;
     setCurrentPage(number);
     const loadingProducts = itemsCount - (number - 1) * itemsPerPage;
-    console.log(
-      "__Debugger__PaginationComponent\n:::*** :::loadingProducts: ",
-      loadingProducts,
-      "\n"
-    );
+    // console.log(
+    //   "__Debugger__PaginationComponent\n:::*** :::loadingProducts: ",
+    //   loadingProducts,
+    //   "\n"
+    // );
     if (alwayScrollToTop) {
       scrollToTop();
     }
