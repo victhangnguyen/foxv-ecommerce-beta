@@ -116,7 +116,7 @@ const HistoryOrderScreen = () => {
           order: order,
           page: currentPage,
           perPage: itemsPerPage,
-          search: {
+          filterOpts: {
             keyword: search.keyword,
             status: search.status,
             user: userId,

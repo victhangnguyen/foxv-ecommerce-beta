@@ -7,7 +7,7 @@ import FormComponent from "../../../components/Form/FormComponent";
 import InputComponent from "../../../components/Form/InputComponent";
 import FormInputComponent from "../../../components/Form/FormInputComponent";
 
-const RegisterFormComponent = ({ onSubmit }) => {
+const RegisterFormComponent = ({ loading, onSubmit }) => {
   const phoneNumerRegExp = /^[+]*[(]{0,1}[0-9]{1,4}[)]{0,1}[-\s\./0-9]*$/;
   const unicodeLetters = /^[A-Za-z\u00C0-\u024F\u1E00-\u1EFF ]+$/;
   const alphanumbericLetters = /^[a-zA-Z0-9]+$/;
@@ -134,8 +134,13 @@ const RegisterFormComponent = ({ onSubmit }) => {
       /> */}
 
       <div className="d-flex justify-content-center">
-        <Button className="btn-submit w-100" variant="primary" type="submit">
-          Đăng ký tài khoản
+        <Button
+          className="btn-submit w-100"
+          variant="primary"
+          type="submit"
+          disabled={loading ? true : false}
+        >
+          {loading ? "Loading..." : "Đăng ký tài khoản"}
         </Button>
       </div>
     </FormComponent>

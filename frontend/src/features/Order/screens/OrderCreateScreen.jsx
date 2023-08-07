@@ -149,9 +149,10 @@ const OrderCreateScreen = () => {
         </div>
         <div className="col-md-6 col-lg-6 col-xl-7 offset-md-1">
           <OrderFormComponent
-            isAdminController={isAdminController}
-            loading={loading}
             initialValues={initialValues}
+            loading={loading}
+            order={order}
+            isAdminController={isAdminController}
             onSubmit={handleCreateSubmit}
             handleClickCancel={handleClickCancel}
           />

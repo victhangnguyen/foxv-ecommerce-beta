@@ -21,6 +21,7 @@ export const signup = async (req, res, next) => {
     //! check existing
     // Check if username or email already exists
     const existingUser = await User.findOne().or([{ username }, { email }]);
+    const userRole = await Role.findOne({ name: "user" });
 
     if (existingUser) {
       return res
@@ -39,6 +40,8 @@ export const signup = async (req, res, next) => {
       email,
       phoneNumber,
       password,
+      //! active Account
+      roles: [userRole._id],
     });
 
     // save newUser to database
@@ -99,7 +102,7 @@ export const signup = async (req, res, next) => {
 
 export const signin = async (req, res, next) => {
   const { username, password } = req.body;
-  console.log('__Debugger__auth\n__signin__req.body: ', req.body, '\n');
+  console.log("__Debugger__auth\n__signin__req.body: ", req.body, "\n");
 
   try {
     const user = await User.findOne({ username }).populate("roles").exec();

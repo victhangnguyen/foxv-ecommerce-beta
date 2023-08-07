@@ -1,6 +1,4 @@
 import React from "react";
-import { useSelector } from "react-redux";
-import _ from "lodash";
 import * as yup from "yup";
 
 //! imp Components
@@ -13,13 +11,12 @@ import SelectControllerComponent from "../../../components/Form/SelectController
 import constants from "../../../constants";
 
 const OrderFormComponent = ({
-  order,
-  orderId,
-  initialValues,
   loading,
+  order,
+  initialValues,
   onSubmit,
   handleClickCancel,
-  isAdminController
+  isAdminController,
 }) => {
   const phoneNumerRegExp = /^[+]*[(]{0,1}[0-9]{1,4}[)]{0,1}[-\s\./0-9]*$/;
   const unicodeLetters = /^[A-Za-z\u00C0-\u024F\u1E00-\u1EFF ]+$/;
@@ -57,15 +54,13 @@ const OrderFormComponent = ({
     },
   ];
 
-  if (orderId) {
+  if (order?._id) {
     if (order?.status === constants.order.status.CANCELED) {
       statusOptions.splice(0, 5); //! opts just have canceled
     }
   } else {
     statusOptions.splice(5, 1);
   }
-
-  
 
   const validationSchema = yup.object({
     name: yup
@@ -90,13 +85,13 @@ const OrderFormComponent = ({
         className="form-register"
       >
         {
-          //! orderId
+          //! order?._id
         }
         {!isAdminController && (
           <InputComponent
             readOnly={isAdminController ? false : true}
             disabled={isAdminController ? false : true}
-            name="orderId"
+            name="order?._id"
             label={"Mã đơn hàng"}
           />
         )}
@@ -173,10 +168,15 @@ const OrderFormComponent = ({
         }
         {isAdminController && (
           <div className="d-flex justify-content-center">
-            <Button className="btn-submit" variant="primary" type="submit">
+            <Button
+              className="btn-submit"
+              variant="primary"
+              type="submit"
+              disabled={loading ? true : false}
+            >
               {loading
                 ? "Loading..."
-                : orderId
+                : order?._id
                 ? "Cập nhật đơn hàng"
                 : "Tạo đơn hàng mới"}
             </Button>

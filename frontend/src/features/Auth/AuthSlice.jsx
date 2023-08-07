@@ -27,12 +27,6 @@ export const signup = createAsyncThunk(
         confirmPassword,
       });
 
-      console.log(
-        "__Debugger__AuthSlice\n__Signup__response: ",
-        response,
-        "\n"
-      );
-
       return thunkAPI.fulfillWithValue(response);
     } catch (error) {
       return thunkAPI.rejectWithValue({

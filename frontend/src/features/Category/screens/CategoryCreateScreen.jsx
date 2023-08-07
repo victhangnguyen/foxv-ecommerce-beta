@@ -270,7 +270,7 @@ const CategoryCreateScreen = () => {
       />
 
       <h2 className="fw-bold mb-2 text-uppercase ">
-        {loading ? 'Loading...' : 'Thêm Loại sản phẩm (Category)'}
+        Thêm Loại sản phẩm (Category)
       </h2>
       <p className=" mb-3">Điền đầy đủ thông tin để tạo Category mới!</p>
 

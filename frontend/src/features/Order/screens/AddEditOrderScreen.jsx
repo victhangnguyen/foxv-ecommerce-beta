@@ -32,7 +32,7 @@ const AddEditOrderScreen = ({ entity }) => {
     ?.map((role) => role.name)
     .includes("admin");
 
-  const { order, newOrder, success, message, error } = useSelector(
+  const { loading, order, newOrder, success, message, error } = useSelector(
     (state) => state.order
   );
 
@@ -230,10 +230,10 @@ const AddEditOrderScreen = ({ entity }) => {
         </div>
         <div className="col-md-6 col-lg-6 col-xl-7 offset-md-1">
           <OrderFormComponent
-            isAdminController={isAdminController}
-            order={order}
-            orderId={orderId}
             initialValues={initialValues}
+            loading={loading}
+            order={order}
+            isAdminController={isAdminController}
             onSubmit={handleUpdateSubmit}
             handleClickCancel={handleClickCancel}
           />

@@ -3,7 +3,7 @@ import React from "react";
 import { toast } from "react-toastify";
 //! imp Hooks
 import { useDispatch, useSelector } from "react-redux";
-import { useNavigate, useParams } from "react-router-dom";
+import { useParams } from "react-router-dom";
 //! imp Components
 import { Button, Col, Row } from "react-bootstrap";
 import AlertDismissibleComponent from "../../../components/Alert/AlertDismissibleComponent";
@@ -14,18 +14,17 @@ import UserFormPasswordComponent from "../components/Form/UserFormPasswordCompon
 import API from "../../../API";
 //! imp Actions
 import {
-  getUserById,
+  clearNotification,
   createUser,
-  updateUserInfoById,
+  emptyUser,
+  getUserById,
   updatePasswordByAdmin,
   updatePasswordByUser,
-  emptyUser,
-  clearNotification,
+  updateUserInfoById,
 } from "../UserSlice";
 
 const AddEditUserScreen = () => {
   const dispatch = useDispatch();
-  const navigate = useNavigate();
   const { userId } = useParams();
 
   //! rootState
@@ -121,7 +120,7 @@ const AddEditUserScreen = () => {
     }
   }
 
-  const handleSubmitChangeInformation = async (data, event, methods) => {
+  const handleSubmitAddEdit = async (data, event, methods) => {
     const isEqualData = _.isEqual(initialValues, data);
 
     if (isEqualData) {
@@ -138,15 +137,17 @@ const AddEditUserScreen = () => {
 
     try {
       if (userId) {
-        /* MODE: UPDATE / EDIT USER*/
+        /* MODE: EDIT - UPDATE USER*/
         await dispatch(updateUserInfoById({ userId, userData })).unwrap();
         // await loadUser(); //! Re-load to check initialValues
       } else {
-        /* MODE: CREATE NEW USER */
+        /* MODE: ADD - CREATE NEW USER */
         await dispatch(createUser(userData)).unwrap();
+        //! make Form clear
+        methods.reset();
         //! Navigate
+        // navigate("/admin/users", { replace: true });
       }
-      // navigate("/admin/users", { replace: true });
     } catch (error) {
       //! Error Handling
       if (error.response?.status === 422) {
@@ -194,7 +195,7 @@ const AddEditUserScreen = () => {
               confirmPassword,
             },
           })
-        )
+        );
       } else {
         await dispatch(
           updatePasswordByUser({
@@ -207,20 +208,7 @@ const AddEditUserScreen = () => {
           })
         ).unwrap();
       }
-
-      // setAlertOpts({
-      //   variant: "success",
-      //   title: "Thay đổi mật khẩu thành công!",
-      //   message: "Bạn đã thay đổi mật khẩu thành công.",
-      // });
-
-      // setShowAlert(true);
     } catch (error) {
-      console.log(
-        "__Debugger__AddEditUserScreen\n__handleClickChangePassword__error: ",
-        error,
-        "\n"
-      );
       //! Error Handling
       if (error.response?.status === 422) {
         const errors = error.response.data.errors;
@@ -236,18 +224,6 @@ const AddEditUserScreen = () => {
         });
         return;
       }
-
-      // setAlertOpts({
-      //   variant: "danger",
-      //   title: "Lỗi hệ thống",
-      //   message:
-      //     error.response?.data?.message ||
-      //     error.response?.message ||
-      //     error.message ||
-      //     error,
-      // });
-
-      // setShowAlert(true);
     }
   };
 
@@ -258,6 +234,13 @@ const AddEditUserScreen = () => {
       const response = await API.user.updateRole(userId, "admin");
 
       await loadUser();
+
+      setAlertOpts({
+        variant: "success",
+        title: "Thông báo",
+        message: response?.message,
+      });
+      handleShowAlert();
     } catch (error) {
       setAlertOpts({
         variant: "danger",
@@ -268,8 +251,7 @@ const AddEditUserScreen = () => {
           error.message ||
           error,
       });
-      setShowAlert(true);
-      toast.error(error.response?.message || error.massage);
+      handleShowAlert();
     }
   }
 
@@ -315,11 +297,7 @@ const AddEditUserScreen = () => {
         alwaysShown={true}
       />
       <h2 className="fw-bold mb-2 text-uppercase ">
-        {loading
-          ? "Loading..."
-          : isExistUser
-          ? "Cập nhật tài khoản"
-          : "Thêm tài khoản mới"}
+        {isExistUser ? "Cập nhật tài khoản" : "Thêm tài khoản mới"}
       </h2>
       {
         //! FORM SubCategoryFormComponent
@@ -328,8 +306,8 @@ const AddEditUserScreen = () => {
         <Col md={8} lg={6}>
           <UserFormComponent
             initialValues={initialValues}
-            user={user}
-            onSubmit={handleSubmitChangeInformation}
+            loading={loading}
+            onSubmit={handleSubmitAddEdit}
           />
           {userId && (
             <>
@@ -346,7 +324,7 @@ const AddEditUserScreen = () => {
         {isAdminController && userId && (
           <Col md={{ span: 3, offset: 1 }} lg={{ span: 5, offset: 1 }}>
             <span className="me-2">
-              {isAdmin ? "Admin đang được bật" : "Admin đang bị tắt"}
+              Quyền Admin: 
             </span>
             <Button
               variant={isAdmin ? "danger" : "success"}
