@@ -3,7 +3,7 @@ Người quản lý có thể quản lý sản phẩm, quản lý tài khoản k
 
 0. Shop - Cửa hàng
 - Thể hiện toàn bộ sản phẩm, và công cụ để lọc sản phẩm theo sở thích người dùng.
-![image](https://github.com/victhangnguyen/foxv-ecommerce-beta/assets/97330371/ba6e9c85-1fb7-4192-9cb9-0f1b08696444)
+![image](https://github.com/victhangnguyen/foxv-ecommerce-beta/assets/97330371/eb1a6111-24b7-4c60-8c17-c87f090d05bc)
 
 1.	Chức năng Đăng ký người dùng mới
 Để trở thành thành viên của hệ thống, Người sử dụng cần phải đăng ký tài khoản.
